@@ -28,6 +28,14 @@ export class TestExplorer implements vscode.TreeDataProvider<TestExplorerItem> {
 		const parent = item || this.tree;
 		return parent ? parent.children : [];
 	}
+
+	reload(): void {
+		this.adapter.reloadTests();
+	}
+
+	start(): void {
+		this.adapter.startTests([]);
+	}
 }
 
 function transform(item: TestItem): TestExplorerItem {

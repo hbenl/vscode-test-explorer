@@ -46,6 +46,26 @@
           "name": "Test Explorer"
         }
       ]
+    },
+    "commands":[
+      {
+        "command": "extension.test-explorer.reload",
+        "title": "Test Explorer: Reload the test tree"
+      },
+      {
+        "command": "extension.test-explorer.start",
+        "title": "Test Explorer: Run tests"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "extension.test-explorer.reload"
+        },
+        {
+          "command": "extension.test-explorer.start"
+        }
+      ]
     }
   }
 }
