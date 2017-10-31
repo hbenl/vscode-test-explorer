@@ -14,7 +14,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TestExplorerItem> {
 		this.onDidChangeTreeData = this.treeDataChanged.event;
 
 		this.adapter.tests.subscribe((suite) => {
-			this.tree = TestExplorerTree.from(suite);
+			this.tree = TestExplorerTree.from(suite, this.tree);
 			this.treeDataChanged.fire();
 		});
 

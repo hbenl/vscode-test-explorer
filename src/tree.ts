@@ -8,9 +8,10 @@ export class TestExplorerTree {
 		public readonly itemsById: Map<string, TestExplorerItem>
 	) {}
 
-	static from(testItem: TestItem): TestExplorerTree {
+	static from(testItem: TestItem, oldTree?: TestExplorerTree): TestExplorerTree {
 		const itemsById = new Map<string, TestExplorerItem>();
-		const root = transform(testItem, itemsById);
+		const oldItemsById = oldTree ? oldTree.itemsById : undefined;
+		const root = transform(testItem, itemsById, oldItemsById);
 		return new TestExplorerTree(root, itemsById);
 	}
 }
@@ -19,19 +20,26 @@ export class TestExplorerItem extends vscode.TreeItem {
 	constructor(
 		public readonly testItem: TestItem,
 		public readonly children: TestExplorerItem[],
-		collapsibleState: vscode.TreeItemCollapsibleState
+		collapsibleState?: vscode.TreeItemCollapsibleState
 	) {
 		super(testItem.label, collapsibleState);
 	}
 }
 
-function transform(item: TestItem, itemsById: Map<string, TestExplorerItem>): TestExplorerItem {
+function transform(
+	item: TestItem,
+	itemsById: Map<string, TestExplorerItem>,
+	oldItemsById?: Map<string, TestExplorerItem>
+): TestExplorerItem {
 
+	const oldItem = oldItemsById ? oldItemsById.get(item.id) : undefined;
 	let result: TestExplorerItem;
+
 	if (item.type === 'suite') {
 
-		var children = item.children.map((child) => transform(child, itemsById));
-		result = new TestExplorerItem(item, children, vscode.TreeItemCollapsibleState.Collapsed);
+		const children = item.children.map((child) => transform(child, itemsById, oldItemsById));
+		const collapsibleState = oldItem ? oldItem.collapsibleState : vscode.TreeItemCollapsibleState.Collapsed;
+		result = new TestExplorerItem(item, children, collapsibleState);
 
 	} else {
 
