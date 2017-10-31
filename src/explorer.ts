@@ -61,7 +61,20 @@ export class TestExplorer implements vscode.TreeDataProvider<TestExplorerItem> {
 		this.adapter.reloadTests();
 	}
 
-	start(): void {
-		this.adapter.startTests([]);
+	start(item: TestExplorerItem | undefined): void {
+
+		let testIds: string[] = [];
+
+		if (item) {
+			testIds = item.collectTestIds();
+		} else {
+			if (this.tree) {
+				testIds = this.tree.root.collectTestIds();
+			}
+		}
+
+		if (testIds.length === 0) return;
+
+		this.adapter.startTests(testIds);
 	}
 }

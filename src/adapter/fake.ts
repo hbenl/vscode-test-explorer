@@ -54,14 +54,15 @@ export class FakeAdapter implements TestRunnerAdapter {
 	}
 
 	async startTests(tests: string[]): Promise<void> {
+		let successToggle = true;
 		await delay(500);
-		this.statesSubject.next({ testId: 'Test1', state: 'running' });
-		await delay(1000);
-		this.statesSubject.next({ testId: 'Test1', state: 'success' });
-		await delay(500);
-		this.statesSubject.next({ testId: 'Test2', state: 'running' });
-		await delay(1000);
-		this.statesSubject.next({ testId: 'Test2', state: 'error' });
+		for (const testId of tests) {
+			this.statesSubject.next({ testId, state: 'running' });
+			await delay(1000);
+			this.statesSubject.next({ testId, state: successToggle ? 'success' : 'error' });
+			successToggle = !successToggle;
+			await delay(200);
+		}
 	}
 }
 

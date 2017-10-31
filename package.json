@@ -65,6 +65,11 @@
         {
           "command": "extension.test-explorer.start"
         }
+      ],
+      "view/item/context": [
+        {
+          "command": "extension.test-explorer.start"
+        }
       ]
     }
   }

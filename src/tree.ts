@@ -34,6 +34,23 @@ export class TestExplorerItem extends vscode.TreeItem {
 		super(testItem.label, collapsibleState);
 		this.iconPath = iconPath;
 	}
+
+	collectTestIds(): string[] {
+
+		if (this.testItem.type === 'suite') {
+
+			let testIds: string[] = [];
+			for (const child of this.children) {
+				testIds = testIds.concat(child.collectTestIds());
+			}
+			return testIds;
+
+		} else {
+
+			return [ this.testItem.id ];
+
+		}
+	}
 }
 
 function transform(
@@ -50,7 +67,7 @@ function transform(
 
 		const children = item.children.map(
 			(child) => transform(child, itemsById, oldItemsById, defaultIconPath));
-		const collapsibleState = oldItem ? oldItem.collapsibleState : vscode.TreeItemCollapsibleState.Collapsed;
+		const collapsibleState = oldItem ? oldItem.collapsibleState : vscode.TreeItemCollapsibleState.Expanded;
 
 		result = new TestExplorerItem(item, children, collapsibleState);
 
