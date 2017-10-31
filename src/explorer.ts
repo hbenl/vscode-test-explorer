@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
-import { TestRunnerAdapter, TestItem } from './adapter/api';
+import { TestRunnerAdapter } from './adapter/api';
+import { TestExplorerTree, TestExplorerItem } from './tree';
 
 export class TestExplorer implements vscode.TreeDataProvider<TestExplorerItem> {
 
-	private tree?: TestExplorerItem;
+	private tree?: TestExplorerTree;
 	private readonly treeDataChanged = new vscode.EventEmitter<TestExplorerItem>();
 	public readonly onDidChangeTreeData: vscode.Event<TestExplorerItem>;
 
@@ -13,7 +14,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TestExplorerItem> {
 		this.onDidChangeTreeData = this.treeDataChanged.event;
 
 		this.adapter.tests.subscribe((suite) => {
-			this.tree = transform(suite);
+			this.tree = TestExplorerTree.from(suite);
 			this.treeDataChanged.fire();
 		});
 
@@ -25,7 +26,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TestExplorerItem> {
 	}
 
 	getChildren(item?: TestExplorerItem): vscode.ProviderResult<TestExplorerItem[]> {
-		const parent = item || this.tree;
+		const parent = item || (this.tree ? this.tree.root : undefined);
 		return parent ? parent.children : [];
 	}
 
@@ -35,29 +36,5 @@ export class TestExplorer implements vscode.TreeDataProvider<TestExplorerItem> {
 
 	start(): void {
 		this.adapter.startTests([]);
-	}
-}
-
-function transform(item: TestItem): TestExplorerItem {
-
-	if (item.type === 'suite') {
-
-		var children = item.children.map(transform);
-		return new TestExplorerItem(item, children, vscode.TreeItemCollapsibleState.Collapsed);
-
-	} else {
-
-		return new TestExplorerItem(item, [], vscode.TreeItemCollapsibleState.None);
-		
-	}
-}
-
-class TestExplorerItem extends vscode.TreeItem {
-	constructor(
-		public readonly testItem: TestItem,
-		public readonly children: TestExplorerItem[],
-		collapsibleState: vscode.TreeItemCollapsibleState
-	) {
-		super(testItem.label, collapsibleState);
 	}
 }

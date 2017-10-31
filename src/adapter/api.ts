@@ -2,16 +2,19 @@ import { Observable } from 'rxjs';
 
 export type TestItem = TestSuite | Test;
 
-export interface TestSuite {
-	type: 'suite';
+interface TestItemBase {
+	type: string;
+	id: string;
 	label: string;
+}
+
+export interface TestSuite extends TestItemBase {
+	type: 'suite';
 	readonly children: TestItem[];
 }
 
-export interface Test {
+export interface Test extends TestItemBase {
 	type: 'test';
-	id: string;
-	label: string;
 }
 
 export interface TestState {

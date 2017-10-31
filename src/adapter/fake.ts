@@ -8,6 +8,7 @@ export class FakeAdapter implements TestRunnerAdapter {
 
 	private readonly tree: TestSuite = {
 		type: 'suite',
+		id: 'root',
 		label: 'Root',
 		children: [
 			<Test> {
@@ -22,6 +23,7 @@ export class FakeAdapter implements TestRunnerAdapter {
 			},
 			<TestSuite> {
 				type: 'suite',
+				id: 'Suite1',
 				label: 'Test Suite',
 				children: [
 					<Test> {
