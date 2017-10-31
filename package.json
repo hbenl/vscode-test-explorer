@@ -28,7 +28,6 @@
     "tslib": "^1.8.0"
   },
   "devDependencies": {
-    "@types/rx-node": "0.0.5",
     "typescript": "^2.5.3",
     "vsce": "^1.32.0",
     "vscode": "^1.1.6"

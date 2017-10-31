@@ -1,10 +1,10 @@
-import Rx from 'rxjs';
-import { TestRunnerAdapter, TestSuite, TestState, Test } from './api';
+import { Observable, Subject } from 'rxjs';
+import { TestRunnerAdapter, TestSuite, Test, TestState } from './api';
 
 export class FakeAdapter implements TestRunnerAdapter {
 
-	private readonly testsSubject = new Rx.Subject<TestSuite>();
-	private readonly statesSubject = new Rx.Subject<TestState>();
+	private readonly testsSubject = new Subject<TestSuite>();
+	private readonly statesSubject = new Subject<TestState>();
 
 	private readonly tree: TestSuite = {
 		type: 'suite',
@@ -23,11 +23,11 @@ export class FakeAdapter implements TestRunnerAdapter {
 		]
 	};
 
-	get tests(): Rx.Observable<TestSuite> {
+	get tests(): Observable<TestSuite> {
 		return this.testsSubject.asObservable();
 	}
 
-	get testStates(): Rx.Observable<TestState> {
+	get testStates(): Observable<TestState> {
 		return this.statesSubject.asObservable();
 	}
 	
