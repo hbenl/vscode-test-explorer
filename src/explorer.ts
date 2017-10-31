@@ -43,11 +43,11 @@ function transform(item: TestItem): TestExplorerItem {
 	if (item.type === 'suite') {
 
 		var children = item.children.map(transform);
-		return new TestExplorerItem(item, children);
+		return new TestExplorerItem(item, children, vscode.TreeItemCollapsibleState.Collapsed);
 
 	} else {
 
-		return new TestExplorerItem(item, []);
+		return new TestExplorerItem(item, [], vscode.TreeItemCollapsibleState.None);
 		
 	}
 }
@@ -55,8 +55,9 @@ function transform(item: TestItem): TestExplorerItem {
 class TestExplorerItem extends vscode.TreeItem {
 	constructor(
 		public readonly testItem: TestItem,
-		public readonly children: TestExplorerItem[]
+		public readonly children: TestExplorerItem[],
+		collapsibleState: vscode.TreeItemCollapsibleState
 	) {
-		super(testItem.label);
+		super(testItem.label, collapsibleState);
 	}
 }

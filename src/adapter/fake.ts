@@ -19,6 +19,22 @@ export class FakeAdapter implements TestRunnerAdapter {
 				type: 'test',
 				id: 'Test2',
 				label: 'Test #2'
+			},
+			<TestSuite> {
+				type: 'suite',
+				label: 'Test Suite',
+				children: [
+					<Test> {
+						type: 'test',
+						id: 'Test3',
+						label: 'Test #3'
+					},
+					<Test> {
+						type: 'test',
+						id: 'Test4',
+						label: 'Test #4'
+					}
+				]
 			}
 		]
 	};
