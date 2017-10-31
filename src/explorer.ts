@@ -9,12 +9,39 @@ export class TestExplorer implements vscode.TreeDataProvider<TestExplorerItem> {
 	public readonly onDidChangeTreeData: vscode.Event<TestExplorerItem>;
 
 	constructor(
+		context: vscode.ExtensionContext,
 		private readonly adapter: TestRunnerAdapter
 	) {
 		this.onDidChangeTreeData = this.treeDataChanged.event;
 
 		this.adapter.tests.subscribe((suite) => {
-			this.tree = TestExplorerTree.from(suite, this.tree);
+			this.tree = TestExplorerTree.from(suite, this.tree, context.asAbsolutePath('icons/pending.svg'));
+			this.treeDataChanged.fire();
+		});
+
+		this.adapter.testStates.subscribe((testState) => {
+
+			if (!this.tree) return;
+			const item = this.tree.itemsById.get(testState.testId);
+			if (!item) return;
+
+			switch(testState.state) {
+				case 'running':
+					item.iconPath = {
+						dark: context.asAbsolutePath('icons/running-dark.svg'),
+						light: context.asAbsolutePath('icons/running-light.svg')
+					};
+					break;
+
+				case 'success':
+					item.iconPath = context.asAbsolutePath('icons/success.svg');
+					break;
+
+				case 'error':
+					item.iconPath = context.asAbsolutePath('icons/error.svg');
+					break;
+			}
+
 			this.treeDataChanged.fire();
 		});
 
