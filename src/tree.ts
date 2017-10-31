@@ -73,7 +73,9 @@ function transform(
 
 	} else {
 
-		result = new TestExplorerItem(item, [], vscode.TreeItemCollapsibleState.None, defaultIconPath);
+		const iconPath = oldItem ? oldItem.iconPath : defaultIconPath;
+
+		result = new TestExplorerItem(item, [], vscode.TreeItemCollapsibleState.None, iconPath);
 
 	}
 
