@@ -1,0 +1,13 @@
+{
+  "files.exclude": {
+    ".git": true,
+    "node_modules": true,
+    "out": true
+  },
+  "editor.insertSpaces": false,
+  "editor.tabSize": 4,
+  "[json]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2
+  }
+}

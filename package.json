@@ -1,0 +1,52 @@
+{
+  "name": "vscode-test-explorer",
+  "displayName": "Test Explorer for Visual Studio Code",
+  "description": "Run your tests in the Sidebar of Visual Studio Code",
+  "author": "Holger Benl <hbenl@evandor.de>",
+  "publisher": "hbenl",
+  "version": "0.0.1",
+  "license": "MIT",
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "test"
+  ],
+  "main": "out/main.js",
+  "scripts": {
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "reinstall": "rimraf node_modules package-lock.json && npm install",
+    "clean": "rimraf out vscode-test-explorer-*.vsix",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "rebuild": "npm run clean && npm run build",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "dependencies": {
+    "rxjs": "^5.5.2",
+    "tslib": "^1.8.0"
+  },
+  "devDependencies": {
+    "@types/rx-node": "0.0.5",
+    "typescript": "^2.5.3",
+    "vsce": "^1.32.0",
+    "vscode": "^1.1.6"
+  },
+  "engines": {
+    "vscode": "^1.17.0"
+  },
+  "activationEvents": [
+    "onView:extension.test-explorer.tests"
+  ],
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "extension.test-explorer.tests",
+          "name": "Test Explorer"
+        }
+      ]
+    }
+  }
+}
