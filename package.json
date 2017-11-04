@@ -24,10 +24,14 @@
     "publish": "vsce publish"
   },
   "dependencies": {
+    "escape-string-regexp": "^1.0.5",
+    "mocha": "^4.0.1",
     "rxjs": "^5.5.2",
     "tslib": "^1.8.0"
   },
   "devDependencies": {
+    "@types/escape-string-regexp": "0.0.32",
+    "@types/mocha": "^2.2.44",
     "typescript": "^2.5.3",
     "vsce": "^1.32.0",
     "vscode": "^1.1.6"
@@ -47,7 +51,7 @@
         }
       ]
     },
-    "commands":[
+    "commands": [
       {
         "command": "extension.test-explorer.reload",
         "title": "Test Explorer: Reload the test tree"

@@ -16,6 +16,7 @@
   },
   "include": [
     "src/main.ts",
+    "src/adapter/*/worker/*.ts",
     "src/typings/*.d.ts"
   ]
 }
