@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
-<path fill="gray" d="M1576 927l-1328 738q-23 13-39.5 3t-16.5-36v-1472q0-26 16.5-36t39.5 3l1328 738q23 13 23 31t-23 31z"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+	<defs>
+		<mask id="mask" x="0" y="0" width="16" height="16">
+			<circle cx="8" cy="8" r="7" style="fill: white;"/>
+			<path d="M6,4.5 L6,11.5 M10,4.5 L10,11.5" style="stroke: black; stroke-width: 2.5;"/>
+		</mask>
+	</defs>
+	<rect x="0" y="0" width="16" height="16" style="fill: #4070f0; mask: url(#mask);"/>
 </svg>

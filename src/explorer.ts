@@ -27,10 +27,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TestExplorerItem> {
 
 			switch(testState.state) {
 				case 'running':
-					item.iconPath = {
-						dark: context.asAbsolutePath('icons/running-dark.svg'),
-						light: context.asAbsolutePath('icons/running-light.svg')
-					};
+					item.iconPath = context.asAbsolutePath('icons/running.svg');
 					break;
 
 				case 'success':

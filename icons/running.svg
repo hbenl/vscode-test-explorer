@@ -3,8 +3,8 @@
 	<defs>
 		<mask id="mask" x="0" y="0" width="16" height="16">
 			<circle cx="8" cy="8" r="7" style="fill: white;"/>
-			<path d="M4.5,4.5 L11.5,11.5 M4.5,11.5 L11.5,4.5" style="stroke: black; stroke-width: 2px;"/>
+			<path d="M5,4 L13,8 L5,12 X" style="fill: black;"/>
 		</mask>
 	</defs>
-	<rect x="0" y="0" width="16" height="16" style="fill: #c04040; mask: url(#mask);"/>
+	<rect x="0" y="0" width="16" height="16" style="fill: #4070f0; mask: url(#mask);"/>
 </svg>
