@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import { TestExplorer } from './explorer';
-import { FakeAdapter } from './adapter/fake';
+import { MochaAdapter } from './adapter/mocha/adapter';
 
 export function activate(context: vscode.ExtensionContext) {
 
-	const testExplorer = new TestExplorer(context, new FakeAdapter());
+	const testExplorer = new TestExplorer(context, new MochaAdapter());
 
 	context.subscriptions.push(vscode.commands.registerCommand(
 		'extension.test-explorer.reload', () => testExplorer.reload()
