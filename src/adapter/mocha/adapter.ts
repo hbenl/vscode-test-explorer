@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
 import { fork } from 'child_process';
 import { Observable, Subject } from 'rxjs';
-import { TestRunnerAdapter, TestSuite, TestState } from '../api';
+import { TestRunnerAdapter, TestSuite, TestStateMessage } from '../api';
 
 export class MochaAdapter implements TestRunnerAdapter {
 
 	private testFiles: string[];
 
 	private readonly testsSubject = new Subject<TestSuite>();
-	private readonly statesSubject = new Subject<TestState>();
+	private readonly statesSubject = new Subject<TestStateMessage>();
 
 	constructor() {
 		const config = vscode.workspace.getConfiguration('test-explorer');
@@ -19,7 +19,7 @@ export class MochaAdapter implements TestRunnerAdapter {
 		return this.testsSubject.asObservable();
 	}
 
-	get testStates(): Observable<TestState> {
+	get testStates(): Observable<TestStateMessage> {
 		return this.statesSubject.asObservable();
 	}
 
@@ -54,7 +54,7 @@ export class MochaAdapter implements TestRunnerAdapter {
 				{ execArgv: [] }
 			);
 
-			childProc.on('message', message => this.statesSubject.next(<TestState>message));
+			childProc.on('message', message => this.statesSubject.next(<TestStateMessage>message));
 
 			childProc.on('exit', () => resolve());
 		});

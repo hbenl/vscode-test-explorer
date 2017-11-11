@@ -17,14 +17,14 @@ export interface Test extends TestItemBase {
 	type: 'test';
 }
 
-export interface TestState {
+export interface TestStateMessage {
 	testId: string;
-	state: 'running' | 'success' | 'error';
+	state: 'running' | 'passed' | 'failed';
 }
 
 export interface TestRunnerAdapter {
 	readonly tests: Observable<TestSuite>;
 	reloadTests(): void;
-	readonly testStates: Observable<TestState>;
+	readonly testStates: Observable<TestStateMessage>;
 	startTests(tests: string[]): Promise<void>;
 }

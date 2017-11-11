@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import * as Mocha from 'mocha';
 import * as RegExEscape from 'escape-string-regexp';
-import { TestState } from '../../api';
+import { TestStateMessage } from '../../api';
 
 let sendMessage: (message: any) => void;
 
@@ -10,7 +10,7 @@ class Reporter {
 	constructor(runner: EventEmitter) {
 
 		runner.on('test', (test: Mocha.ITest) => {
-			const state: TestState = {
+			const state: TestStateMessage = {
 				testId: test.fullTitle(),
 				state: 'running'
 			};
@@ -18,17 +18,17 @@ class Reporter {
 		});
 
 		runner.on('pass', (test: Mocha.ITest) => {
-			const state: TestState = {
+			const state: TestStateMessage = {
 				testId: test.fullTitle(),
-				state: 'success'
+				state: 'passed'
 			};
 			sendMessage(state);
 		});
 
 		runner.on('fail', (test: Mocha.ITest) => {
-			const state: TestState = {
+			const state: TestStateMessage = {
 				testId: test.fullTitle(),
-				state: 'error'
+				state: 'failed'
 			};
 			sendMessage(state);
 		});

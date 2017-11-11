@@ -1,12 +1,13 @@
 import * as vscode from 'vscode';
 import { TestRunnerAdapter } from './adapter/api';
-import { TestExplorerTree, TestExplorerItem } from './tree';
+import { TestExplorerTree, TreeItem } from './tree';
+import { IconPaths } from './iconPaths';
 
-export class TestExplorer implements vscode.TreeDataProvider<TestExplorerItem> {
+export class TestExplorer implements vscode.TreeDataProvider<TreeItem> {
 
 	private tree?: TestExplorerTree;
-	private readonly treeDataChanged = new vscode.EventEmitter<TestExplorerItem>();
-	public readonly onDidChangeTreeData: vscode.Event<TestExplorerItem>;
+	private readonly treeDataChanged = new vscode.EventEmitter<TreeItem>();
+	public readonly onDidChangeTreeData: vscode.Event<TreeItem>;
 
 	constructor(
 		context: vscode.ExtensionContext,
@@ -15,41 +16,30 @@ export class TestExplorer implements vscode.TreeDataProvider<TestExplorerItem> {
 		this.onDidChangeTreeData = this.treeDataChanged.event;
 
 		this.adapter.tests.subscribe((suite) => {
-			this.tree = TestExplorerTree.from(suite, this.tree, context.asAbsolutePath('icons/pending.svg'));
+
+			this.tree = TestExplorerTree.from(
+				suite, this.tree, this.treeDataChanged, new IconPaths(context));
+
 			this.treeDataChanged.fire();
 		});
 
-		this.adapter.testStates.subscribe((testState) => {
+		this.adapter.testStates.subscribe((testStateMessage) => {
 
 			if (!this.tree) return;
-			const item = this.tree.itemsById.get(testState.testId);
+			const item = this.tree.itemsById.get(testStateMessage.testId);
 			if (!item) return;
 
-			switch(testState.state) {
-				case 'running':
-					item.iconPath = context.asAbsolutePath('icons/running.svg');
-					break;
-
-				case 'success':
-					item.iconPath = context.asAbsolutePath('icons/success.svg');
-					break;
-
-				case 'error':
-					item.iconPath = context.asAbsolutePath('icons/error.svg');
-					break;
-			}
-
-			this.treeDataChanged.fire();
+			item.setCurrentState(testStateMessage.state);
 		});
 
 		this.adapter.reloadTests();
 	}
 
-	getTreeItem(item: TestExplorerItem): vscode.TreeItem {
+	getTreeItem(item: TreeItem): vscode.TreeItem {
 		return item;
 	}
 
-	getChildren(item?: TestExplorerItem): vscode.ProviderResult<TestExplorerItem[]> {
+	getChildren(item?: TreeItem): vscode.ProviderResult<TreeItem[]> {
 		const parent = item || (this.tree ? this.tree.root : undefined);
 		return parent ? parent.children : [];
 	}
@@ -58,19 +48,20 @@ export class TestExplorer implements vscode.TreeDataProvider<TestExplorerItem> {
 		this.adapter.reloadTests();
 	}
 
-	start(item: TestExplorerItem | undefined): void {
+	start(item: TreeItem | undefined): void {
+
+		if (!this.tree) return;
 
 		let testIds: string[] = [];
-
 		if (item) {
 			testIds = item.collectTestIds();
 		} else {
-			if (this.tree) {
-				testIds = this.tree.root.collectTestIds();
-			}
+			testIds = this.tree.root.collectTestIds();
 		}
 
 		if (testIds.length === 0) return;
+
+		this.tree.root.shiftState();
 
 		this.adapter.startTests(testIds);
 	}
