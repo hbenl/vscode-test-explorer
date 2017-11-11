@@ -1,13 +1,19 @@
+import * as vscode from 'vscode';
 import { fork } from 'child_process';
 import { Observable, Subject } from 'rxjs';
 import { TestRunnerAdapter, TestSuite, TestState } from '../api';
 
 export class MochaAdapter implements TestRunnerAdapter {
 
+	private testFiles: string[];
+
 	private readonly testsSubject = new Subject<TestSuite>();
 	private readonly statesSubject = new Subject<TestState>();
 
-	constructor(private readonly config: MochaAdapterConfig) {}
+	constructor() {
+		const config = vscode.workspace.getConfiguration('test-explorer');
+		this.testFiles = config.get('files') || [];
+	}
 
 	get tests(): Observable<TestSuite> {
 		return this.testsSubject.asObservable();
@@ -23,7 +29,7 @@ export class MochaAdapter implements TestRunnerAdapter {
 
 		const childProc = fork(
 			require.resolve('./worker/loadTests.js'),
-			[ JSON.stringify(this.config.tests) ],
+			[ JSON.stringify(this.testFiles) ],
 			{ execArgv: [] }
 		);
 
@@ -44,7 +50,7 @@ export class MochaAdapter implements TestRunnerAdapter {
 
 			const childProc = fork(
 				require.resolve('./worker/runTests.js'),
-				[ JSON.stringify(this.config.tests), JSON.stringify(tests) ],
+				[ JSON.stringify(this.testFiles), JSON.stringify(tests) ],
 				{ execArgv: [] }
 			);
 
@@ -53,8 +59,4 @@ export class MochaAdapter implements TestRunnerAdapter {
 			childProc.on('exit', () => resolve());
 		});
 	}
-}
-
-export interface MochaAdapterConfig {
-	tests: string[];
 }
