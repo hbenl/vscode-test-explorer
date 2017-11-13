@@ -2,25 +2,28 @@ import * as vscode from 'vscode';
 import { TestRunnerAdapter } from './adapter/api';
 import { TestExplorerTree, TreeItem } from './tree';
 import { IconPaths } from './iconPaths';
+import { TreeEventDebouncer } from './debouncer';
 
 export class TestExplorer implements vscode.TreeDataProvider<TreeItem> {
 
 	private tree?: TestExplorerTree;
+	private debouncer: TreeEventDebouncer;
 	private readonly treeDataChanged = new vscode.EventEmitter<TreeItem>();
 	public readonly onDidChangeTreeData: vscode.Event<TreeItem>;
-
+	
 	constructor(
 		context: vscode.ExtensionContext,
 		private readonly adapter: TestRunnerAdapter
 	) {
+		this.debouncer = new TreeEventDebouncer(this.treeDataChanged);
 		this.onDidChangeTreeData = this.treeDataChanged.event;
-
+		
 		this.adapter.tests.subscribe((suite) => {
 
 			this.tree = TestExplorerTree.from(
-				suite, this.tree, this.treeDataChanged, new IconPaths(context));
+				suite, this.tree, this.debouncer, new IconPaths(context));
 
-			this.treeDataChanged.fire();
+			this.debouncer.itemChanged(this.tree.root);
 		});
 
 		this.adapter.testStates.subscribe((testStateMessage) => {
@@ -62,6 +65,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeItem> {
 		if (testIds.length === 0) return;
 
 		this.tree.root.shiftState();
+		this.debouncer.itemChanged(this.tree.root);
 
 		this.adapter.startTests(testIds);
 	}

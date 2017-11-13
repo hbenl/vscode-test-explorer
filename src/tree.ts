@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { TestItem } from './adapter/api';
 import { parentItemState, stateIconPath, parentCurrentItemState } from './state';
 import { IconPaths } from './iconPaths';
+import { TreeEventDebouncer } from './debouncer';
 
 export type CurrentItemState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed';
 
@@ -18,28 +19,24 @@ export class TestExplorerTree {
 
 	public get root() { return this._root; }
 	public readonly itemsById = new Map<string, TreeItem>();
-	
+
 	private constructor(
-		private readonly treeDataChanged: vscode.EventEmitter<TreeItem>,
+		public readonly debouncer: TreeEventDebouncer,
 		public readonly iconPaths: IconPaths
 	) {}
 
 	static from(
 		testItem: TestItem,
 		oldTree: TestExplorerTree | undefined,
-		treeDataChanged: vscode.EventEmitter<TreeItem>,
+		debouncer: TreeEventDebouncer,
 		iconPaths: IconPaths
 	): TestExplorerTree {
 
-		const tree = new TestExplorerTree(treeDataChanged, iconPaths);
+		const tree = new TestExplorerTree(debouncer, iconPaths);
 		const oldItemsById = oldTree ? oldTree.itemsById : undefined;
 		tree._root = TreeItem.from(testItem, undefined, tree, oldItemsById);
 
 		return tree;
-	}
-
-	itemChanged(item?: TreeItem) {
-		this.treeDataChanged.fire(item);
 	}
 }
 
@@ -50,7 +47,7 @@ export class TreeItem extends vscode.TreeItem {
 
 	public get state() { return this._state; }
 	public get children() { return this._children; }
-	
+
 	private constructor(
 		public readonly testItem: TestItem,
 		public readonly parent: TreeItem | undefined,
@@ -102,10 +99,11 @@ export class TreeItem extends vscode.TreeItem {
 			this.parent.childStateChanged(this);
 		}
 
-		this.tree.itemChanged(this.parent);
+		this.tree.debouncer.itemChanged(this);
 	}
 
 	childStateChanged(child: TreeItem) {
+		if (!this.parent) return; // the root item doesn't maintain a state since it isn't visible
 
 		const oldState = this.state.current;
 		const newState = parentCurrentItemState(this.children);
@@ -132,8 +130,7 @@ export class TreeItem extends vscode.TreeItem {
 
 		}
 
-		//TODO: why doesn't this work as expected?
-		this.tree.itemChanged(this.parent);
+		this.iconPath = stateIconPath(this.state, this.tree.iconPaths);
 	}
 
 	collectTestIds(): string[] {
