@@ -1,5 +1,14 @@
-import { NodeState, CurrentNodeState, PreviousNodeState, TreeNode } from './tree';
-import { IconPaths } from './iconPaths';
+import { TreeNode } from './tree';
+import { IconPaths } from '../iconPaths';
+
+export type CurrentNodeState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed';
+
+export type PreviousNodeState = 'passed' | 'failed' | 'other';
+
+export interface NodeState {
+	current: CurrentNodeState,
+	previous: PreviousNodeState
+}
 
 export function parentNodeState(children: TreeNode[]): NodeState {
 	return { 

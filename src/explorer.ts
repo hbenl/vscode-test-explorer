@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TestRunnerAdapter } from './adapter/api';
-import { TestExplorerTree, TreeNode } from './tree';
+import { TestExplorerTree, TreeNode } from './tree/tree';
 import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './debouncer';
 

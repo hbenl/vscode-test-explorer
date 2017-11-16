@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TreeNode } from "./tree";
+import { TreeNode } from "./tree/tree";
 
 export class TreeEventDebouncer {
 
