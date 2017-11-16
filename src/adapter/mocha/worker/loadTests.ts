@@ -1,5 +1,5 @@
 import * as Mocha from 'mocha';
-import { TestSuite, Test, TestItem } from '../../api';
+import { TestSuiteInfo, TestInfo, TestTreeInfo } from '../../api';
 
 let sendMessage: (message: any) => void;
 
@@ -33,9 +33,9 @@ function loadTests(searchPaths: string[]) {
 	sendMessage(convertSuite(mocha.suite));
 }
 
-function convertSuite(suite: Mocha.ISuite): TestSuite {
+function convertSuite(suite: Mocha.ISuite): TestSuiteInfo {
 
-	let children: TestItem[] = suite.suites.map(convertSuite);
+	let children: TestTreeInfo[] = suite.suites.map(convertSuite);
 	children = children.concat(suite.tests.map(convertTest));
 
 	return {
@@ -46,7 +46,7 @@ function convertSuite(suite: Mocha.ISuite): TestSuite {
 	};
 }
 
-function convertTest(test: Mocha.ITest): Test {
+function convertTest(test: Mocha.ITest): TestInfo {
 	return {
 		type: 'test',
 		id: test.fullTitle(),

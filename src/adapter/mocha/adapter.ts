@@ -1,13 +1,13 @@
 import * as vscode from 'vscode';
 import { fork } from 'child_process';
 import { Observable, Subject } from 'rxjs';
-import { TestRunnerAdapter, TestSuite, TestStateMessage } from '../api';
+import { TestRunnerAdapter, TestSuiteInfo, TestStateMessage } from '../api';
 
 export class MochaAdapter implements TestRunnerAdapter {
 
 	private testFiles: string[];
 
-	private readonly testsSubject = new Subject<TestSuite>();
+	private readonly testsSubject = new Subject<TestSuiteInfo>();
 	private readonly statesSubject = new Subject<TestStateMessage>();
 
 	constructor() {
@@ -15,7 +15,7 @@ export class MochaAdapter implements TestRunnerAdapter {
 		this.testFiles = config.get('files') || [];
 	}
 
-	get tests(): Observable<TestSuite> {
+	get tests(): Observable<TestSuiteInfo> {
 		return this.testsSubject.asObservable();
 	}
 
@@ -35,7 +35,7 @@ export class MochaAdapter implements TestRunnerAdapter {
 
 		childProc.on('message', message => {
 			testsLoaded = true;
-			this.testsSubject.next(<TestSuite>message);
+			this.testsSubject.next(<TestSuiteInfo>message);
 		});
 
 		childProc.on('exit', () => {

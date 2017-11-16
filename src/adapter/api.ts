@@ -1,29 +1,30 @@
 import { Observable } from 'rxjs';
 
-export type TestItem = TestSuite | Test;
+export type TestTreeInfo = TestInfo | TestSuiteInfo;
 
-interface TestItemBase {
+interface TestTreeInfoBase {
 	type: string;
 	id: string;
 	label: string;
 }
 
-export interface TestSuite extends TestItemBase {
+export interface TestSuiteInfo extends TestTreeInfoBase {
 	type: 'suite';
-	readonly children: TestItem[];
+	readonly children: TestTreeInfo[];
 }
 
-export interface Test extends TestItemBase {
+export interface TestInfo extends TestTreeInfoBase {
 	type: 'test';
 }
 
 export interface TestStateMessage {
 	testId: string;
 	state: 'running' | 'passed' | 'failed';
+	message?: string;
 }
 
 export interface TestRunnerAdapter {
-	readonly tests: Observable<TestSuite>;
+	readonly tests: Observable<TestSuiteInfo>;
 	reloadTests(): void;
 	readonly testStates: Observable<TestStateMessage>;
 	startTests(tests: string[]): Promise<void>;

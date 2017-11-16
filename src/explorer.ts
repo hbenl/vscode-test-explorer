@@ -1,15 +1,15 @@
 import * as vscode from 'vscode';
 import { TestRunnerAdapter } from './adapter/api';
-import { TestExplorerTree, TreeItem } from './tree';
+import { TestExplorerTree, TreeNode } from './tree';
 import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './debouncer';
 
-export class TestExplorer implements vscode.TreeDataProvider<TreeItem> {
+export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 	private tree?: TestExplorerTree;
 	private debouncer: TreeEventDebouncer;
-	private readonly treeDataChanged = new vscode.EventEmitter<TreeItem>();
-	public readonly onDidChangeTreeData: vscode.Event<TreeItem>;
+	private readonly treeDataChanged = new vscode.EventEmitter<TreeNode>();
+	public readonly onDidChangeTreeData: vscode.Event<TreeNode>;
 	
 	constructor(
 		context: vscode.ExtensionContext,
@@ -17,33 +17,35 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeItem> {
 	) {
 		this.debouncer = new TreeEventDebouncer(this.treeDataChanged);
 		this.onDidChangeTreeData = this.treeDataChanged.event;
-		
+
+		const iconPaths = new IconPaths(context);
+
 		this.adapter.tests.subscribe((suite) => {
 
 			this.tree = TestExplorerTree.from(
-				suite, this.tree, this.debouncer, new IconPaths(context));
+				suite, this.tree, this.debouncer, iconPaths);
 
-			this.debouncer.itemChanged(this.tree.root);
+			this.debouncer.nodeChanged(this.tree.root);
 		});
 
 		this.adapter.testStates.subscribe((testStateMessage) => {
 
 			if (!this.tree) return;
-			const item = this.tree.itemsById.get(testStateMessage.testId);
-			if (!item) return;
+			const node = this.tree.nodesById.get(testStateMessage.testId);
+			if (!node) return;
 
-			item.setCurrentState(testStateMessage.state);
+			node.setCurrentState(testStateMessage.state);
 		});
 
 		this.adapter.reloadTests();
 	}
 
-	getTreeItem(item: TreeItem): vscode.TreeItem {
-		return item;
+	getTreeItem(node: TreeNode): vscode.TreeItem {
+		return node.getTreeItem();
 	}
 
-	getChildren(item?: TreeItem): vscode.ProviderResult<TreeItem[]> {
-		const parent = item || (this.tree ? this.tree.root : undefined);
+	getChildren(node?: TreeNode): vscode.ProviderResult<TreeNode[]> {
+		const parent = node || (this.tree ? this.tree.root : undefined);
 		return parent ? parent.children : [];
 	}
 
@@ -51,21 +53,21 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeItem> {
 		this.adapter.reloadTests();
 	}
 
-	start(item: TreeItem | undefined): void {
+	start(node: TreeNode | undefined): void {
 
 		if (!this.tree) return;
 
 		let testIds: string[] = [];
-		if (item) {
-			testIds = item.collectTestIds();
+		if (node) {
+			testIds = node.collectTestIds();
 		} else {
 			testIds = this.tree.root.collectTestIds();
 		}
 
 		if (testIds.length === 0) return;
 
-		this.tree.root.shiftState();
-		this.debouncer.itemChanged(this.tree.root);
+		this.tree.root.deprecateState();
+		this.debouncer.nodeChanged(this.tree.root);
 
 		this.adapter.startTests(testIds);
 	}

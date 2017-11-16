@@ -1,14 +1,14 @@
-import { TreeItem, ItemState, CurrentItemState, PreviousItemState } from './tree';
+import { NodeState, CurrentNodeState, PreviousNodeState, TreeNode } from './tree';
 import { IconPaths } from './iconPaths';
 
-export function parentItemState(children: TreeItem[]): ItemState {
+export function parentNodeState(children: TreeNode[]): NodeState {
 	return { 
-		current: parentCurrentItemState(children),
-		previous: parentPreviousItemState(children)
+		current: parentCurrentNodeState(children),
+		previous: parentPreviousNodeState(children)
 	};
 }
 
-export function parentCurrentItemState(children: TreeItem[]): CurrentItemState {
+export function parentCurrentNodeState(children: TreeNode[]): CurrentNodeState {
 
 	if (children.length === 0) {
 
@@ -33,7 +33,7 @@ export function parentCurrentItemState(children: TreeItem[]): CurrentItemState {
 	}
 }
 
-export function parentPreviousItemState(children: TreeItem[]): PreviousItemState {
+export function parentPreviousNodeState(children: TreeNode[]): PreviousNodeState {
 
 	if (children.length === 0) {
 
@@ -54,7 +54,7 @@ export function parentPreviousItemState(children: TreeItem[]): PreviousItemState
 	}
 }
 
-export function stateIconPath(state: ItemState, iconPaths: IconPaths): string {
+export function stateIconPath(state: NodeState, iconPaths: IconPaths): string {
 
 	switch (state.current) {
 
