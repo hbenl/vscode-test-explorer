@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { TestSuiteInfo } from "../adapter/api";
+import { TestSuiteInfo, TestStateMessage } from "../adapter/api";
 import { TreeNode, TestExplorerTree, treeNodeFrom } from "./tree";
-import { NodeState, CurrentNodeState, stateIconPath, parentNodeState, parentCurrentNodeState } from "./state";
+import { NodeState, stateIconPath, parentNodeState, parentCurrentNodeState, CurrentNodeState } from "./state";
 
 export class TestSuiteNode implements TreeNode {
 
@@ -11,6 +11,8 @@ export class TestSuiteNode implements TreeNode {
 	public get state(): NodeState { return this._state; }
 
 	public get children(): TreeNode[] { return this._children; }
+
+	public get log(): undefined { return undefined; }
 
 	private constructor(
 		private readonly testSuiteInfo: TestSuiteInfo,
@@ -35,9 +37,13 @@ export class TestSuiteNode implements TreeNode {
 		return testSuiteNode;
 	}
 
-	setCurrentState(currentState: CurrentNodeState): void {
+	setCurrentState(stateMessage: TestStateMessage | CurrentNodeState): void {
 
-		this.state.current = currentState;
+		if (typeof stateMessage === 'string') {
+			this.state.current = stateMessage;
+		} else {
+			this.state.current = stateMessage.state;
+		}
 
 		if (this.parent) {
 			this.parent.childStateChanged(this);

@@ -13,6 +13,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 	
 	constructor(
 		context: vscode.ExtensionContext,
+		private readonly outputChannel: vscode.OutputChannel,
 		private readonly adapter: TestRunnerAdapter
 	) {
 		this.debouncer = new TreeEventDebouncer(this.treeDataChanged);
@@ -34,7 +35,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 			const node = this.tree.nodesById.get(testStateMessage.testId);
 			if (!node) return;
 
-			node.setCurrentState(testStateMessage.state);
+			node.setCurrentState(testStateMessage);
 		});
 
 		this.adapter.reloadTests();
@@ -76,5 +77,22 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		this.debouncer.nodeChanged(this.tree.root);
 
 		this.adapter.startTests(testIds);
+	}
+
+	selected(node: TreeNode | undefined): void {
+
+		if (!node) return;
+
+		if (node.log) {
+
+			this.outputChannel.clear();
+			this.outputChannel.append(node.log);
+			this.outputChannel.show(true);
+
+		} else {
+
+			this.outputChannel.hide();
+
+		}
 	}
 }

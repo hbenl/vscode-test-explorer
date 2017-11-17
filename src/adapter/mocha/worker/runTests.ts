@@ -10,27 +10,34 @@ class Reporter {
 	constructor(runner: EventEmitter) {
 
 		runner.on('test', (test: Mocha.ITest) => {
-			const state: TestStateMessage = {
+
+			const stateMessage: TestStateMessage = {
 				testId: test.fullTitle(),
 				state: 'running'
 			};
-			sendMessage(state);
+
+			sendMessage(stateMessage);
 		});
 
 		runner.on('pass', (test: Mocha.ITest) => {
-			const state: TestStateMessage = {
+
+			const stateMessage: TestStateMessage = {
 				testId: test.fullTitle(),
 				state: 'passed'
 			};
-			sendMessage(state);
+
+			sendMessage(stateMessage);
 		});
 
-		runner.on('fail', (test: Mocha.ITest) => {
-			const state: TestStateMessage = {
+		runner.on('fail', (test: Mocha.ITest, err: Error) => {
+
+			const stateMessage: TestStateMessage = {
 				testId: test.fullTitle(),
-				state: 'failed'
+				state: 'failed',
+				message: err.stack || err.message
 			};
-			sendMessage(state);
+
+			sendMessage(stateMessage);
 		});
 	}
 }

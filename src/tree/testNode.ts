@@ -1,14 +1,18 @@
 import * as vscode from 'vscode';
-import { TestInfo } from "../adapter/api";
+import { TestInfo, TestStateMessage } from "../adapter/api";
 import { TreeNode, TestExplorerTree } from "./tree";
-import { NodeState, CurrentNodeState, stateIconPath } from "./state";
+import { NodeState, stateIconPath, CurrentNodeState } from "./state";
 import { TestSuiteNode } from './testSuiteNode';
 
 export class TestNode implements TreeNode {
 
+	private _log: string = "";
+
 	public get state(): NodeState { return this._state; }
 
 	public get children(): TreeNode[] { return []; }
+
+	public get log(): string { return this._log; }
 
 	private constructor(
 		private readonly testInfo: TestInfo,
@@ -33,9 +37,20 @@ export class TestNode implements TreeNode {
 		return testNode;
 	}
 
-	setCurrentState(currentState: CurrentNodeState): void {
+	setCurrentState(stateMessage: TestStateMessage | CurrentNodeState): void {
 
-		this.state.current = currentState;
+		if (typeof stateMessage === 'string') {
+
+			this.state.current = stateMessage;
+
+		} else {
+
+			this.state.current = stateMessage.state;
+
+			if (stateMessage.message) {
+				this._log += stateMessage.message + "\n";
+			}
+		}
 
 		if (this.parent) {
 			this.parent.childStateChanged(this);
@@ -50,6 +65,7 @@ export class TestNode implements TreeNode {
 			this._state = { current: 'pending', previous: this.state.current };
 		}
 
+		this._log = "";
 	}
 
 	collectTestIds(): string[] {
@@ -62,6 +78,11 @@ export class TestNode implements TreeNode {
 
 		const treeItem = new vscode.TreeItem(this.testInfo.label, vscode.TreeItemCollapsibleState.None);
 		treeItem.iconPath = stateIconPath(this.state, this.tree.iconPaths);
+		treeItem.command = {
+			title: '',
+			command: 'extension.test-explorer.selected',
+			arguments: [ this ]
+		};
 
 		return treeItem;
 	}

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TestTreeInfo } from '../adapter/api';
+import { TestTreeInfo, TestStateMessage } from '../adapter/api';
 import { TestNode } from './testNode';
 import { TestSuiteNode } from './testSuiteNode';
 import { NodeState, CurrentNodeState } from './state';
@@ -35,9 +35,10 @@ export class TestExplorerTree {
 
 export interface TreeNode {
 	readonly state: NodeState;
+	readonly log: string | undefined;
 	readonly parent: TestSuiteNode | undefined;
 	readonly children: TreeNode[];
-	setCurrentState(currentState: CurrentNodeState): void;
+	setCurrentState(stateMessage: TestStateMessage | CurrentNodeState): void;
 	deprecateState(): void;
 	collectTestIds(): string[];
 	getTreeItem(): vscode.TreeItem;
