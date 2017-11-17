@@ -1,26 +1,25 @@
 import * as vscode from 'vscode';
 import { fork } from 'child_process';
-import { Observable, Subject } from 'rxjs';
 import { TestRunnerAdapter, TestSuiteInfo, TestStateMessage } from '../api';
 
 export class MochaAdapter implements TestRunnerAdapter {
 
 	private testFiles: string[];
 
-	private readonly testsSubject = new Subject<TestSuiteInfo>();
-	private readonly statesSubject = new Subject<TestStateMessage>();
+	private readonly testsSubject = new vscode.EventEmitter<TestSuiteInfo>();
+	private readonly statesSubject = new vscode.EventEmitter<TestStateMessage>();
 
 	constructor() {
 		const config = vscode.workspace.getConfiguration('test-explorer');
 		this.testFiles = config.get('files') || [];
 	}
 
-	get tests(): Observable<TestSuiteInfo> {
-		return this.testsSubject.asObservable();
+	get tests(): vscode.Event<TestSuiteInfo> {
+		return this.testsSubject.event;
 	}
 
-	get testStates(): Observable<TestStateMessage> {
-		return this.statesSubject.asObservable();
+	get testStates(): vscode.Event<TestStateMessage> {
+		return this.statesSubject.event;
 	}
 
 	reloadTests(): void {
@@ -35,12 +34,12 @@ export class MochaAdapter implements TestRunnerAdapter {
 
 		childProc.on('message', message => {
 			testsLoaded = true;
-			this.testsSubject.next(<TestSuiteInfo>message);
+			this.testsSubject.fire(<TestSuiteInfo>message);
 		});
 
 		childProc.on('exit', () => {
 			if (!testsLoaded) {
-				this.testsSubject.next({ type: 'suite', id: '', label: 'No tests found', children: [] });
+				this.testsSubject.fire({ type: 'suite', id: '', label: 'No tests found', children: [] });
 			}
 		});
 	}
@@ -54,7 +53,7 @@ export class MochaAdapter implements TestRunnerAdapter {
 				{ execArgv: [] }
 			);
 
-			childProc.on('message', message => this.statesSubject.next(<TestStateMessage>message));
+			childProc.on('message', message => this.statesSubject.fire(<TestStateMessage>message));
 
 			childProc.on('exit', () => resolve());
 		});

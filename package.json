@@ -26,7 +26,6 @@
   "dependencies": {
     "escape-string-regexp": "^1.0.5",
     "mocha": "^4.0.1",
-    "rxjs": "^5.5.2",
     "tslib": "^1.8.0"
   },
   "devDependencies": {
@@ -43,7 +42,7 @@
     "onView:extension.test-explorer.tests"
   ],
   "contributes": {
-    "configuration":[
+    "configuration": [
       {
         "title": "Configuration for the Test Explorer extension",
         "properties": {

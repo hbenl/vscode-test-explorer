@@ -20,7 +20,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 		const iconPaths = new IconPaths(context);
 
-		this.adapter.tests.subscribe((suite) => {
+		this.adapter.tests((suite) => {
 
 			this.tree = TestExplorerTree.from(
 				suite, this.tree, this.debouncer, iconPaths);
@@ -28,7 +28,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 			this.debouncer.nodeChanged(this.tree.root);
 		});
 
-		this.adapter.testStates.subscribe((testStateMessage) => {
+		this.adapter.testStates((testStateMessage) => {
 
 			if (!this.tree) return;
 			const node = this.tree.nodesById.get(testStateMessage.testId);

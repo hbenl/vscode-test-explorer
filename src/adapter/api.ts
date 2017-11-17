@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import * as vscode from 'vscode';
 
 export type TestTreeInfo = TestInfo | TestSuiteInfo;
 
@@ -24,8 +24,8 @@ export interface TestStateMessage {
 }
 
 export interface TestRunnerAdapter {
-	readonly tests: Observable<TestSuiteInfo>;
+	readonly tests: vscode.Event<TestSuiteInfo>;
 	reloadTests(): void;
-	readonly testStates: Observable<TestStateMessage>;
+	readonly testStates: vscode.Event<TestStateMessage>;
 	startTests(tests: string[]): Promise<void>;
 }
