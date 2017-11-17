@@ -28,4 +28,5 @@ export interface TestRunnerAdapter {
 	reloadTests(): void;
 	readonly testStates: vscode.Event<TestStateMessage>;
 	startTests(tests: string[]): Promise<void>;
+	cancelTests(): void;
 }

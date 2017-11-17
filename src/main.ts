@@ -18,6 +18,10 @@ export function activate(context: vscode.ExtensionContext) {
 	));
 
 	context.subscriptions.push(vscode.commands.registerCommand(
+		'extension.test-explorer.cancel', () => testExplorer.cancel()
+	));
+
+	context.subscriptions.push(vscode.commands.registerCommand(
 		'extension.test-explorer.selected', (node) => testExplorer.selected(node)
 	));
 

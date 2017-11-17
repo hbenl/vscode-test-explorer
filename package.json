@@ -78,6 +78,10 @@
       {
         "command": "extension.test-explorer.start",
         "title": "Test Explorer: Run tests"
+      },
+      {
+        "command": "extension.test-explorer.cancel",
+        "title": "Test Explorer: Cancel running tests"
       }
     ],
     "menus": {
@@ -87,6 +91,9 @@
         },
         {
           "command": "extension.test-explorer.start"
+        },
+        {
+          "command": "extension.test-explorer.cancel"
         }
       ],
       "view/item/context": [

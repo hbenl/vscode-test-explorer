@@ -79,6 +79,10 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		this.adapter.startTests(testIds);
 	}
 
+	cancel(): void {
+		this.adapter.cancelTests();
+	}
+
 	selected(node: TreeNode | undefined): void {
 
 		if (!node) return;

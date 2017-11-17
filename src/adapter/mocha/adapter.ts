@@ -1,10 +1,12 @@
 import * as vscode from 'vscode';
-import { fork } from 'child_process';
+import { fork, ChildProcess } from 'child_process';
 import { TestRunnerAdapter, TestSuiteInfo, TestStateMessage } from '../api';
 
 export class MochaAdapter implements TestRunnerAdapter {
 
 	private testFiles: string[];
+
+	private runningTestProcess: ChildProcess | undefined;
 
 	private readonly testsSubject = new vscode.EventEmitter<TestSuiteInfo>();
 	private readonly statesSubject = new vscode.EventEmitter<TestStateMessage>();
@@ -47,15 +49,25 @@ export class MochaAdapter implements TestRunnerAdapter {
 	startTests(tests: string[]): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
 
-			const childProc = fork(
+			this.runningTestProcess = fork(
 				require.resolve('./worker/runTests.js'),
 				[ JSON.stringify(this.testFiles), JSON.stringify(tests) ],
 				{ execArgv: [] }
 			);
 
-			childProc.on('message', message => this.statesSubject.fire(<TestStateMessage>message));
+			this.runningTestProcess.on('message', 
+				message => this.statesSubject.fire(<TestStateMessage>message));
 
-			childProc.on('exit', () => resolve());
+			this.runningTestProcess.on('exit', () => {
+				this.runningTestProcess = undefined;
+				resolve();
+			});
 		});
+	}
+
+	cancelTests(): void {
+		if (this.runningTestProcess) {
+			this.runningTestProcess.kill();
+		}
 	}
 }
