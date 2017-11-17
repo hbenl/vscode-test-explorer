@@ -67,6 +67,12 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		if (testIds.length === 0) return;
 
 		this.tree.root.deprecateState();
+		for (const testId of testIds) {
+			const testNode = this.tree.nodesById.get(testId);
+			if (testNode) {
+				testNode.setCurrentState('scheduled');
+			}
+		}
 		this.debouncer.nodeChanged(this.tree.root);
 
 		this.adapter.startTests(testIds);
