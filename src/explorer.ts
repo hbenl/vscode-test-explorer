@@ -54,7 +54,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		this.adapter.reloadTests();
 	}
 
-	start(node: TreeNode | undefined): void {
+	async start(node: TreeNode | undefined): Promise<void> {
 
 		if (!this.tree) return;
 
@@ -76,7 +76,14 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		}
 		this.debouncer.nodeChanged(this.tree.root);
 
-		this.adapter.startTests(testIds);
+		await this.adapter.startTests(testIds);
+
+		for (const testId of testIds) {
+			const testNode = this.tree.nodesById.get(testId);
+			if (testNode && ((testNode.state.current === 'scheduled') || (testNode.state.current === 'running'))) {
+				testNode.setCurrentState('pending');
+			}
+		}
 	}
 
 	cancel(): void {
