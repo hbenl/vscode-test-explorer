@@ -1,7 +1,7 @@
 import { TreeNode } from './tree';
 import { IconPaths } from '../iconPaths';
 
-export type CurrentNodeState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed';
+export type CurrentNodeState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed' | 'running-failed';
 
 export type PreviousNodeState = 'passed' | 'failed' | 'other';
 
@@ -11,7 +11,7 @@ export interface NodeState {
 }
 
 export function parentNodeState(children: TreeNode[]): NodeState {
-	return { 
+	return {
 		current: parentCurrentNodeState(children),
 		previous: parentPreviousNodeState(children)
 	};
@@ -23,9 +23,33 @@ export function parentCurrentNodeState(children: TreeNode[]): CurrentNodeState {
 
 		return 'pending';
 
-	} else if (children.some((child) => ((child.state.current === 'scheduled') || (child.state.current === 'running')))) {
+	} else if (children.some((child) => (child.state.current === 'running'))) {
 
-		return 'running';
+		if (children.some((child) => (child.state.current === 'failed'))) {
+
+			return 'running-failed';
+
+		} else {
+
+			return 'running';
+
+		}
+
+	} else if (children.some((child) => (child.state.current === 'scheduled'))) {
+
+		if (children.some((child) => (child.state.current === 'failed'))) {
+
+			return 'running-failed';
+
+		} else if (children.some((child) => (child.state.current === 'passed'))) {
+
+			return 'running';
+
+		} else {
+
+			return 'scheduled';
+
+		}
 
 	} else if (children.some((child) => (child.state.current === 'failed'))) {
 
@@ -74,6 +98,10 @@ export function stateIconPath(state: NodeState, iconPaths: IconPaths): string {
 		case 'running':
 
 			return iconPaths.running;
+
+		case 'running-failed':
+
+			return iconPaths.runningFailed;
 
 		case 'passed':
 

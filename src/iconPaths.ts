@@ -5,6 +5,7 @@ export class IconPaths {
 	pending: string;
 	scheduled: string;
 	running: string;
+	runningFailed: string;
 	passed: string;
 	failed: string;
 	passedFaint: string;
@@ -14,6 +15,7 @@ export class IconPaths {
 		this.pending = context.asAbsolutePath('icons/pending.svg'),
 		this.scheduled = context.asAbsolutePath('icons/scheduled.svg'),
 		this.running = context.asAbsolutePath('icons/running.svg'),
+		this.runningFailed = context.asAbsolutePath('icons/running-failed.svg'),
 		this.passed = context.asAbsolutePath('icons/passed.svg'),
 		this.failed = context.asAbsolutePath('icons/failed.svg'),
 		this.passedFaint = context.asAbsolutePath('icons/passed-faint.svg'),

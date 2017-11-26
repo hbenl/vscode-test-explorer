@@ -6,5 +6,5 @@
 			<path d="M4.5,4.5 L11.5,11.5 M4.5,11.5 L11.5,4.5" style="stroke: black; stroke-width: 2px;"/>
 		</mask>
 	</defs>
-	<rect x="0" y="0" width="16" height="16" style="fill: #c04040; opacity: 0.4; mask: url(#mask);"/>
+	<rect x="0" y="0" width="16" height="16" style="fill: #c04040; opacity: 0.5; mask: url(#mask);"/>
 </svg>
