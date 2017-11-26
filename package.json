@@ -77,11 +77,13 @@
       },
       {
         "command": "extension.test-explorer.start",
-        "title": "Test Explorer: Run tests"
+        "title": "Test Explorer: Run tests",
+        "icon": "./icons/start.svg"
       },
       {
         "command": "extension.test-explorer.cancel",
-        "title": "Test Explorer: Cancel running tests"
+        "title": "Test Explorer: Cancel running tests",
+        "icon": "./icons/stop.svg"
       }
     ],
     "menus": {
@@ -90,10 +92,14 @@
           "command": "extension.test-explorer.reload"
         },
         {
-          "command": "extension.test-explorer.start"
+          "command": "extension.test-explorer.start",
+          "group": "navigation",
+          "when": "!testsRunning"
         },
         {
-          "command": "extension.test-explorer.cancel"
+          "command": "extension.test-explorer.cancel",
+          "group": "navigation",
+          "when": "testsRunning"
         }
       ],
       "view/item/context": [

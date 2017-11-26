@@ -58,6 +58,8 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 		if (!this.tree) return;
 
+		vscode.commands.executeCommand('setContext', 'testsRunning', true);
+
 		let testIds: string[] = [];
 		if (node) {
 			testIds = node.collectTestIds();
@@ -77,6 +79,8 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		this.debouncer.nodeChanged(this.tree.root);
 
 		await this.adapter.startTests(testIds);
+
+		vscode.commands.executeCommand('setContext', 'testsRunning', false);
 
 		for (const testId of testIds) {
 			const testNode = this.tree.nodesById.get(testId);
