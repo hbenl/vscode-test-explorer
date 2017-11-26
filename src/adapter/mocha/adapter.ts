@@ -65,6 +65,19 @@ export class MochaAdapter implements TestRunnerAdapter {
 		});
 	}
 
+	debugTests(tests: string[]): void {
+
+		vscode.debug.startDebugging(vscode.workspace.workspaceFolders![0], {
+			name: 'Debug Mocha Tests',
+			type: 'node',
+			request: 'launch',
+			program: require.resolve('./worker/runTests.js'),
+			args: [ JSON.stringify(this.testFiles), JSON.stringify(tests) ],
+			cwd: '${workspaceRoot}',
+			stopOnEntry: false
+		});
+	}
+
 	cancelTests(): void {
 		if (this.runningTestProcess) {
 			this.runningTestProcess.kill();

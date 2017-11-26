@@ -22,6 +22,10 @@ export function activate(context: vscode.ExtensionContext) {
 	));
 
 	context.subscriptions.push(vscode.commands.registerCommand(
+		'extension.test-explorer.debug', (node) => testExplorer.debug(node)
+	));
+
+	context.subscriptions.push(vscode.commands.registerCommand(
 		'extension.test-explorer.selected', (node) => testExplorer.selected(node)
 	));
 

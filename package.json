@@ -84,6 +84,10 @@
         "command": "extension.test-explorer.cancel",
         "title": "Test Explorer: Cancel running tests",
         "icon": "./icons/stop.svg"
+      },
+      {
+        "command": "extension.test-explorer.debug",
+        "title": "Test Explorer: Debug tests"
       }
     ],
     "menus": {
@@ -105,6 +109,9 @@
       "view/item/context": [
         {
           "command": "extension.test-explorer.start"
+        },
+        {
+          "command": "extension.test-explorer.debug"
         }
       ]
     }

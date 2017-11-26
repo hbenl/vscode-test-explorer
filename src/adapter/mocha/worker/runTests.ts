@@ -3,8 +3,6 @@ import * as Mocha from 'mocha';
 import * as RegExEscape from 'escape-string-regexp';
 import { TestStateMessage } from '../../api';
 
-let sendMessage: (message: any) => void;
-
 class Reporter {
 
 	constructor(runner: EventEmitter) {
@@ -42,18 +40,12 @@ class Reporter {
 	}
 }
 
-if (process.send) {
-
-	sendMessage = (message) => process.send!(message);
+const sendMessage = process.send ? (message: any) => process.send!(message) : () => {};
 
 	const searchPaths = <string[]>JSON.parse(process.argv[2]);
 	const testsToRun = <string[]>JSON.parse(process.argv[3]);
 
 	runTests(searchPaths, testsToRun);
-
-} else {
-	console.log('This script is designed to run in a child process!');
-}
 
 function runTests(searchPaths: string[], testsToRun: string[]) {
 

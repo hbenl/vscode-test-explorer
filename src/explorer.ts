@@ -60,12 +60,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 		vscode.commands.executeCommand('setContext', 'testsRunning', true);
 
-		let testIds: string[] = [];
-		if (node) {
-			testIds = node.collectTestIds();
-		} else {
-			testIds = this.tree.root.collectTestIds();
-		}
+		const testIds = (node || this.tree.root).collectTestIds();
 
 		if (testIds.length === 0) return;
 
@@ -88,6 +83,17 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 				testNode.setCurrentState('pending');
 			}
 		}
+	}
+
+	debug(node: TreeNode | undefined): void {
+
+		if (!this.tree) return;
+
+		const testIds = (node || this.tree.root).collectTestIds();
+
+		if (testIds.length === 0) return;
+
+		this.adapter.debugTests(testIds);
 	}
 
 	cancel(): void {
