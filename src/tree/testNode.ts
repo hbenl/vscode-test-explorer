@@ -1,62 +1,42 @@
 import * as vscode from 'vscode';
-import { TestInfo, TestStateMessage } from "../adapter/api";
-import { TreeNode, TestExplorerTree } from "./tree";
+import { TestInfo } from "../adapter/api";
+import { TreeNode } from "./treeNode";
 import { NodeState, stateIconPath, CurrentNodeState } from "./state";
 import { TestSuiteNode } from './testSuiteNode';
+import { TestCollectionNode } from './testCollectionNode';
 
 export class TestNode implements TreeNode {
 
+	private _state: NodeState;
 	private _log: string = "";
 
-	public get state(): NodeState { return this._state; }
+	get state(): NodeState { return this._state; }
+	get log(): string { return this._log; }
+	readonly children: TreeNode[] = [];
 
-	public get children(): TreeNode[] { return []; }
-
-	public get log(): string { return this._log; }
-
-	private constructor(
-		private readonly testInfo: TestInfo,
-		private _state: NodeState,
+	constructor(
+		public readonly collection: TestCollectionNode,
+		public readonly info: TestInfo,
 		public readonly parent: TestSuiteNode | undefined,
-		private readonly tree: TestExplorerTree
-	) {}
-
-	static from(
-		testInfo: TestInfo,
-		parent: TestSuiteNode | undefined,
-		tree: TestExplorerTree,
 		oldNodesById: Map<string, TreeNode> | undefined
-	): TestNode {
-
-		const oldNode = oldNodesById ? oldNodesById.get(testInfo.id) : undefined;
-		const state: NodeState = oldNode ? oldNode.state : { current: 'pending', previous: 'other' };
-		const testNode = new TestNode(testInfo, state, parent, tree);
-
-		tree.nodesById.set(testInfo.id, testNode);
-
-		return testNode;
+	) {
+		const oldNode = oldNodesById ? oldNodesById.get(info.id) : undefined;
+		this._state = oldNode ? oldNode.state : { current: 'pending', previous: 'other' };
 	}
 
-	setCurrentState(stateMessage: TestStateMessage | CurrentNodeState): void {
+	setCurrentState(currentState: CurrentNodeState, logMessage?: string): void {
 
-		if (typeof stateMessage === 'string') {
+		this.state.current = currentState;
 
-			this.state.current = stateMessage;
-
-		} else {
-
-			this.state.current = stateMessage.state;
-
-			if (stateMessage.message) {
-				this._log += stateMessage.message + "\n";
-			}
+		if (logMessage) {
+			this._log += logMessage + "\n";
 		}
 
 		if (this.parent) {
 			this.parent.childStateChanged(this);
 		}
 
-		this.tree.debouncer.nodeChanged(this);
+		this.collection.nodeChanged(this);
 	}
 
 	deprecateState(): void {
@@ -68,16 +48,14 @@ export class TestNode implements TreeNode {
 		this._log = "";
 	}
 
-	collectTestIds(): string[] {
-
-		return [ this.testInfo.id ];
-
+	collectTestNodes(testNodes: Map<string, TestNode>): void {
+		testNodes.set(this.info.id, this);
 	}
 
 	getTreeItem(): vscode.TreeItem {
 
-		const treeItem = new vscode.TreeItem(this.testInfo.label, vscode.TreeItemCollapsibleState.None);
-		treeItem.iconPath = stateIconPath(this.state, this.tree.iconPaths);
+		const treeItem = new vscode.TreeItem(this.info.label, vscode.TreeItemCollapsibleState.None);
+		treeItem.iconPath = stateIconPath(this.state, this.collection.iconPaths);
 		treeItem.command = {
 			title: '',
 			command: 'extension.test-explorer.selected',

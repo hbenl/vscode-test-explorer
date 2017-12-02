@@ -1,55 +1,46 @@
 import * as vscode from 'vscode';
-import { TestSuiteInfo, TestStateMessage } from "../adapter/api";
-import { TreeNode, TestExplorerTree, treeNodeFrom } from "./tree";
+import { TestSuiteInfo } from "../adapter/api";
+import { TreeNode } from "./treeNode";
 import { NodeState, stateIconPath, parentNodeState, parentCurrentNodeState, CurrentNodeState } from "./state";
+import { TestCollectionNode } from './testCollectionNode';
+import { TestNode } from './testNode';
 
 export class TestSuiteNode implements TreeNode {
 
 	private _state: NodeState;
 	private _children: TreeNode[];
 
-	public get state(): NodeState { return this._state; }
+	get state(): NodeState { return this._state; }
+	readonly log = undefined;
+	get children(): TreeNode[] { return this._children; }
 
-	public get children(): TreeNode[] { return this._children; }
-
-	public get log(): undefined { return undefined; }
-
-	private constructor(
-		private readonly testSuiteInfo: TestSuiteInfo,
+	constructor(
+		public readonly collection: TestCollectionNode,
+		public readonly info: TestSuiteInfo,
 		public readonly parent: TestSuiteNode | undefined,
-		private readonly tree: TestExplorerTree
-	) {}
-
-	static from(
-		testSuiteInfo: TestSuiteInfo,
-		parent: TestSuiteNode | undefined,
-		tree: TestExplorerTree,
 		oldNodesById: Map<string, TreeNode> | undefined
-	): TestSuiteNode {
+	) {
 
-		const testSuiteNode = new TestSuiteNode(testSuiteInfo, parent, tree);
-		testSuiteNode._children = testSuiteInfo.children.map(
-			(child) => treeNodeFrom(child, testSuiteNode, tree, oldNodesById));
-		testSuiteNode._state = parentNodeState(testSuiteNode._children);
+		this._children = info.children.map((childInfo) => {
+			if (childInfo.type === 'test') {
+				return new TestNode(collection, childInfo, this, oldNodesById);
+			} else {
+				return new TestSuiteNode(collection, childInfo, this, oldNodesById);
+			}
+		});
 
-		tree.nodesById.set(testSuiteInfo.id, testSuiteNode);
-
-		return testSuiteNode;
+		this._state = parentNodeState(this._children);
 	}
 
-	setCurrentState(stateMessage: TestStateMessage | CurrentNodeState): void {
+	setCurrentState(currentState: CurrentNodeState): void {
 
-		if (typeof stateMessage === 'string') {
-			this.state.current = stateMessage;
-		} else {
-			this.state.current = stateMessage.state;
-		}
+		this.state.current = currentState;
 
 		if (this.parent) {
 			this.parent.childStateChanged(this);
 		}
 
-		this.tree.debouncer.nodeChanged(this);
+		this.collection.nodeChanged(this);
 	}
 
 	deprecateState(): void {
@@ -62,7 +53,6 @@ export class TestSuiteNode implements TreeNode {
 	}
 
 	childStateChanged(child: TreeNode): void {
-		if (!this.parent) return; // the root item doesn't maintain a state since it isn't visible
 
 		const oldState = this.state.current;
 		const newState = parentCurrentNodeState(this._children);
@@ -72,21 +62,16 @@ export class TestSuiteNode implements TreeNode {
 		}
 	}
 
-	collectTestIds(): string[] {
-
-		const testIds: string[] = [];
-
+	collectTestNodes(testNodes: Map<string, TestNode>): void {
 		for (const child of this._children) {
-			testIds.push(...child.collectTestIds());
+			child.collectTestNodes(testNodes);
 		}
-
-		return testIds;
 	}
 
 	getTreeItem(): vscode.TreeItem {
 
-		const treeItem = new vscode.TreeItem(this.testSuiteInfo.label, vscode.TreeItemCollapsibleState.Expanded);
-		treeItem.iconPath = stateIconPath(this.state, this.tree.iconPaths);
+		const treeItem = new vscode.TreeItem(this.info.label, vscode.TreeItemCollapsibleState.Expanded);
+		treeItem.iconPath = stateIconPath(this.state, this.collection.iconPaths);
 
 		return treeItem;
 	}

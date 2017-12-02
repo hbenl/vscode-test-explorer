@@ -1,44 +1,48 @@
 import * as vscode from 'vscode';
-import { TestRunnerAdapter } from './adapter/api';
-import { TestExplorerTree, TreeNode } from './tree/tree';
+import { TestCollectionAdapter } from './adapter/api';
+import { TestCollectionNode } from './tree/testCollectionNode';
+import { TreeNode } from './tree/treeNode';
 import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './debouncer';
+import { TestNode } from './tree/testNode';
+import { TestRunScheduler } from './scheduler';
 
 export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
-	private tree?: TestExplorerTree;
-	private debouncer: TreeEventDebouncer;
+	public readonly iconPaths: IconPaths;
+	private readonly debouncer: TreeEventDebouncer;
+
+	private readonly outputChannel: vscode.OutputChannel;
+
 	private readonly treeDataChanged = new vscode.EventEmitter<TreeNode>();
 	public readonly onDidChangeTreeData: vscode.Event<TreeNode>;
-	
+
+	private collections: TestCollectionNode[] = [];
+
+	private scheduler = new TestRunScheduler(this);
+
 	constructor(
-		context: vscode.ExtensionContext,
-		private readonly outputChannel: vscode.OutputChannel,
-		private readonly adapter: TestRunnerAdapter
+		context: vscode.ExtensionContext
 	) {
+
+		this.iconPaths = new IconPaths(context);
 		this.debouncer = new TreeEventDebouncer(this.treeDataChanged);
+
+		this.outputChannel = vscode.window.createOutputChannel("Test Explorer");
+		context.subscriptions.push(this.outputChannel);
+
 		this.onDidChangeTreeData = this.treeDataChanged.event;
+	}
 
-		const iconPaths = new IconPaths(context);
+	registerCollection(adapter: TestCollectionAdapter): void {
+		this.collections.push(new TestCollectionNode(adapter, this));
+	}
 
-		this.adapter.tests((suite) => {
-
-			this.tree = TestExplorerTree.from(
-				suite, this.tree, this.debouncer, iconPaths);
-
-			this.debouncer.nodeChanged(this.tree.root);
-		});
-
-		this.adapter.testStates((testStateMessage) => {
-
-			if (!this.tree) return;
-			const node = this.tree.nodesById.get(testStateMessage.testId);
-			if (!node) return;
-
-			node.setCurrentState(testStateMessage);
-		});
-
-		this.adapter.reloadTests();
+	unregisterCollection(adapter: TestCollectionAdapter): void {
+		var index = this.collections.findIndex((collection) => (collection.adapter === adapter));
+		if (index >= 0) {
+			this.collections.splice(index, 1);
+		}
 	}
 
 	getTreeItem(node: TreeNode): vscode.TreeItem {
@@ -46,58 +50,62 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 	}
 
 	getChildren(node?: TreeNode): vscode.ProviderResult<TreeNode[]> {
-		const parent = node || (this.tree ? this.tree.root : undefined);
-		return parent ? parent.children : [];
+
+		if (node) {
+
+			return node.children;
+
+		} else {
+
+			const nonEmptyCollections = this.collections.filter(
+				(collection) => (collection.suite !== undefined));
+
+			if (nonEmptyCollections.length === 0) {
+
+				return [];
+
+			} else if (nonEmptyCollections.length === 1) {
+
+				return nonEmptyCollections[0].suite!.children;
+
+			} else {
+
+				return nonEmptyCollections.map((collection) => collection.suite!);
+
+			}
+		}
 	}
 
 	reload(): void {
-		this.adapter.reloadTests();
+		for (const collection of this.collections) {
+			collection.adapter.reloadTests();
+		}
 	}
 
-	async start(node: TreeNode | undefined): Promise<void> {
-
-		if (!this.tree) return;
-
-		vscode.commands.executeCommand('setContext', 'testsRunning', true);
-
-		const testIds = (node || this.tree.root).collectTestIds();
-
-		if (testIds.length === 0) return;
-
-		this.tree.root.deprecateState();
-		for (const testId of testIds) {
-			const testNode = this.tree.nodesById.get(testId);
-			if (testNode) {
-				testNode.setCurrentState('scheduled');
-			}
-		}
-		this.debouncer.nodeChanged(this.tree.root);
-
-		await this.adapter.startTests(testIds);
-
-		vscode.commands.executeCommand('setContext', 'testsRunning', false);
-
-		for (const testId of testIds) {
-			const testNode = this.tree.nodesById.get(testId);
-			if (testNode && ((testNode.state.current === 'scheduled') || (testNode.state.current === 'running'))) {
-				testNode.setCurrentState('pending');
+	start(node: TreeNode | undefined): void {
+		if (node) {
+			this.scheduler.schedule(node);
+		} else {
+			for (const collection of this.collections) {
+				this.scheduler.schedule(collection);
 			}
 		}
 	}
 
-	debug(node: TreeNode | undefined): void {
+	async debug(node: TreeNode): Promise<void> {
 
-		if (!this.tree) return;
+		const testNodes = new Map<string, TestNode>();
+		node.collectTestNodes(testNodes);
 
-		const testIds = (node || this.tree.root).collectTestIds();
+		if (testNodes.size === 0) return;
 
-		if (testIds.length === 0) return;
-
-		this.adapter.debugTests(testIds);
+		await this.scheduler.cancel();
+		
+		node.collection.adapter.debugTests([...testNodes.keys()]);
 	}
 
 	cancel(): void {
-		this.adapter.cancelTests();
+		this.scheduler.cancel();
 	}
 
 	selected(node: TreeNode | undefined): void {
@@ -115,5 +123,9 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 			this.outputChannel.hide();
 
 		}
+	}
+
+	nodeChanged(node: TreeNode): void {
+		this.debouncer.nodeChanged(node);
 	}
 }

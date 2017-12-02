@@ -1,4 +1,4 @@
-import { TreeNode } from './tree';
+import { TreeNode } from './treeNode';
 import { IconPaths } from '../iconPaths';
 
 export type CurrentNodeState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed' | 'running-failed';

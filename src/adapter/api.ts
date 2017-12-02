@@ -23,8 +23,8 @@ export interface TestStateMessage {
 	message?: string;
 }
 
-export interface TestRunnerAdapter {
-	readonly tests: vscode.Event<TestSuiteInfo>;
+export interface TestCollectionAdapter {
+	readonly tests: vscode.Event<TestSuiteInfo | undefined>;
 	reloadTests(): void;
 	readonly testStates: vscode.Event<TestStateMessage>;
 	startTests(tests: string[]): Promise<void>;

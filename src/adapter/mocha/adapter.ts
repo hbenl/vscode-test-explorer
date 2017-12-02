@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { fork, ChildProcess } from 'child_process';
-import { TestRunnerAdapter, TestSuiteInfo, TestStateMessage } from '../api';
+import { TestCollectionAdapter, TestSuiteInfo, TestStateMessage } from '../api';
 
-export class MochaAdapter implements TestRunnerAdapter {
+export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 
 	private testFiles: string[];
 
@@ -11,7 +11,9 @@ export class MochaAdapter implements TestRunnerAdapter {
 	private readonly testsSubject = new vscode.EventEmitter<TestSuiteInfo>();
 	private readonly statesSubject = new vscode.EventEmitter<TestStateMessage>();
 
-	constructor() {
+	constructor(
+		private readonly workspaceFolder: vscode.WorkspaceFolder
+	) {
 		const config = vscode.workspace.getConfiguration('test-explorer');
 		this.testFiles = config.get('files') || [];
 	}
@@ -31,7 +33,7 @@ export class MochaAdapter implements TestRunnerAdapter {
 		const childProc = fork(
 			require.resolve('./worker/loadTests.js'),
 			[ JSON.stringify(this.testFiles) ],
-			{ execArgv: [] }
+			{ execArgv: [], cwd: this.workspaceFolder.uri.fsPath }
 		);
 
 		childProc.on('message', message => {
@@ -52,7 +54,7 @@ export class MochaAdapter implements TestRunnerAdapter {
 			this.runningTestProcess = fork(
 				require.resolve('./worker/runTests.js'),
 				[ JSON.stringify(this.testFiles), JSON.stringify(tests) ],
-				{ execArgv: [] }
+				{ execArgv: [], cwd: this.workspaceFolder.uri.fsPath }
 			);
 
 			this.runningTestProcess.on('message', 
