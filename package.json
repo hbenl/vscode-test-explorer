@@ -76,6 +76,10 @@
         "title": "Reload the test tree"
       },
       {
+        "command": "extension.test-explorer.reload-collection",
+        "title": "Reload this test collection"
+      },
+      {
         "command": "extension.test-explorer.start",
         "title": "Run tests",
         "icon": "./icons/start.svg"
@@ -113,6 +117,10 @@
       ],
       "view/item/context": [
         {
+          "command": "extension.test-explorer.reload-collection",
+          "when": "view == extension.test-explorer.tests && viewItem == collection"
+        },
+        {
           "command": "extension.test-explorer.start",
           "when": "view == extension.test-explorer.tests"
         },
@@ -124,6 +132,10 @@
       "commandPalette": [
         {
           "command": "extension.test-explorer.reload",
+          "when": "false"
+        },
+        {
+          "command": "extension.test-explorer.reload-collection",
           "when": "false"
         },
         {

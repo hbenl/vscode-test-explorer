@@ -72,6 +72,7 @@ export class TestSuiteNode implements TreeNode {
 
 		const treeItem = new vscode.TreeItem(this.info.label, vscode.TreeItemCollapsibleState.Expanded);
 		treeItem.iconPath = stateIconPath(this.state, this.collection.iconPaths);
+		treeItem.contextValue = (this.parent !== undefined) ? 'suite' : 'collection';
 
 		return treeItem;
 	}
