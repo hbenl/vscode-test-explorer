@@ -21,7 +21,12 @@ export class TestNode implements TreeNode {
 		oldNodesById: Map<string, TreeNode> | undefined
 	) {
 		const oldNode = oldNodesById ? oldNodesById.get(info.id) : undefined;
-		this._state = oldNode ? oldNode.state : { current: 'pending', previous: 'other' };
+		if (oldNode) {
+			this._state = oldNode.state;
+			this._log = oldNode.log || "";
+		} else {
+			this._state = { current: 'pending', previous: 'other' };
+		}
 	}
 
 	setCurrentState(currentState: CurrentNodeState, logMessage?: string): void {
@@ -40,12 +45,9 @@ export class TestNode implements TreeNode {
 	}
 
 	deprecateState(): void {
-
 		if ((this.state.current === 'passed') || (this.state.current === 'failed')) {
 			this._state = { current: 'pending', previous: this.state.current };
 		}
-
-		this._log = "";
 	}
 
 	collectTestNodes(testNodes: Map<string, TestNode>): void {
