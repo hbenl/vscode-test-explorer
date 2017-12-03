@@ -14,7 +14,7 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 	constructor(
 		private readonly workspaceFolder: vscode.WorkspaceFolder
 	) {
-		const config = vscode.workspace.getConfiguration('test-explorer');
+		const config = vscode.workspace.getConfiguration('test-explorer', workspaceFolder.uri);
 		this.testFiles = config.get('files') || [];
 	}
 
