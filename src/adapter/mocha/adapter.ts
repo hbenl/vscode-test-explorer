@@ -26,31 +26,36 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 		return this.statesSubject.event;
 	}
 
-	reloadTests(): void {
+	async reloadTests(): Promise<void> {
+		return new Promise<void>((resolve, reject) => {
 
-		let testsLoaded = false;
+			let testsLoaded = false;
 
-		const childProc = fork(
-			require.resolve('./worker/loadTests.js'),
-			[ JSON.stringify(this.testFiles) ],
-			{ execArgv: [], cwd: this.workspaceFolder.uri.fsPath }
-		);
+			const childProc = fork(
+				require.resolve('./worker/loadTests.js'),
+				[ JSON.stringify(this.testFiles) ],
+				{ execArgv: [], cwd: this.workspaceFolder.uri.fsPath }
+			);
 
-		childProc.on('message', (info: TestSuiteInfo | undefined) => {
+			childProc.on('message', (info: TestSuiteInfo | undefined) => {
 
-			testsLoaded = true;
+				testsLoaded = true;
 
-			if (info) {
-				info.label = this.workspaceFolder.name;
-			}
+				if (info) {
+					info.label = this.workspaceFolder.name;
+				}
 
-			this.testsSubject.fire(info);
-		});
+				this.testsSubject.fire(info);
+			});
 
-		childProc.on('exit', () => {
-			if (!testsLoaded) {
-				this.testsSubject.fire({ type: 'suite', id: '', label: 'No tests found', children: [] });
-			}
+			childProc.on('exit', () => {
+
+				if (!testsLoaded) {
+					this.testsSubject.fire({ type: 'suite', id: '', label: 'No tests found', children: [] });
+				}
+
+				resolve();
+			});
 		});
 	}
 

@@ -25,7 +25,7 @@ export interface TestStateMessage {
 
 export interface TestCollectionAdapter {
 	readonly tests: vscode.Event<TestSuiteInfo | undefined>;
-	reloadTests(): void;
+	reloadTests(): Promise<void>;
 	readonly testStates: vscode.Event<TestStateMessage>;
 	startTests(tests: string[]): Promise<void>;
 	cancelTests(): void;
