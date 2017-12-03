@@ -33,6 +33,10 @@ export class TestNode implements TreeNode {
 
 		this.state.current = currentState;
 
+		if (currentState === 'scheduled') {
+			this._log = "";
+		}
+
 		if (logMessage) {
 			this._log += logMessage + "\n";
 		}
