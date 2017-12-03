@@ -36,9 +36,15 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 			{ execArgv: [], cwd: this.workspaceFolder.uri.fsPath }
 		);
 
-		childProc.on('message', message => {
+		childProc.on('message', (info: TestSuiteInfo | undefined) => {
+
 			testsLoaded = true;
-			this.testsSubject.fire(<TestSuiteInfo>message);
+
+			if (info) {
+				info.label = this.workspaceFolder.name;
+			}
+
+			this.testsSubject.fire(info);
 		});
 
 		childProc.on('exit', () => {
