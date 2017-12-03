@@ -73,45 +73,74 @@
     "commands": [
       {
         "command": "extension.test-explorer.reload",
-        "title": "Test Explorer: Reload the test tree"
+        "title": "Reload the test tree"
       },
       {
         "command": "extension.test-explorer.start",
-        "title": "Test Explorer: Run tests",
+        "title": "Run tests",
         "icon": "./icons/start.svg"
       },
       {
         "command": "extension.test-explorer.cancel",
-        "title": "Test Explorer: Cancel running tests",
+        "title": "Cancel running tests",
         "icon": "./icons/stop.svg"
       },
       {
         "command": "extension.test-explorer.debug",
-        "title": "Test Explorer: Debug tests"
+        "title": "Debug tests"
+      },
+      {
+        "command": "extension.test-explorer.selected",
+        "title": "Test tree item selected"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "extension.test-explorer.reload"
+          "command": "extension.test-explorer.reload",
+          "when": "view == extension.test-explorer.tests"
         },
         {
           "command": "extension.test-explorer.start",
           "group": "navigation",
-          "when": "!testsRunning"
+          "when": "view == extension.test-explorer.tests && !testsRunning"
         },
         {
           "command": "extension.test-explorer.cancel",
           "group": "navigation",
-          "when": "testsRunning"
+          "when": "view == extension.test-explorer.tests && testsRunning"
         }
       ],
       "view/item/context": [
         {
-          "command": "extension.test-explorer.start"
+          "command": "extension.test-explorer.start",
+          "when": "view == extension.test-explorer.tests"
         },
         {
-          "command": "extension.test-explorer.debug"
+          "command": "extension.test-explorer.debug",
+          "when": "view == extension.test-explorer.tests"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "extension.test-explorer.reload",
+          "when": "false"
+        },
+        {
+          "command": "extension.test-explorer.start",
+          "when": "false"
+        },
+        {
+          "command": "extension.test-explorer.cancel",
+          "when": "false"
+        },
+        {
+          "command": "extension.test-explorer.debug",
+          "when": "false"
+        },
+        {
+          "command": "extension.test-explorer.selected",
+          "when": "false"
         }
       ]
     }
