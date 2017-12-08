@@ -1,5 +1,7 @@
 import * as Mocha from 'mocha';
+import * as RegExpEscape from 'escape-string-regexp';
 import { TestSuiteInfo, TestInfo, TestTreeInfo } from '../../api';
+import { TestFileCache } from './testFileCache';
 
 let sendMessage: (message: any) => void;
 
@@ -15,7 +17,7 @@ if (process.send) {
 	console.log('This script is designed to run in a child process!');
 }
 
-function loadTests(searchPaths: string[]) {
+async function loadTests(searchPaths: string[]) {
 
 	let files: string[] = [];
 	for (const searchPath of searchPaths) {
@@ -30,26 +32,47 @@ function loadTests(searchPaths: string[]) {
 
 	mocha.loadFiles();
 
-	sendMessage(convertSuite(mocha.suite));
+	sendMessage(await convertSuite(mocha.suite, new TestFileCache()));
 }
 
-function convertSuite(suite: Mocha.ISuite): TestSuiteInfo {
+async function convertSuite(suite: Mocha.ISuite, cache: TestFileCache): Promise<TestSuiteInfo> {
 
-	let children: TestTreeInfo[] = suite.suites.map(convertSuite);
-	children = children.concat(suite.tests.map(convertTest));
+	const testFileContent = suite.file ? await cache.getFile(suite.file) : undefined;
+	const line = testFileContent ? findLineContaining(suite.title, testFileContent) : undefined;
+
+	const childSuites: TestTreeInfo[] = await Promise.all(suite.suites.map((suite) => convertSuite(suite, cache)));
+	const childTests: TestTreeInfo[] = await Promise.all(suite.tests.map((test) => convertTest(test, cache)));
 
 	return {
 		type: 'suite',
 		id: suite.fullTitle(),
 		label: suite.title,
-		children
+		file: suite.file,
+		line,
+		children: childSuites.concat(childTests)
 	};
 }
 
-function convertTest(test: Mocha.ITest): TestInfo {
+async function convertTest(test: Mocha.ITest, cache: TestFileCache): Promise<TestInfo> {
+
+	const testFileContent = test.file ? await cache.getFile(test.file) : undefined;
+	const line = testFileContent ? findLineContaining(test.title, testFileContent) : undefined;
+
 	return {
 		type: 'test',
 		id: test.fullTitle(),
-		label: test.title
+		label: test.title,
+		file: test.file,
+		line
 	}
+}
+
+function findLineContaining(needle: string, haystack: string | undefined): number | undefined {
+
+	if (!haystack) return undefined;
+
+	const index = haystack.search(RegExpEscape(needle));
+	if (index < 0) return undefined;
+
+	return haystack.substr(0, index).split('\n').length;
 }

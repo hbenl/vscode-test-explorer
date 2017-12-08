@@ -10,11 +10,15 @@ interface TestTreeInfoBase {
 
 export interface TestSuiteInfo extends TestTreeInfoBase {
 	type: 'suite';
+	file?: string;
+	line?: number;
 	readonly children: TestTreeInfo[];
 }
 
 export interface TestInfo extends TestTreeInfoBase {
 	type: 'test';
+	file?: string;
+	line?: number;
 }
 
 export interface TestStateMessage {

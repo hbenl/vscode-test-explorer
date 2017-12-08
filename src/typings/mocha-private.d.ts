@@ -3,8 +3,12 @@ declare namespace Mocha {
 		function lookupFiles(path: string, extensions: string[], recursive?: boolean): string[];
 	}
 	interface ISuite {
+		file?: string;
 		suites: ISuite[];
 		tests: ITest[];
+	}
+	interface ITest {
+		file?: string;
 	}
 }
 
