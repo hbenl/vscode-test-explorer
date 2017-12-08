@@ -6,6 +6,7 @@ import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './debouncer';
 import { TestNode } from './tree/testNode';
 import { TestRunScheduler } from './scheduler';
+import { TestSuiteNode } from './tree/testSuiteNode';
 
 export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
@@ -126,6 +127,23 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 			this.outputChannel.hide();
 
+		}
+	}
+
+	async showSource(node: TreeNode): Promise<void> {
+
+		if ((node instanceof TestNode) || (node instanceof TestSuiteNode)) {
+
+			const file = node.info.file;
+
+			if (file) {
+
+				const line = node.info.line || 0;
+				const range = new vscode.Range(line, 0, line, 0);
+				const document = await vscode.workspace.openTextDocument(file);
+				await vscode.window.showTextDocument(document, { selection: range });
+
+			}
 		}
 	}
 

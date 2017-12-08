@@ -74,5 +74,5 @@ function findLineContaining(needle: string, haystack: string | undefined): numbe
 	const index = haystack.search(RegExpEscape(needle));
 	if (index < 0) return undefined;
 
-	return haystack.substr(0, index).split('\n').length;
+	return haystack.substr(0, index).split('\n').length - 1;
 }

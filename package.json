@@ -98,6 +98,10 @@
       {
         "command": "extension.test-explorer.selected",
         "title": "Test tree item selected"
+      },
+      {
+        "command": "extension.test-explorer.show-source",
+        "title": "Show source"
       }
     ],
     "menus": {
@@ -128,6 +132,10 @@
         },
         {
           "command": "extension.test-explorer.debug",
+          "when": "view == extension.test-explorer.tests"
+        },
+        {
+          "command": "extension.test-explorer.show-source",
           "when": "view == extension.test-explorer.tests"
         }
       ],
