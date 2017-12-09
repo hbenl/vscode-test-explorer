@@ -108,7 +108,10 @@
       {
         "command": "extension.test-explorer.start",
         "title": "Run tests",
-        "icon": "./icons/start.svg"
+        "icon": {
+          "dark": "./icons/start-dark.svg",
+          "light": "./icons/start-light.svg"
+        }
       },
       {
         "command": "extension.test-explorer.cancel",

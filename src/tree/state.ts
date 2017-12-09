@@ -1,5 +1,5 @@
 import { TreeNode } from './treeNode';
-import { IconPaths } from '../iconPaths';
+import { IconPaths, IconPath } from '../iconPaths';
 
 export type CurrentNodeState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed' | 'running-failed';
 
@@ -87,7 +87,7 @@ export function parentPreviousNodeState(children: TreeNode[]): PreviousNodeState
 	}
 }
 
-export function stateIconPath(state: NodeState, iconPaths: IconPaths): string {
+export function stateIconPath(state: NodeState, iconPaths: IconPaths): IconPath {
 
 	switch (state.current) {
 
