@@ -42,27 +42,17 @@ class Reporter {
 
 const sendMessage = process.send ? (message: any) => process.send!(message) : () => {};
 
-	const searchPaths = <string[]>JSON.parse(process.argv[2]);
-	const testsToRun = <string[]>JSON.parse(process.argv[3]);
+const files = <string[]>JSON.parse(process.argv[2]);
+const testsToRun = <string[]>JSON.parse(process.argv[3]);
 
-	runTests(searchPaths, testsToRun);
+const regExp = testsToRun.map(RegExEscape).join('|');
 
-function runTests(searchPaths: string[], testsToRun: string[]) {
+const mocha = new Mocha();
 
-	let files: string[] = [];
-	for (const searchPath of searchPaths) {
-		files = files.concat(Mocha.utils.lookupFiles(searchPath, ['js']));
-	}
-
-	let regExp = testsToRun.map(RegExEscape).join('|');
-
-	const mocha = new Mocha();
-
-	for (const file of files) {
-		mocha.addFile(file);
-	}
-	mocha.grep(regExp);
-	mocha.reporter(Reporter);
-	
-	mocha.run();
+for (const file of files) {
+	mocha.addFile(file);
 }
+mocha.grep(regExp);
+mocha.reporter(Reporter);
+
+mocha.run();

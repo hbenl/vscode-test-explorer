@@ -4,7 +4,7 @@ import { TestCollectionAdapter, TestSuiteInfo, TestStateMessage } from '../api';
 
 export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 
-	private testFiles: string[];
+	private config: vscode.WorkspaceConfiguration;
 
 	private runningTestProcess: ChildProcess | undefined;
 
@@ -14,8 +14,7 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 	constructor(
 		private readonly workspaceFolder: vscode.WorkspaceFolder
 	) {
-		const config = vscode.workspace.getConfiguration('test-explorer', workspaceFolder.uri);
-		this.testFiles = config.get('files') || [];
+		this.config = vscode.workspace.getConfiguration('mochaExplorer', workspaceFolder.uri);
 	}
 
 	get tests(): vscode.Event<TestSuiteInfo> {
@@ -27,13 +26,16 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 	}
 
 	async reloadTests(): Promise<void> {
-		return new Promise<void>((resolve, reject) => {
 
-			let testsLoaded = false;
+		const testFiles = await this.lookupFiles();
+
+		let testsLoaded = false;
+
+		await new Promise<void>((resolve, reject) => {
 
 			const childProc = fork(
 				require.resolve('./worker/loadTests.js'),
-				[ JSON.stringify(this.testFiles) ],
+				[ JSON.stringify(testFiles) ],
 				{ execArgv: [], cwd: this.workspaceFolder.uri.fsPath }
 			);
 
@@ -59,12 +61,15 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 		});
 	}
 
-	startTests(tests: string[]): Promise<void> {
-		return new Promise<void>((resolve, reject) => {
+	async startTests(tests: string[]): Promise<void> {
+
+		const testFiles = await this.lookupFiles();
+
+		await new Promise<void>((resolve, reject) => {
 
 			this.runningTestProcess = fork(
 				require.resolve('./worker/runTests.js'),
-				[ JSON.stringify(this.testFiles), JSON.stringify(tests) ],
+				[ JSON.stringify(testFiles), JSON.stringify(tests) ],
 				{ execArgv: [], cwd: this.workspaceFolder.uri.fsPath }
 			);
 
@@ -78,14 +83,16 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 		});
 	}
 
-	debugTests(tests: string[]): void {
+	async debugTests(tests: string[]): Promise<void> {
+
+		const testFiles = await this.lookupFiles();
 
 		vscode.debug.startDebugging(vscode.workspace.workspaceFolders![0], {
 			name: 'Debug Mocha Tests',
 			type: 'node',
 			request: 'launch',
 			program: require.resolve('./worker/runTests.js'),
-			args: [ JSON.stringify(this.testFiles), JSON.stringify(tests) ],
+			args: [ JSON.stringify(testFiles), JSON.stringify(tests) ],
 			cwd: '${workspaceRoot}',
 			stopOnEntry: false
 		});
@@ -95,5 +102,12 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 		if (this.runningTestProcess) {
 			this.runningTestProcess.kill();
 		}
+	}
+
+	private async lookupFiles(): Promise<string[]> {
+		const testFilesGlob = this.config.get<string>('files') || 'test/**/*.js';
+		const relativePattern = new vscode.RelativePattern(this.workspaceFolder, testFilesGlob);
+		const fileUris = await vscode.workspace.findFiles(relativePattern);
+		return fileUris.map(uri => uri.fsPath);
 	}
 }

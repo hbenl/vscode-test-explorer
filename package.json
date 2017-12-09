@@ -48,19 +48,11 @@
       "type": "object",
       "title": "Configuration for the Test Explorer extension",
       "properties": {
-        "test-explorer": {
-          "type": "object",
-          "description": "Configuration for the Test Explorer extension",
-          "scope": "resource",
-          "properties": {
-            "files": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "description": "An array of globs for the test files"
-            }
-          }
+        "mochaExplorer.files": {
+          "description": "The glob describing the location of your test files (relative to the workspace folder)",
+          "type": "string",
+          "default": "test/**/*.js",
+          "scope": "resource"
         }
       }
     },

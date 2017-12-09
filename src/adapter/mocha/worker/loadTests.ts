@@ -9,20 +9,15 @@ if (process.send) {
 
 	sendMessage = (message) => process.send!(message);
 
-	const searchPaths = <string[]>JSON.parse(process.argv[2]);
+	const files = <string[]>JSON.parse(process.argv[2]);
 
-	loadTests(searchPaths);
+	loadTests(files);
 
 } else {
 	console.log('This script is designed to run in a child process!');
 }
 
-async function loadTests(searchPaths: string[]) {
-
-	let files: string[] = [];
-	for (const searchPath of searchPaths) {
-		files = files.concat(Mocha.utils.lookupFiles(searchPath, ['js']));
-	}
+async function loadTests(files: string[]) {
 
 	const mocha = new Mocha();
 
