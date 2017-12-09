@@ -10,16 +10,18 @@ if (process.send) {
 	sendMessage = (message) => process.send!(message);
 
 	const files = <string[]>JSON.parse(process.argv[2]);
+	const ui: string = JSON.parse(process.argv[3]).ui;
 
-	loadTests(files);
+	loadTests(files, ui);
 
 } else {
 	console.log('This script is designed to run in a child process!');
 }
 
-async function loadTests(files: string[]) {
+async function loadTests(files: string[], ui: string) {
 
 	const mocha = new Mocha();
+	mocha.ui(ui);
 
 	for (const file of files) {
 		mocha.addFile(file);

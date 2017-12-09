@@ -1,10 +1,9 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { fork, ChildProcess } from 'child_process';
 import { TestCollectionAdapter, TestSuiteInfo, TestStateMessage } from '../api';
 
 export class MochaTestCollectionAdapter implements TestCollectionAdapter {
-
-	private config: vscode.WorkspaceConfiguration;
 
 	private runningTestProcess: ChildProcess | undefined;
 
@@ -13,9 +12,7 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 
 	constructor(
 		private readonly workspaceFolder: vscode.WorkspaceFolder
-	) {
-		this.config = vscode.workspace.getConfiguration('mochaExplorer', workspaceFolder.uri);
-	}
+	) {}
 
 	get tests(): vscode.Event<TestSuiteInfo> {
 		return this.testsSubject.event;
@@ -27,7 +24,9 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 
 	async reloadTests(): Promise<void> {
 
-		const testFiles = await this.lookupFiles();
+		const config = this.getConfiguration();
+		const testFiles = await this.lookupFiles(config);
+		const mochaOpts = this.getMochaOpts(config);
 
 		let testsLoaded = false;
 
@@ -35,7 +34,7 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 
 			const childProc = fork(
 				require.resolve('./worker/loadTests.js'),
-				[ JSON.stringify(testFiles) ],
+				[ JSON.stringify(testFiles), JSON.stringify(mochaOpts) ],
 				{ execArgv: [], cwd: this.workspaceFolder.uri.fsPath }
 			);
 
@@ -63,17 +62,23 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 
 	async startTests(tests: string[]): Promise<void> {
 
-		const testFiles = await this.lookupFiles();
+		const config = this.getConfiguration();
+		const testFiles = await this.lookupFiles(config);
+		const mochaOpts = this.getMochaOpts(config);
 
 		await new Promise<void>((resolve, reject) => {
 
 			this.runningTestProcess = fork(
 				require.resolve('./worker/runTests.js'),
-				[ JSON.stringify(testFiles), JSON.stringify(tests) ],
-				{ execArgv: [], cwd: this.workspaceFolder.uri.fsPath }
+				[ JSON.stringify(testFiles), JSON.stringify(tests), JSON.stringify(mochaOpts) ],
+				{
+					cwd: this.getCwd(config),
+					env: this.getEnv(config),
+					execArgv: []
+				}
 			);
 
-			this.runningTestProcess.on('message', 
+			this.runningTestProcess.on('message',
 				message => this.statesSubject.fire(<TestStateMessage>message));
 
 			this.runningTestProcess.on('exit', () => {
@@ -85,14 +90,16 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 
 	async debugTests(tests: string[]): Promise<void> {
 
-		const testFiles = await this.lookupFiles();
+		const config = this.getConfiguration();
+		const testFiles = await this.lookupFiles(config);
+		const mochaOpts = this.getMochaOpts(config);
 
-		vscode.debug.startDebugging(vscode.workspace.workspaceFolders![0], {
+		vscode.debug.startDebugging(this.workspaceFolder, {
 			name: 'Debug Mocha Tests',
 			type: 'node',
 			request: 'launch',
 			program: require.resolve('./worker/runTests.js'),
-			args: [ JSON.stringify(testFiles), JSON.stringify(tests) ],
+			args: [ JSON.stringify(testFiles), JSON.stringify(tests), JSON.stringify(mochaOpts) ],
 			cwd: '${workspaceRoot}',
 			stopOnEntry: false
 		});
@@ -104,10 +111,38 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 		}
 	}
 
-	private async lookupFiles(): Promise<string[]> {
-		const testFilesGlob = this.config.get<string>('files') || 'test/**/*.js';
+	private getConfiguration(): vscode.WorkspaceConfiguration {
+		return vscode.workspace.getConfiguration('mochaExplorer', this.workspaceFolder.uri);
+	}
+
+	private async lookupFiles(config: vscode.WorkspaceConfiguration): Promise<string[]> {
+		const testFilesGlob = config.get<string>('files') || 'test/**/*.js';
 		const relativePattern = new vscode.RelativePattern(this.workspaceFolder, testFilesGlob);
 		const fileUris = await vscode.workspace.findFiles(relativePattern);
 		return fileUris.map(uri => uri.fsPath);
 	}
+
+	private getEnv(config: vscode.WorkspaceConfiguration): object {
+		return config.get('env') || {};
+	}
+
+	private getCwd(config: vscode.WorkspaceConfiguration): string {
+		const dirname = this.workspaceFolder.uri.fsPath;
+		const configCwd = config.get<string>('cwd');
+		return configCwd ? path.resolve(dirname, configCwd) : dirname;
+	}
+
+	private getMochaOpts(config: vscode.WorkspaceConfiguration): MochaOpts {
+		return {
+			ui: config.get<string>('ui')!,
+			timeout: config.get<number>('timeout')!,
+			retries: config.get<number>('retries')!
+		}
+	}
+}
+
+export interface MochaOpts {
+	ui: string,
+	timeout: number,
+	retries: number
 }

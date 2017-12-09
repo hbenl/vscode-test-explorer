@@ -6,6 +6,7 @@ declare namespace Mocha {
 		file?: string;
 		suites: ISuite[];
 		tests: ITest[];
+		retries(n?: number | string): ISuite | number;
 	}
 	interface ITest {
 		file?: string;

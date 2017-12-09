@@ -53,6 +53,38 @@
           "type": "string",
           "default": "test/**/*.js",
           "scope": "resource"
+        },
+        "mochaExplorer.env": {
+          "description": "Environment variables to be set when running the tests",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {},
+          "scope": "resource"
+        },
+        "mochaExplorer.cwd": {
+          "description": "The working directory where mocha is run (relative to the workspace folder)",
+          "type": "string",
+          "scope": "resource"
+        },
+        "mochaExplorer.ui": {
+          "description": "The mocha ui used by the tests",
+          "type": "string",
+          "default": "bdd",
+          "scope": "resource"
+        },
+        "mochaExplorer.timeout": {
+          "description": "The test-case timeout in milliseconds",
+          "type": "number",
+          "default": 2000,
+          "scope": "resource"
+        },
+        "mochaExplorer.retries": {
+          "description": "The number of times to retry failed tests",
+          "type": "number",
+          "default": 0,
+          "scope": "resource"
         }
       }
     },
