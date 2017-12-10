@@ -1,45 +1,7 @@
-import { EventEmitter } from 'events';
 import * as Mocha from 'mocha';
 import * as RegExEscape from 'escape-string-regexp';
-import { TestStateMessage } from '../../api';
-import { MochaOpts } from '../adapter';
-
-class Reporter {
-
-	constructor(runner: EventEmitter) {
-
-		runner.on('test', (test: Mocha.ITest) => {
-
-			const stateMessage: TestStateMessage = {
-				testId: test.fullTitle(),
-				state: 'running'
-			};
-
-			sendMessage(stateMessage);
-		});
-
-		runner.on('pass', (test: Mocha.ITest) => {
-
-			const stateMessage: TestStateMessage = {
-				testId: test.fullTitle(),
-				state: 'passed'
-			};
-
-			sendMessage(stateMessage);
-		});
-
-		runner.on('fail', (test: Mocha.ITest, err: Error) => {
-
-			const stateMessage: TestStateMessage = {
-				testId: test.fullTitle(),
-				state: 'failed',
-				message: err.stack || err.message
-			};
-
-			sendMessage(stateMessage);
-		});
-	}
-}
+import { MochaOpts } from '../opts';
+import ReporterFactory from './reporter';
 
 const sendMessage = process.send ? (message: any) => process.send!(message) : () => {};
 
@@ -60,6 +22,6 @@ for (const file of files) {
 }
 
 mocha.grep(regExp);
-mocha.reporter(Reporter);
+mocha.reporter(ReporterFactory(sendMessage));
 
 mocha.run();

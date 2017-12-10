@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { fork, ChildProcess } from 'child_process';
 import { TestCollectionAdapter, TestSuiteInfo, TestStateMessage } from '../api';
+import { MochaOpts } from './opts';
 
 export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 
@@ -150,10 +151,4 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 			retries: config.get<number>('retries')!
 		}
 	}
-}
-
-export interface MochaOpts {
-	ui: string,
-	timeout: number,
-	retries: number
 }
