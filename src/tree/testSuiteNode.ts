@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { TestSuiteInfo } from "../adapter/api";
-import { TreeNode } from "./treeNode";
-import { NodeState, stateIconPath, parentNodeState, parentCurrentNodeState, CurrentNodeState } from "./state";
-import { TestCollectionNode } from './testCollectionNode';
+import { TreeNode, TreeNodeUpdates } from "./treeNode";
+import { NodeState, stateIconPath, parentNodeState, parentCurrentNodeState, parentPreviousNodeState } from "./state";
+import { TestCollection } from './testCollection';
 import { TestNode } from './testNode';
 
 export class TestSuiteNode implements TreeNode {
@@ -11,11 +11,12 @@ export class TestSuiteNode implements TreeNode {
 	private _children: TreeNode[];
 
 	get state(): NodeState { return this._state; }
+	neededUpdates: TreeNodeUpdates = 'none';
 	readonly log = undefined;
 	get children(): TreeNode[] { return this._children; }
 
 	constructor(
-		public readonly collection: TestCollectionNode,
+		public readonly collection: TestCollection,
 		public readonly info: TestSuiteInfo,
 		public readonly parent: TestSuiteNode | undefined,
 		oldNodesById: Map<string, TreeNode> | undefined
@@ -32,15 +33,27 @@ export class TestSuiteNode implements TreeNode {
 		this._state = parentNodeState(this._children);
 	}
 
-	setCurrentState(currentState: CurrentNodeState): void {
+	recalcState(): void {
+		if (this.neededUpdates !== 'recalc') return;
 
-		this.state.current = currentState;
-
-		if (this.parent) {
-			this.parent.childStateChanged(this);
+		for (const child of this.children) {
+			if (child instanceof TestSuiteNode) {
+				child.recalcState();
+			}
 		}
 
-		this.collection.nodeChanged(this);
+		const newCurrentNodeState = parentCurrentNodeState(this.children);
+		const newPreviousNodeState = parentPreviousNodeState(this.children);
+
+		if ((this.state.current !== newCurrentNodeState) || (this.state.previous !== newPreviousNodeState)) {
+
+			this.state.current = newCurrentNodeState;
+			this.state.previous = newPreviousNodeState;
+			this.neededUpdates = 'send';
+
+		} else {
+			this.neededUpdates = 'none';
+		}
 	}
 
 	deprecateState(): void {
@@ -49,24 +62,7 @@ export class TestSuiteNode implements TreeNode {
 			child.deprecateState();
 		}
 
-		this._state = parentNodeState(this._children);
-	}
-
-	setAutorun(autorun: boolean): void {
-		this.state.autorun = autorun;
-		for (const child of this.children) {
-			child.setAutorun(autorun);
-		}
-	}
-
-	childStateChanged(child: TreeNode): void {
-
-		const oldState = this.state.current;
-		const newState = parentCurrentNodeState(this._children);
-
-		if (newState !== oldState) {
-			this.setCurrentState(newState);
-		}
+		this.neededUpdates = 'recalc';
 	}
 
 	collectTestNodes(testNodes: Map<string, TestNode>, filter?: (n: TestNode) => boolean): void {
@@ -77,7 +73,11 @@ export class TestSuiteNode implements TreeNode {
 
 	getTreeItem(): vscode.TreeItem {
 
-		const treeItem = new vscode.TreeItem(this.info.label, vscode.TreeItemCollapsibleState.Expanded);
+		if (this.neededUpdates === 'send') {
+			this.neededUpdates = 'none';
+		}
+
+		const treeItem = new vscode.TreeItem(this.info.label, vscode.TreeItemCollapsibleState.Collapsed);
 		treeItem.iconPath = stateIconPath(this.state, this.collection.iconPaths);
 		treeItem.contextValue = (this.parent !== undefined) ? 'suite' : 'collection';
 

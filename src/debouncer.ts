@@ -1,59 +1,77 @@
 import * as vscode from 'vscode';
 import { TreeNode } from "./tree/treeNode";
+import { TestCollection } from './tree/testCollection';
 
 export class TreeEventDebouncer {
 
-	private changedNodes = new Set<TreeNode>();
 	private timeout: NodeJS.Timer | undefined;
 
 	constructor(
+		private readonly collections: TestCollection[],
 		private readonly treeDataChanged: vscode.EventEmitter<TreeNode>
 	) {}
 
-	nodeChanged(node: TreeNode): void {
+	sendNodeChangedEvents(immediately: boolean): void {
 
-		if (!node.parent) {
-			this.treeChanged();
-			return;
-		}
+		if (immediately) {
 
-		this.changedNodes.add(node.parent);
+			if (this.timeout) {
+				clearTimeout(this.timeout);
+				this.timeout = undefined;
+			}
 
-		if (!this.timeout) {
-			this.timeout = setTimeout(() => this.sendEvents(), 300);
+			this.sendNodeChangedEventsNow();
+
+		} else if (!this.timeout) {
+
+			this.timeout = setTimeout(() => {
+				this.timeout = undefined;
+				this.sendNodeChangedEventsNow();
+			}, 200);
+
 		}
 	}
 
-	private treeChanged(): void {
-
-		this.treeDataChanged.fire();
+	sendTreeChangedEvent(): void {
 
 		if (this.timeout) {
 			clearTimeout(this.timeout);
 			this.timeout = undefined;
 		}
 
-		this.changedNodes.clear();
+		this.treeDataChanged.fire();
 	}
 
-	private sendEvents(): void {
+	private sendNodeChangedEventsNow(): void {
 
-		for (const node of this.changedNodes) {
-			if (!this.ancestorChanged(node)) {
-				this.treeDataChanged.fire(node.parent ? node : undefined);
+		const changedNodes: TreeNode[] = [];
+		for (const collection of this.collections) {
+			if (collection.suite) {
+				collection.suite.recalcState();
+				changedNodes.push(...this.collectChangedNodes(collection.suite));
 			}
 		}
 
-		this.changedNodes.clear();
-		this.timeout = undefined;
+		for (const node of changedNodes) {
+			this.treeDataChanged.fire(node);
+		}
 	}
 
-	private ancestorChanged(node: TreeNode): boolean {
+	private collectChangedNodes(node: TreeNode): TreeNode[] {
 
-		if (!node.parent) {
-			return false;
+		if (node.neededUpdates === 'send') {
+
+			return [ node ];
+
+		} else {
+
+			const nodesToSend: TreeNode[] = [];
+
+			for (const child of node.children) {
+				nodesToSend.push(...this.collectChangedNodes(child));
+			}
+	
+			return nodesToSend;
 		}
-
-		return this.changedNodes.has(node.parent) || this.ancestorChanged(node.parent);
 	}
 }

@@ -1,12 +1,11 @@
 import * as vscode from 'vscode';
 import { TestCollectionAdapter } from './adapter/api';
-import { TestCollectionNode } from './tree/testCollectionNode';
+import { TestCollection } from './tree/testCollection';
 import { TreeNode } from './tree/treeNode';
 import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './debouncer';
 import { TestNode } from './tree/testNode';
 import { TestRunScheduler } from './scheduler';
-import { TestSuiteNode } from './tree/testSuiteNode';
 
 export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
@@ -18,7 +17,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 	private readonly treeDataChanged = new vscode.EventEmitter<TreeNode>();
 	public readonly onDidChangeTreeData: vscode.Event<TreeNode>;
 
-	private collections: TestCollectionNode[] = [];
+	private readonly collections: TestCollection[] = [];
 
 	private scheduler = new TestRunScheduler(this);
 
@@ -27,7 +26,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 	) {
 
 		this.iconPaths = new IconPaths(context);
-		this.debouncer = new TreeEventDebouncer(this.treeDataChanged);
+		this.debouncer = new TreeEventDebouncer(this.collections, this.treeDataChanged);
 
 		this.outputChannel = vscode.window.createOutputChannel("Test Explorer");
 		context.subscriptions.push(this.outputChannel);
@@ -36,7 +35,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 	}
 
 	registerCollection(adapter: TestCollectionAdapter): void {
-		this.collections.push(new TestCollectionNode(adapter, this));
+		this.collections.push(new TestCollection(adapter, this));
 	}
 
 	unregisterCollection(adapter: TestCollectionAdapter): void {
@@ -62,24 +61,18 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 				(collection) => (collection.suite !== undefined));
 
 			if (nonEmptyCollections.length === 0) {
-
 				return [];
-
 			} else if (nonEmptyCollections.length === 1) {
-
 				return nonEmptyCollections[0].suite!.children;
-
 			} else {
-
-				return nonEmptyCollections;
-
+				return nonEmptyCollections.map(collection => collection.suite!);
 			}
 		}
 	}
 
-	reload(node?: TestCollectionNode): void {
-		if (node) {
-			node.adapter.reloadTests();
+	reload(collection?: TestCollection): void {
+		if (collection) {
+			collection.adapter.reloadTests();
 		} else {
 			for (const collection of this.collections) {
 				collection.adapter.reloadTests();
@@ -92,7 +85,9 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 			this.scheduler.schedule(node);
 		} else {
 			for (const collection of this.collections) {
-				this.scheduler.schedule(collection);
+				if (collection.suite) {
+					this.scheduler.schedule(collection.suite);
+				}
 			}
 		}
 	}
@@ -114,7 +109,6 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 	}
 
 	selected(node: TreeNode | undefined): void {
-
 		if (!node) return;
 
 		if (node.log) {
@@ -132,34 +126,32 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 	async showSource(node: TreeNode): Promise<void> {
 
-		if ((node instanceof TestNode) || (node instanceof TestSuiteNode)) {
+		const file = node.info.file;
+		if (file) {
 
-			const file = node.info.file;
+			const line = node.info.line || 0;
+			const range = new vscode.Range(line, 0, line, 0);
+			const document = await vscode.workspace.openTextDocument(file);
+			await vscode.window.showTextDocument(document, { selection: range });
 
-			if (file) {
-
-				const line = node.info.line || 0;
-				const range = new vscode.Range(line, 0, line, 0);
-				const document = await vscode.workspace.openTextDocument(file);
-				await vscode.window.showTextDocument(document, { selection: range });
-
-			}
 		}
 	}
 
 	setAutorun(node: TreeNode, autorun: boolean): void {
-		node.setAutorun(autorun);
-		if (node.parent instanceof TestSuiteNode) {
-			node.parent.childStateChanged(node);
+		node.collection.setAutorun(node, autorun);
+	}
+
+	autorun(collection: TestCollection): void {
+		if (collection.suite) {
+			this.scheduler.schedule(collection.suite, testNode => testNode.state.autorun);
 		}
-		this.debouncer.nodeChanged(node.parent || node.collection);
 	}
 
-	nodeChanged(node: TreeNode): void {
-		this.debouncer.nodeChanged(node);
+	sendNodeChangedEvents(immediately: boolean): void {
+		this.debouncer.sendNodeChangedEvents(immediately);
 	}
 
-	autorun(collection: TestCollectionNode): void {
-		this.scheduler.schedule(collection, testNode => testNode.state.autorun);
+	sendTreeChangedEvent(): void {
+		this.debouncer.sendTreeChangedEvent();
 	}
 }

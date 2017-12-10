@@ -2,13 +2,13 @@ import * as vscode from 'vscode';
 import { TreeNode } from "./tree/treeNode";
 import { TestNode } from "./tree/testNode";
 import { TestExplorer } from "./explorer";
-import { TestCollectionNode } from './tree/testCollectionNode';
+import { TestCollection } from './tree/testCollection';
 
 
 export class TestRunScheduler {
 
 	private pendingTestRuns: TestNode[][] = [];
-	private currentTestRun: [TestCollectionNode, Promise<void>] | undefined;
+	private currentTestRun: [TestCollection, Promise<void>] | undefined;
 
 	constructor(
 		private readonly explorer: TestExplorer
@@ -30,7 +30,7 @@ export class TestRunScheduler {
 		this.pendingTestRuns = [];
 
 		if (this.currentTestRun) {
-			this.currentTestRun[0].collection.adapter.cancelTests();
+			this.currentTestRun[0].adapter.cancelTests();
 			await this.currentTestRun[1];
 		}
 	}
@@ -51,7 +51,7 @@ export class TestRunScheduler {
 		for (const testNode of testNodes) {
 			testNode.setCurrentState('scheduled');
 		}
-		this.explorer.nodeChanged(collection);
+		this.explorer.sendNodeChangedEvents(false);
 
 		vscode.commands.executeCommand('setContext', 'testsRunning', true);
 
