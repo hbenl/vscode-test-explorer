@@ -27,6 +27,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 	registerCommand('extension.test-explorer.show-source', (node) => testExplorer.showSource(node));
 
+	registerCommand('extension.test-explorer.enable-autorun', (node) => testExplorer.setAutorun(node, true));
+
+	registerCommand('extension.test-explorer.disable-autorun', (node) => testExplorer.setAutorun(node, false));
+	
 	context.subscriptions.push(vscode.window.registerTreeDataProvider(
 		'extension.test-explorer.tests', testExplorer
 	));

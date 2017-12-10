@@ -34,4 +34,5 @@ export interface TestCollectionAdapter {
 	startTests(tests: string[]): Promise<void>;
 	cancelTests(): void;
 	debugTests(tests: string[]): void;
+	readonly autorun: vscode.Event<void>;
 }

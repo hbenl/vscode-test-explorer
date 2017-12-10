@@ -11,6 +11,7 @@ export interface TreeNode {
 	readonly children: TreeNode[];
 	setCurrentState(currentState: CurrentNodeState, logMessage?: string): void;
 	deprecateState(): void;
-	collectTestNodes(testNodes: Map<string, TestNode>): void;
+	setAutorun(autorun: boolean): void;
+	collectTestNodes(testNodes: Map<string, TestNode>, filter?: (n: TestNode) => boolean): void;
 	getTreeItem(): vscode.TreeItem;
 }

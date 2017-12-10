@@ -52,6 +52,13 @@ export class TestSuiteNode implements TreeNode {
 		this._state = parentNodeState(this._children);
 	}
 
+	setAutorun(autorun: boolean): void {
+		this.state.autorun = autorun;
+		for (const child of this.children) {
+			child.setAutorun(autorun);
+		}
+	}
+
 	childStateChanged(child: TreeNode): void {
 
 		const oldState = this.state.current;
@@ -62,9 +69,9 @@ export class TestSuiteNode implements TreeNode {
 		}
 	}
 
-	collectTestNodes(testNodes: Map<string, TestNode>): void {
+	collectTestNodes(testNodes: Map<string, TestNode>, filter?: (n: TestNode) => boolean): void {
 		for (const child of this._children) {
-			child.collectTestNodes(testNodes);
+			child.collectTestNodes(testNodes, filter);
 		}
 	}
 

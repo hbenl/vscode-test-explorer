@@ -4,7 +4,7 @@ import { TestCollectionAdapter } from '../adapter/api';
 import { TestNode } from './testNode';
 import { TestExplorer } from '../explorer';
 import { TreeNode } from './treeNode';
-import { CurrentNodeState, NodeState } from './state';
+import { CurrentNodeState, NodeState, defaultState } from './state';
 
 export class TestCollectionNode implements TreeNode {
 
@@ -13,7 +13,7 @@ export class TestCollectionNode implements TreeNode {
 	readonly testNodes = new Map<string, TestNode>();
 	get suite() { return this._suite; }
 	get iconPaths() { return this.explorer.iconPaths; }
-	get state(): NodeState { return this._suite ? this._suite.state : { current: 'pending', previous: 'other' }; }
+	get state(): NodeState { return this._suite ? this._suite.state : defaultState(); }
 	readonly log = undefined;
 	readonly collection = this;
 	readonly parent = undefined;
@@ -42,6 +42,8 @@ export class TestCollectionNode implements TreeNode {
 			node.setCurrentState(testStateMessage.state, testStateMessage.message);
 		});
 
+		adapter.autorun(() => this.explorer.autorun(this));
+
 		this.adapter.reloadTests();
 	}
 
@@ -69,9 +71,15 @@ export class TestCollectionNode implements TreeNode {
 		this.explorer.nodeChanged(node);
 	}
 
-	collectTestNodes(testNodes: Map<string, TestNode>): void {
+	setAutorun(autorun: boolean): void {
 		if (this._suite) {
-			this._suite.collectTestNodes(testNodes);
+			this._suite.setAutorun(autorun);
+		}
+	}
+
+	collectTestNodes(testNodes: Map<string, TestNode>, filter?: (n: TestNode) => boolean): void {
+		if (this._suite) {
+			this._suite.collectTestNodes(testNodes, filter);
 		}
 	}
 }

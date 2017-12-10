@@ -2,22 +2,27 @@ import * as vscode from 'vscode';
 import { TreeNode } from "./tree/treeNode";
 import { TestNode } from "./tree/testNode";
 import { TestExplorer } from "./explorer";
+import { TestCollectionNode } from './tree/testCollectionNode';
 
 
 export class TestRunScheduler {
 
-	private pendingTestRuns: TreeNode[] = [];
-	private currentTestRun: [TreeNode, Promise<void>] | undefined;
+	private pendingTestRuns: TestNode[][] = [];
+	private currentTestRun: [TestCollectionNode, Promise<void>] | undefined;
 
 	constructor(
 		private readonly explorer: TestExplorer
 	) {}
 
-	schedule(node: TreeNode): void {
+	schedule(node: TreeNode, filter?: (n: TestNode) => boolean): void {
 
-		this.pendingTestRuns.push(node);
+		const testNodes = new Map<string, TestNode>();
+		node.collectTestNodes(testNodes, filter);
 
-		this.doNext();
+		if (testNodes.size > 0) {
+			this.pendingTestRuns.push([...testNodes.values()]);
+			this.doNext();
+		}
 	}
 
 	async cancel(): Promise<void> {
@@ -33,32 +38,26 @@ export class TestRunScheduler {
 	private doNext() {
 		if (this.currentTestRun) return;
 
-		const node = this.pendingTestRuns.shift();
-		if (!node) return;
+		const testNodes = this.pendingTestRuns.shift();
+		if (!testNodes) return;
 
-		this.runTests(node);
+		this.runTests(testNodes);
 	}
 
-	private async runTests(node: TreeNode) {
+	private async runTests(testNodes: TestNode[]) {
 
-		const testNodes = new Map<string, TestNode>();
-		node.collectTestNodes(testNodes);
-
-		if (testNodes.size === 0) {
-			this.doNext();
-			return;
-		}
-
-		node.collection.deprecateState();
-		for (const testNode of testNodes.values()) {
+		const collection = testNodes[0]!.collection;
+		collection.deprecateState();
+		for (const testNode of testNodes) {
 			testNode.setCurrentState('scheduled');
 		}
-		this.explorer.nodeChanged(node.collection);
+		this.explorer.nodeChanged(collection);
 
 		vscode.commands.executeCommand('setContext', 'testsRunning', true);
 
-		const testRunPromise = node.collection.adapter.startTests([...testNodes.keys()]);
-		this.currentTestRun = [node, testRunPromise];
+		const testIds = testNodes.map(testNode => testNode.info.id);
+		const testRunPromise = collection.adapter.startTests(testIds);
+		this.currentTestRun = [collection, testRunPromise];
 
 		await testRunPromise;
 
@@ -66,7 +65,7 @@ export class TestRunScheduler {
 
 		vscode.commands.executeCommand('setContext', 'testsRunning', false);
 
-		for (const testNode of testNodes.values()) {
+		for (const testNode of testNodes) {
 			if ((testNode.state.current === 'scheduled') || (testNode.state.current === 'running')) {
 				testNode.setCurrentState('pending');
 			}

@@ -129,6 +129,14 @@
       {
         "command": "extension.test-explorer.show-source",
         "title": "Show source"
+      },
+      {
+        "command": "extension.test-explorer.enable-autorun",
+        "title": "Enable autorun"
+      },
+      {
+        "command": "extension.test-explorer.disable-autorun",
+        "title": "Disable autorun"
       }
     ],
     "menus": {
@@ -163,6 +171,14 @@
         },
         {
           "command": "extension.test-explorer.show-source",
+          "when": "view == extension.test-explorer.tests"
+        },
+        {
+          "command": "extension.test-explorer.enable-autorun",
+          "when": "view == extension.test-explorer.tests"
+        },
+        {
+          "command": "extension.test-explorer.disable-autorun",
           "when": "view == extension.test-explorer.tests"
         }
       ],

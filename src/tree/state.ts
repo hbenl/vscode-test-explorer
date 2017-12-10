@@ -7,13 +7,23 @@ export type PreviousNodeState = 'passed' | 'failed' | 'other';
 
 export interface NodeState {
 	current: CurrentNodeState,
-	previous: PreviousNodeState
+	previous: PreviousNodeState,
+	autorun: boolean
+}
+
+export function defaultState(): NodeState {
+	return {
+		current: 'pending',
+		previous: 'other',
+		autorun: false
+	};
 }
 
 export function parentNodeState(children: TreeNode[]): NodeState {
 	return {
 		current: parentCurrentNodeState(children),
-		previous: parentPreviousNodeState(children)
+		previous: parentPreviousNodeState(children),
+		autorun: children.some(child => child.state.autorun)
 	};
 }
 
@@ -105,11 +115,11 @@ export function stateIconPath(state: NodeState, iconPaths: IconPaths): IconPath 
 
 		case 'passed':
 
-			return iconPaths.passed;
+			return state.autorun ? iconPaths.passedAutorun : iconPaths.passed;
 
 		case 'failed':
 
-			return iconPaths.failed;
+			return state.autorun ? iconPaths.failedAutorun : iconPaths.failed;
 
 		default:
 
@@ -117,15 +127,15 @@ export function stateIconPath(state: NodeState, iconPaths: IconPaths): IconPath 
 
 				case 'passed':
 
-					return iconPaths.passedFaint;
+					return state.autorun ? iconPaths.passedFaintAutorun : iconPaths.passedFaint;
 
 				case 'failed':
 
-					return iconPaths.failedFaint;
+					return state.autorun ? iconPaths.failedFaintAutorun : iconPaths.failedFaint;
 
 				default:
 
-					return iconPaths.pending;
+					return state.autorun ? iconPaths.pendingAutorun : iconPaths.pending;
 			}
 	}
 }

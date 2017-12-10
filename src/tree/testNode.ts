@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { TestInfo } from "../adapter/api";
 import { TreeNode } from "./treeNode";
-import { NodeState, stateIconPath, CurrentNodeState } from "./state";
+import { NodeState, stateIconPath, CurrentNodeState, defaultState } from "./state";
 import { TestSuiteNode } from './testSuiteNode';
 import { TestCollectionNode } from './testCollectionNode';
 
@@ -25,7 +25,7 @@ export class TestNode implements TreeNode {
 			this._state = oldNode.state;
 			this._log = oldNode.log || "";
 		} else {
-			this._state = { current: 'pending', previous: 'other' };
+			this._state = defaultState();
 		}
 	}
 
@@ -50,12 +50,22 @@ export class TestNode implements TreeNode {
 
 	deprecateState(): void {
 		if ((this.state.current === 'passed') || (this.state.current === 'failed')) {
-			this._state = { current: 'pending', previous: this.state.current };
+			this._state = {
+				current: 'pending',
+				previous: this.state.current,
+				autorun: this.state.autorun
+			};
 		}
 	}
 
-	collectTestNodes(testNodes: Map<string, TestNode>): void {
-		testNodes.set(this.info.id, this);
+	setAutorun(autorun: boolean): void {
+		this.state.autorun = autorun;
+	}
+
+	collectTestNodes(testNodes: Map<string, TestNode>, filter?: (n: TestNode) => boolean): void {
+		if ((filter === undefined) || filter(this)) {
+			testNodes.set(this.info.id, this);
+		}
 	}
 
 	getTreeItem(): vscode.TreeItem {

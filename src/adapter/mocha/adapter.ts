@@ -7,19 +7,30 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 
 	private runningTestProcess: ChildProcess | undefined;
 
-	private readonly testsSubject = new vscode.EventEmitter<TestSuiteInfo>();
-	private readonly statesSubject = new vscode.EventEmitter<TestStateMessage>();
-
+	private readonly testsEmitter = new vscode.EventEmitter<TestSuiteInfo>();
+	private readonly statesEmitter = new vscode.EventEmitter<TestStateMessage>();
+	private readonly autorunEmitter = new vscode.EventEmitter<void>();
+	
 	constructor(
 		private readonly workspaceFolder: vscode.WorkspaceFolder
-	) {}
+	) {
+		vscode.workspace.onDidSaveTextDocument((doc) => {
+			if (doc.uri.fsPath.startsWith(this.workspaceFolder.uri.fsPath)) {
+				this.autorunEmitter.fire();
+			}
+		});
+	}
 
 	get tests(): vscode.Event<TestSuiteInfo> {
-		return this.testsSubject.event;
+		return this.testsEmitter.event;
 	}
 
 	get testStates(): vscode.Event<TestStateMessage> {
-		return this.statesSubject.event;
+		return this.statesEmitter.event;
+	}
+
+	get autorun(): vscode.Event<void> {
+		return this.autorunEmitter.event;
 	}
 
 	async reloadTests(): Promise<void> {
@@ -46,13 +57,13 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 					info.label = this.workspaceFolder.name;
 				}
 
-				this.testsSubject.fire(info);
+				this.testsEmitter.fire(info);
 			});
 
 			childProc.on('exit', () => {
 
 				if (!testsLoaded) {
-					this.testsSubject.fire({ type: 'suite', id: '', label: 'No tests found', children: [] });
+					this.testsEmitter.fire({ type: 'suite', id: '', label: 'No tests found', children: [] });
 				}
 
 				resolve();
@@ -79,7 +90,7 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 			);
 
 			this.runningTestProcess.on('message',
-				message => this.statesSubject.fire(<TestStateMessage>message));
+				message => this.statesEmitter.fire(<TestStateMessage>message));
 
 			this.runningTestProcess.on('exit', () => {
 				this.runningTestProcess = undefined;
