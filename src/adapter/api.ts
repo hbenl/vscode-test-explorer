@@ -28,6 +28,7 @@ export interface TestStateMessage {
 }
 
 export interface TestCollectionAdapter {
+	workspaceFolder?: vscode.WorkspaceFolder;
 	readonly tests: vscode.Event<TestSuiteInfo | undefined>;
 	reloadTests(): Promise<void>;
 	readonly testStates: vscode.Event<TestStateMessage>;

@@ -48,6 +48,18 @@
       "type": "object",
       "title": "Configuration for the Test Explorer extension",
       "properties": {
+        "testExplorer.outdateOnStart": {
+          "description": "Outdate all test states whenever a test run is started",
+          "type": "boolean",
+          "default": false,
+          "scope": "resource"
+        },
+        "testExplorer.outdateOnReload": {
+          "description": "Outdate all test states whenever a test run is started",
+          "type": "boolean",
+          "default": false,
+          "scope": "resource"
+        },
         "mochaExplorer.files": {
           "description": "The glob describing the location of your test files (relative to the workspace folder)",
           "type": "string",
@@ -137,6 +149,14 @@
       {
         "command": "extension.test-explorer.disable-autorun",
         "title": "Disable autorun"
+      },
+      {
+        "command": "extension.test-explorer.outdate",
+        "title": "Outdate test states"
+      },
+      {
+        "command": "extension.test-explorer.reset",
+        "title": "Reset test states"
       }
     ],
     "menus": {
@@ -179,6 +199,14 @@
         },
         {
           "command": "extension.test-explorer.disable-autorun",
+          "when": "view == extension.test-explorer.tests"
+        },
+        {
+          "command": "extension.test-explorer.outdate",
+          "when": "view == extension.test-explorer.tests"
+        },
+        {
+          "command": "extension.test-explorer.reset",
           "when": "view == extension.test-explorer.tests"
         }
       ],

@@ -13,7 +13,7 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 	private readonly autorunEmitter = new vscode.EventEmitter<void>();
 	
 	constructor(
-		private readonly workspaceFolder: vscode.WorkspaceFolder
+		public readonly workspaceFolder: vscode.WorkspaceFolder
 	) {
 		vscode.workspace.onDidSaveTextDocument((doc) => {
 			if (doc.uri.fsPath.startsWith(this.workspaceFolder.uri.fsPath)) {

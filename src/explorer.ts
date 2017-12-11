@@ -147,6 +147,14 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		node.collection.setAutorun(node, autorun);
 	}
 
+	outdateState(node: TreeNode): void {
+		node.collection.outdateState(node);
+	}
+
+	resetState(node: TreeNode): void {
+		node.collection.resetState(node);
+	}
+
 	autorun(collection: TestCollection): void {
 		if (collection.suite) {
 			this.scheduler.schedule(collection.suite, testNode => testNode.state.autorun);

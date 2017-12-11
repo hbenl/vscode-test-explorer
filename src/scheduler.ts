@@ -47,7 +47,10 @@ export class TestRunScheduler {
 	private async runTests(testNodes: TestNode[]) {
 
 		const collection = testNodes[0]!.collection;
-		collection.deprecateState();
+
+		if (collection.shouldOutdateStateOnStart()) {
+			collection.outdateState();
+		}
 		for (const testNode of testNodes) {
 			testNode.setCurrentState('scheduled');
 		}

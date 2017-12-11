@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import { TestSuiteNode } from './testSuiteNode';
 import { TestCollectionAdapter } from '../adapter/api';
 import { TestNode } from './testNode';
@@ -25,6 +26,10 @@ export class TestCollection {
 				this.testNodes.clear();
 				this._suite.collectTestNodes(this.testNodes);
 
+				if (this.shouldOutdateStateOnReload()) {
+					this._suite.outdateState();
+				}
+
 			} else {
 				this._suite = undefined;
 				this.testNodes.clear();
@@ -47,11 +52,46 @@ export class TestCollection {
 		this.adapter.reloadTests();
 	}
 
-	deprecateState(): void {
-		if (this._suite) {
-			this._suite.deprecateState();
-			this.sendNodeChangedEvents();
+	outdateState(node?: TreeNode): void {
+
+		if (node) {
+
+			node.outdateState();
+
+			let ancestor = node.parent;
+			while (ancestor) {
+				ancestor.neededUpdates = 'recalc';
+				ancestor = ancestor.parent;
+			}
+
+		} else if (this._suite) {
+
+			this._suite.outdateState();
+
 		}
+
+		this.sendNodeChangedEvents();
+	}
+
+	resetState(node?: TreeNode): void {
+
+		if (node) {
+
+			node.resetState();
+
+			let ancestor = node.parent;
+			while (ancestor) {
+				ancestor.neededUpdates = 'recalc';
+				ancestor = ancestor.parent;
+			}
+
+		} else if (this._suite) {
+
+			this._suite.resetState();
+
+		}
+
+		this.sendNodeChangedEvents();
 	}
 
 	setAutorun(node: TreeNode, autorun: boolean): void {
@@ -71,6 +111,20 @@ export class TestCollection {
 
 	sendNodeChangedEvents(): void {
 		this.explorer.sendNodeChangedEvents(false);
+	}
+
+	shouldOutdateStateOnStart(): boolean {
+		return this.getConfiguration().get('outdateOnStart') || false;
+	}
+
+	shouldOutdateStateOnReload(): boolean {
+		return this.getConfiguration().get('outdateOnReload') || false;
+	}
+
+	private getConfiguration(): vscode.WorkspaceConfiguration {
+		const workspaceFolder = this.adapter.workspaceFolder;
+		var workspaceUri = workspaceFolder ? workspaceFolder.uri : undefined;
+		return vscode.workspace.getConfiguration('testExplorer', workspaceUri);
 	}
 
 	private setAutorunRecursively(node: TreeNode, autorun: boolean): void {

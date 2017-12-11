@@ -15,7 +15,8 @@ export interface TreeNode {
 	readonly collection: TestCollection;
 	readonly parent: TestSuiteNode | undefined;
 	readonly children: TreeNode[];
-	deprecateState(): void;
+	outdateState(): void;
+	resetState(): void;
 	collectTestNodes(testNodes: Map<string, TestNode>, filter?: (n: TestNode) => boolean): void;
 	getTreeItem(): vscode.TreeItem;
 }

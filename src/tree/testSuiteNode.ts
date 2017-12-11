@@ -56,13 +56,28 @@ export class TestSuiteNode implements TreeNode {
 		}
 	}
 
-	deprecateState(): void {
+	outdateState(): void {
 
 		for (const child of this._children) {
-			child.deprecateState();
+			child.outdateState();
 		}
 
 		this.neededUpdates = 'recalc';
+	}
+
+	resetState(): void {
+
+		if ((this.state.current !== 'pending') || (this.state.previous !== 'other') || (this.neededUpdates === 'recalc')) {
+
+			this.state.current = 'pending';
+			this.state.previous = 'other';
+
+			for (const child of this._children) {
+				child.resetState();
+			}
+
+			this.neededUpdates = 'send';
+		}
 	}
 
 	collectTestNodes(testNodes: Map<string, TestNode>, filter?: (n: TestNode) => boolean): void {

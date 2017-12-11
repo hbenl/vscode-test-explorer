@@ -56,9 +56,17 @@ export class TestNode implements TreeNode {
 		this.collection.sendNodeChangedEvents();
 	}
 
-	deprecateState(): void {
+	outdateState(): void {
 		if ((this.state.current === 'passed') || (this.state.current === 'failed')) {
 			this._state.current = 'pending';
+			this.neededUpdates = 'send';
+		}
+	}
+
+	resetState(): void {
+		if ((this.state.current !== 'pending') || (this.state.previous !== 'other')) {
+			this._state.current = 'pending';
+			this._state.previous = 'other';
 			this.neededUpdates = 'send';
 		}
 	}
