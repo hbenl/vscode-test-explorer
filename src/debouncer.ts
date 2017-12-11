@@ -61,6 +61,7 @@ export class TreeEventDebouncer {
 
 		if (node.neededUpdates === 'send') {
 
+			this.resetNeededUpdates(node);
 			return [ node ];
 
 		} else {
@@ -72,6 +73,15 @@ export class TreeEventDebouncer {
 			}
 	
 			return nodesToSend;
+		}
+	}
+
+	private resetNeededUpdates(node: TreeNode): void {
+
+		node.neededUpdates = 'none';
+
+		for (const child of node.children) {
+			this.resetNeededUpdates(child);
 		}
 	}
 }
