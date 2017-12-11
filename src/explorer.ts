@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as RegExpEscape from 'escape-string-regexp';
 import { TestCollectionAdapter } from './adapter/api';
 import { TestCollection } from './tree/testCollection';
 import { TreeNode } from './tree/treeNode';
@@ -129,11 +130,16 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		const file = node.info.file;
 		if (file) {
 
-			const line = node.info.line || 0;
-			const range = new vscode.Range(line, 0, line, 0);
 			const document = await vscode.workspace.openTextDocument(file);
-			await vscode.window.showTextDocument(document, { selection: range });
 
+			let line = node.info.line;
+			if (line === undefined) {
+				line = this.findLineContaining(node.info.label, document.getText());
+				node.info.line = line;
+			}
+
+			const options = (line !== undefined) ? { selection: new vscode.Range(line, 0, line, 0) } : undefined;
+			await vscode.window.showTextDocument(document, options);
 		}
 	}
 
@@ -153,5 +159,15 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 	sendTreeChangedEvent(): void {
 		this.debouncer.sendTreeChangedEvent();
+	}
+
+	private findLineContaining(needle: string, haystack: string | undefined): number | undefined {
+
+		if (!haystack) return undefined;
+	
+		const index = haystack.search(RegExpEscape(needle));
+		if (index < 0) return undefined;
+	
+		return haystack.substr(0, index).split('\n').length - 1;
 	}
 }
