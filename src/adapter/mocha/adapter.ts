@@ -64,7 +64,7 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 			childProc.on('exit', () => {
 
 				if (!testsLoaded) {
-					this.testsEmitter.fire({ type: 'suite', id: '', label: 'No tests found', children: [] });
+					this.testsEmitter.fire();
 				}
 
 				resolve();
