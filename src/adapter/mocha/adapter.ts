@@ -135,7 +135,22 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 	}
 
 	private getEnv(config: vscode.WorkspaceConfiguration): object {
-		return config.get('env') || {};
+
+		const processEnv = process.env;
+		const configEnv: { [prop: string]: any } = config.get('env') || {};
+
+		const resultEnv = { ...processEnv };
+
+		for (const prop in configEnv) {
+			const val = configEnv[prop];
+			if ((val === undefined) || (val === null)) {
+				delete resultEnv.prop;
+			} else {
+				resultEnv[prop] = String(val);
+			}
+		}
+
+		return resultEnv;
 	}
 
 	private getCwd(config: vscode.WorkspaceConfiguration): string {
