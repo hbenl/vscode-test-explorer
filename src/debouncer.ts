@@ -53,7 +53,11 @@ export class TreeEventDebouncer {
 		}
 
 		for (const node of changedNodes) {
-			this.treeDataChanged.fire(node);
+			if (node.parent === undefined) { // root node
+				this.treeDataChanged.fire();
+			} else {
+				this.treeDataChanged.fire(node);
+			}
 		}
 	}
 
