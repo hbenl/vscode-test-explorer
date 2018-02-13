@@ -6,6 +6,6 @@
 			<rect x="4.5" y="4.5" width="7" height="7" style="fill: black;"/>
 		</mask>
 	</defs>
-	<rect x="0" y="0" width="16" height="16" style="fill: #606060; opacity: 0.5; mask: url(#mask);"/>
+	<rect x="0" y="0" width="16" height="16" style="fill: #707070; opacity: 0.8; mask: url(#mask);"/>
 	<path d="M10,13 L10,10 L16,13 L10,16 X" style="fill: #444444;"/>
 </svg>

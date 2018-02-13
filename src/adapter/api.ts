@@ -23,7 +23,7 @@ export interface TestInfo extends TestTreeInfoBase {
 
 export interface TestStateMessage {
 	testId: string;
-	state: 'running' | 'passed' | 'failed';
+	state: 'running' | 'passed' | 'failed' | 'skipped';
 	message?: string;
 }
 

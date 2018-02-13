@@ -17,35 +17,37 @@ export class IconPaths {
 	failedAutorun: IconPath;
 	passedFaintAutorun: IconPath;
 	failedFaintAutorun: IconPath;
+	skipped: IconPath;
 
 	constructor(context: ExtensionContext) {
-		this.pending = context.asAbsolutePath('icons/pending.svg'),
+		this.pending = context.asAbsolutePath('icons/pending.svg');
 		this.pendingAutorun = {
 			dark: context.asAbsolutePath('icons/pending-autorun-dark.svg'),
 			light: context.asAbsolutePath('icons/pending-autorun-light.svg')
-		},
-		this.scheduled = context.asAbsolutePath('icons/scheduled.svg'),
-		this.running = context.asAbsolutePath('icons/running.svg'),
-		this.runningFailed = context.asAbsolutePath('icons/running-failed.svg'),
-		this.passed = context.asAbsolutePath('icons/passed.svg'),
-		this.failed = context.asAbsolutePath('icons/failed.svg'),
-		this.passedFaint = context.asAbsolutePath('icons/passed-faint.svg'),
+		};
+		this.scheduled = context.asAbsolutePath('icons/scheduled.svg');
+		this.running = context.asAbsolutePath('icons/running.svg');
+		this.runningFailed = context.asAbsolutePath('icons/running-failed.svg');
+		this.passed = context.asAbsolutePath('icons/passed.svg');
+		this.failed = context.asAbsolutePath('icons/failed.svg');
+		this.passedFaint = context.asAbsolutePath('icons/passed-faint.svg');
 		this.failedFaint = context.asAbsolutePath('icons/failed-faint.svg')
 		this.passedAutorun = {
 			dark: context.asAbsolutePath('icons/passed-autorun-dark.svg'),
 			light: context.asAbsolutePath('icons/passed-autorun-light.svg')
-		},
+		};
 		this.failedAutorun = {
 			dark: context.asAbsolutePath('icons/failed-autorun-dark.svg'),
 			light: context.asAbsolutePath('icons/failed-autorun-light.svg')
-		},
+		};
 		this.passedFaintAutorun = {
 			dark: context.asAbsolutePath('icons/passed-faint-autorun-dark.svg'),
 			light: context.asAbsolutePath('icons/passed-faint-autorun-light.svg')
-		},
+		};
 		this.failedFaintAutorun = {
 			dark: context.asAbsolutePath('icons/failed-faint-autorun-dark.svg'),
 			light: context.asAbsolutePath('icons/failed-faint-autorun-light.svg')
-		}
+		};
+		this.skipped = context.asAbsolutePath('icons/skipped.svg');
 	}
 }

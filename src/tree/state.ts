@@ -1,7 +1,7 @@
 import { TreeNode } from './treeNode';
 import { IconPaths, IconPath } from '../iconPaths';
 
-export type CurrentNodeState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed' | 'running-failed';
+export type CurrentNodeState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed' | 'running-failed' | 'skipped';
 
 export type PreviousNodeState = 'passed' | 'failed' | 'other';
 
@@ -29,7 +29,7 @@ export function parentNodeState(children: TreeNode[]): NodeState {
 
 export function parentCurrentNodeState(children: TreeNode[]): CurrentNodeState {
 
-	if (children.length === 0) {
+	if (children.every((child) => (child.state.current === 'skipped'))) {
 
 		return 'pending';
 
@@ -120,6 +120,10 @@ export function stateIconPath(state: NodeState, iconPaths: IconPaths): IconPath 
 		case 'failed':
 
 			return state.autorun ? iconPaths.failedAutorun : iconPaths.failed;
+
+		case 'skipped':
+
+			return iconPaths.skipped;
 
 		default:
 

@@ -2,10 +2,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
 	<defs>
 		<mask id="mask" x="0" y="0" width="16" height="16">
-			<circle cx="8" cy="8" r="7" style="fill: white;"/>
-			<rect x="4.5" y="4.5" width="7" height="7" style="fill: black;"/>
+			<path d="M2,8 A6.5,6.5 0 0 1 14,8" style="stroke: white; stroke-width: 1.5; fill: none;"/>
+			<path d="M16.5,7.5 L14,11 L11,7.5 X" transform="rotate(-18,14,7.7)" style="fill: white;"/>
+			<circle cx="8" cy="10" r="2" style="fill: white;"/>
 		</mask>
 	</defs>
 	<rect x="0" y="0" width="16" height="16" style="fill: #707070; opacity: 0.8; mask: url(#mask);"/>
-	<path d="M10,13 L10,10 L16,13 L10,16 X" style="fill: #cccccc;"/>
 </svg>

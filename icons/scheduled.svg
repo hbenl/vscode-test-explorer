@@ -3,7 +3,9 @@
 	<defs>
 		<mask id="mask" x="0" y="0" width="16" height="16">
 			<circle cx="8" cy="8" r="7" style="fill: white;"/>
-			<path d="M6,4.5 L6,11.5 M10,4.5 L10,11.5" style="stroke: black; stroke-width: 2.5;"/>
+			<circle cx="5" cy="8" r="1" style="fill: black;"/>
+			<circle cx="8" cy="8" r="1" style="fill: black;"/>
+			<circle cx="11" cy="8" r="1" style="fill: black;"/>
 		</mask>
 	</defs>
 	<rect x="0" y="0" width="16" height="16" style="fill: #4070f0; mask: url(#mask);"/>
