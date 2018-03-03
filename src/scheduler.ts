@@ -14,7 +14,7 @@ export class TestRunScheduler {
 		private readonly explorer: TestExplorer
 	) {}
 
-	schedule(node: TreeNode, filter?: (n: TestNode) => boolean): void {
+	schedule(node: TreeNode): void {
 		this.pendingTestRuns.push(node);
 		this.doNext();
 	}

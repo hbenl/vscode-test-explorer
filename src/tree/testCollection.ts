@@ -9,9 +9,11 @@ export class TestCollection {
 
 	private rootSuite: TestSuiteNode | undefined;
 	private runningSuite: TestSuiteNode | undefined;
+	private _autorunNode: TreeNode | undefined;
 
 	get suite() { return this.rootSuite; }
 	get iconPaths() { return this.explorer.iconPaths; }
+	get autorunNode() { return this._autorunNode; }
 
 	constructor(
 		public readonly adapter: TestCollectionAdapter,
@@ -33,6 +35,9 @@ export class TestCollection {
 				this.rootSuite = undefined;
 
 			}
+
+			this.runningSuite = undefined;
+			this._autorunNode = undefined;
 
 			explorer.sendTreeChangedEvent();
 		});
@@ -61,7 +66,7 @@ export class TestCollection {
 							}
 						}
 
-						if (testSuiteNode !== undefined) {
+						if (testSuiteNode) {
 							this.runningSuite = testSuiteNode;
 						}
 
@@ -69,7 +74,7 @@ export class TestCollection {
 
 				} else { // testStateMessage.state === 'completed'
 
-					if (this.runningSuite !== undefined) {
+					if (this.runningSuite) {
 						this.runningSuite = this.runningSuite.parent;
 					}
 
@@ -77,7 +82,7 @@ export class TestCollection {
 
 			} else { // testStateMessage.type === 'test'
 
-				if (this.runningSuite !== undefined) {
+				if (this.runningSuite) {
 
 					const testId = (typeof testStateMessage.test === 'string') ? testStateMessage.test : testStateMessage.test.id;
 					let testNode = this.runningSuite.findChildTestNode(testId);
@@ -89,7 +94,7 @@ export class TestCollection {
 						}
 					}
 
-					if (testNode !== undefined) {
+					if (testNode) {
 						testNode.setCurrentState(testStateMessage.state, testStateMessage.message);
 					}
 				}
@@ -98,9 +103,19 @@ export class TestCollection {
 			this.sendNodeChangedEvents();
 		});
 
-		adapter.autorun(() => this.explorer.autorun(this));
+		adapter.autorun(() => {
+			if (this._autorunNode) {
+				this.explorer.start(this._autorunNode);
+			}
+		});
 
 		this.adapter.reloadTests();
+	}
+
+	recalcState(): void {
+		if (this.rootSuite) {
+			this.rootSuite.recalcState(this.rootSuite === this._autorunNode);
+		}
 	}
 
 	outdateState(node?: TreeNode): void {
@@ -145,16 +160,18 @@ export class TestCollection {
 		this.sendNodeChangedEvents();
 	}
 
-	setAutorun(node: TreeNode, autorun: boolean): void {
+	setAutorun(node: TreeNode | undefined): void {
 
-		this.setAutorunRecursively(node, autorun);
+		if (this._autorunNode) {
+			this.setRecalcNeededOnAncestors(this._autorunNode);
+			this.setRecalcNeededOnDescendants(this._autorunNode);
+			this._autorunNode = undefined;
+		}
 
-		let ancestor = node.parent;
-		while (ancestor) {
-			if (ancestor.neededUpdates === 'none') {
-				ancestor.neededUpdates = 'send';
-			}
-			ancestor = ancestor.parent;
+		if (this.rootSuite && node) {
+			this.setRecalcNeededOnAncestors(node);
+			this.setRecalcNeededOnDescendants(node);
+			this._autorunNode = node;
 		}
 
 		this.explorer.sendNodeChangedEvents(true);
@@ -178,16 +195,22 @@ export class TestCollection {
 		return vscode.workspace.getConfiguration('testExplorer', workspaceUri);
 	}
 
-	private setAutorunRecursively(node: TreeNode, autorun: boolean): void {
+	private setRecalcNeededOnDescendants(node: TreeNode): void {
 
-		node.state.autorun = autorun;
-
-		if (node.neededUpdates === 'none') {
-			node.neededUpdates = 'send';
-		}
+		node.neededUpdates = 'recalc';
 
 		for (const child of node.children) {
-			this.setAutorunRecursively(child, autorun);
+			this.setRecalcNeededOnDescendants(child);
+		}
+	}
+
+	private setRecalcNeededOnAncestors(node: TreeNode): void {
+
+		let _node: TreeNode | undefined = node;
+
+		while (_node !== undefined) {
+			_node.neededUpdates = 'recalc';
+			_node = _node.parent;
 		}
 	}
 }

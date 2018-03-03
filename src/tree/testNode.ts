@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TestInfo } from "../adapter/api";
-import { TreeNode } from "./treeNode";
+import { TreeNode, TreeNodeUpdates } from "./treeNode";
 import { NodeState, stateIconPath, CurrentNodeState, defaultState } from "./state";
 import { TestSuiteNode } from './testSuiteNode';
 import { TestCollection } from './testCollection';
@@ -11,7 +11,7 @@ export class TestNode implements TreeNode {
 	private _log: string = "";
 
 	get state(): NodeState { return this._state; }
-	neededUpdates: 'send' | 'none' = 'none';
+	neededUpdates: TreeNodeUpdates = 'none';
 	get log(): string { return this._log; }
 	readonly children: TreeNode[] = [];
 
@@ -55,6 +55,21 @@ export class TestNode implements TreeNode {
 		this.collection.sendNodeChangedEvents();
 	}
 
+	recalcState(autorun: boolean): void {
+		if (this.neededUpdates !== 'recalc') return;
+
+		const newAutorunFlag = autorun || (this.collection.autorunNode === this);
+
+		if (this.state.autorun !== newAutorunFlag) {
+
+			this.state.autorun = newAutorunFlag;
+			this.neededUpdates = 'send';
+
+		} else {
+			this.neededUpdates = 'none';
+		}
+	}
+
 	outdateState(): void {
 		if ((this.state.current === 'passed') || (this.state.current === 'failed')) {
 			this._state.current = 'pending';
@@ -90,5 +105,5 @@ export class TestNode implements TreeNode {
 		const path = this.parent.getPath();
 		path.push(this.info.id);
 		return path;
-}
+	}
 }

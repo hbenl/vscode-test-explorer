@@ -39,22 +39,26 @@ export class TestSuiteNode implements TreeNode {
 		this._state = parentNodeState(this._children);
 	}
 
-	recalcState(): void {
+	recalcState(autorun: boolean): void {
 		if (this.neededUpdates !== 'recalc') return;
 
+		const newAutorunFlag = autorun || (this.collection.autorunNode === this);
+
 		for (const child of this.children) {
-			if (child instanceof TestSuiteNode) {
-				child.recalcState();
-			}
+			child.recalcState(newAutorunFlag);
 		}
 
 		const newCurrentNodeState = parentCurrentNodeState(this.children);
 		const newPreviousNodeState = parentPreviousNodeState(this.children);
 
-		if ((this.state.current !== newCurrentNodeState) || (this.state.previous !== newPreviousNodeState)) {
+		if ((this.state.current !== newCurrentNodeState) ||
+			(this.state.previous !== newPreviousNodeState) ||
+			(this.state.autorun !== newAutorunFlag)
+		) {
 
 			this.state.current = newCurrentNodeState;
 			this.state.previous = newPreviousNodeState;
+			this.state.autorun = newAutorunFlag;
 			this.neededUpdates = 'send';
 
 		} else {
@@ -94,7 +98,7 @@ export class TestSuiteNode implements TreeNode {
 
 		const treeItem = new vscode.TreeItem(this.info.label, vscode.TreeItemCollapsibleState.Collapsed);
 		treeItem.iconPath = stateIconPath(this.state, this.collection.iconPaths);
-		treeItem.contextValue = (this.parent !== undefined) ? 'suite' : 'collection';
+		treeItem.contextValue = this.parent ? 'suite' : 'collection';
 
 		return treeItem;
 	}

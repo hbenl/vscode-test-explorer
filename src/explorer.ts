@@ -137,8 +137,12 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		}
 	}
 
-	setAutorun(node: TreeNode, autorun: boolean): void {
-		node.collection.setAutorun(node, autorun);
+	setAutorun(node: TreeNode): void {
+		node.collection.setAutorun(node);
+	}
+
+	clearAutorun(collection: TestCollection): void {
+		collection.setAutorun(undefined);
 	}
 
 	outdateState(node: TreeNode): void {
@@ -147,12 +151,6 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 	resetState(node: TreeNode): void {
 		node.collection.resetState(node);
-	}
-
-	autorun(collection: TestCollection): void {
-		if (collection.suite) {
-			this.scheduler.schedule(collection.suite, testNode => testNode.state.autorun);
-		}
 	}
 
 	sendNodeChangedEvents(immediately: boolean): void {

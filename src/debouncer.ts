@@ -47,7 +47,7 @@ export class TreeEventDebouncer {
 		const changedNodes: TreeNode[] = [];
 		for (const collection of this.collections) {
 			if (collection.suite) {
-				collection.suite.recalcState();
+				collection.recalcState();
 				changedNodes.push(...this.collectChangedNodes(collection.suite));
 			}
 		}
