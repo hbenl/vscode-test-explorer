@@ -7,10 +7,10 @@ import { TreeNode } from './treeNode';
 
 export class TestCollection {
 
-	private _suite: TestSuiteNode | undefined;
+	private rootSuite: TestSuiteNode | undefined;
+	private runningSuite: TestSuiteNode | undefined;
 
-	readonly testNodes = new Map<string, TestNode>();
-	get suite() { return this._suite; }
+	get suite() { return this.rootSuite; }
 	get iconPaths() { return this.explorer.iconPaths; }
 
 	constructor(
@@ -22,28 +22,79 @@ export class TestCollection {
 
 			if (testSuiteInfo) {
 
-				this._suite = new TestSuiteNode(this, testSuiteInfo, undefined, this.testNodes);
-				this.testNodes.clear();
-				this._suite.collectTestNodes(this.testNodes);
+				this.rootSuite = new TestSuiteNode(this, testSuiteInfo, undefined, this.rootSuite);
 
 				if (this.shouldOutdateStateOnReload()) {
-					this._suite.outdateState();
+					this.rootSuite.outdateState();
 				}
 
 			} else {
-				this._suite = undefined;
-				this.testNodes.clear();
+
+				this.rootSuite = undefined;
+
 			}
 
 			explorer.sendTreeChangedEvent();
 		});
 
 		adapter.testStates((testStateMessage) => {
+			if (this.rootSuite === undefined) return;
 
-			const node = this.testNodes.get(testStateMessage.testId);
-			if (!node) return;
+			if (testStateMessage.type === 'suite') {
 
-			node.setCurrentState(testStateMessage.state, testStateMessage.message);
+				const suiteId = (typeof testStateMessage.suite === 'string') ? testStateMessage.suite : testStateMessage.suite.id;
+
+				if (testStateMessage.state === 'running') {
+
+					if (this.runningSuite === undefined) {
+
+						if (suiteId === this.rootSuite.info.id) {
+							this.runningSuite = this.rootSuite;
+						}
+
+					} else {
+
+						let testSuiteNode = this.runningSuite.findChildTestSuiteNode(suiteId);
+						if (testSuiteNode === undefined) {
+							if (typeof testStateMessage.suite === 'object') {
+								testSuiteNode = new TestSuiteNode(this, testStateMessage.suite, this.runningSuite);
+							}
+						}
+
+						if (testSuiteNode !== undefined) {
+							this.runningSuite = testSuiteNode;
+						}
+
+					}
+
+				} else { // testStateMessage.state === 'completed'
+
+					if (this.runningSuite !== undefined) {
+						this.runningSuite = this.runningSuite.parent;
+					}
+
+				}
+
+			} else { // testStateMessage.type === 'test'
+
+				if (this.runningSuite !== undefined) {
+
+					const testId = (typeof testStateMessage.test === 'string') ? testStateMessage.test : testStateMessage.test.id;
+					let testNode = this.runningSuite.findChildTestNode(testId);
+
+					if (testNode === undefined) {
+						if (typeof testStateMessage.test === 'object') {
+							testNode = new TestNode(this, testStateMessage.test, this.runningSuite);
+							this.runningSuite.children.push(testNode);
+						}
+					}
+
+					if (testNode !== undefined) {
+						testNode.setCurrentState(testStateMessage.state, testStateMessage.message);
+					}
+				}
+			}
+
 			this.sendNodeChangedEvents();
 		});
 
@@ -64,9 +115,9 @@ export class TestCollection {
 				ancestor = ancestor.parent;
 			}
 
-		} else if (this._suite) {
+		} else if (this.rootSuite) {
 
-			this._suite.outdateState();
+			this.rootSuite.outdateState();
 
 		}
 
@@ -85,9 +136,9 @@ export class TestCollection {
 				ancestor = ancestor.parent;
 			}
 
-		} else if (this._suite) {
+		} else if (this.rootSuite) {
 
-			this._suite.resetState();
+			this.rootSuite.resetState();
 
 		}
 

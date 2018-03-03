@@ -5,7 +5,6 @@ import { TestCollection } from './tree/testCollection';
 import { TreeNode } from './tree/treeNode';
 import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './debouncer';
-import { TestNode } from './tree/testNode';
 import { TestRunScheduler } from './scheduler';
 
 export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
@@ -95,14 +94,9 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 	async debug(node: TreeNode): Promise<void> {
 
-		const testNodes = new Map<string, TestNode>();
-		node.collectTestNodes(testNodes);
-
-		if (testNodes.size === 0) return;
-
 		await this.scheduler.cancel();
-		
-		node.collection.adapter.debugTests([...testNodes.keys()]);
+
+		node.collection.adapter.debugTests(node.getPath());
 	}
 
 	cancel(): void {

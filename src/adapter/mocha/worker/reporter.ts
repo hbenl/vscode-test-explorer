@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { TestStateMessage } from '../../api';
+import { TestMessage, TestSuiteMessage } from '../../api';
 
 export default (sendMessage: (message: any) => void) => {
 
@@ -7,10 +7,33 @@ export default (sendMessage: (message: any) => void) => {
 
 		constructor(runner: EventEmitter) {
 
+			runner.on('suite', (suite: Mocha.ISuite) => {
+
+				const stateMessage: TestSuiteMessage = {
+					type: 'suite',
+					suite: suite.title,
+					state: 'running'
+				};
+
+				sendMessage(stateMessage);
+			});
+
+			runner.on('suite end', (suite: Mocha.ISuite) => {
+
+				const stateMessage: TestSuiteMessage = {
+					type: 'suite',
+					suite: suite.title,
+					state: 'completed'
+				};
+
+				sendMessage(stateMessage);
+			});
+
 			runner.on('test', (test: Mocha.ITest) => {
 
-				const stateMessage: TestStateMessage = {
-					testId: test.fullTitle(),
+				const stateMessage: TestMessage = {
+					type: 'test',
+					test: test.title,
 					state: 'running'
 				};
 
@@ -19,8 +42,9 @@ export default (sendMessage: (message: any) => void) => {
 
 			runner.on('pass', (test: Mocha.ITest) => {
 
-				const stateMessage: TestStateMessage = {
-					testId: test.fullTitle(),
+				const stateMessage: TestMessage = {
+					type: 'test',
+					test: test.title,
 					state: 'passed'
 				};
 
@@ -29,8 +53,9 @@ export default (sendMessage: (message: any) => void) => {
 
 			runner.on('fail', (test: Mocha.ITest, err: Error) => {
 
-				const stateMessage: TestStateMessage = {
-					testId: test.fullTitle(),
+				const stateMessage: TestMessage = {
+					type: 'test',
+					test: test.title,
 					state: 'failed',
 					message: err.stack || err.message
 				};
@@ -40,8 +65,9 @@ export default (sendMessage: (message: any) => void) => {
 
 			runner.on('pending', (test: Mocha.ITest) => {
 
-				const stateMessage: TestStateMessage = {
-					testId: test.fullTitle(),
+				const stateMessage: TestMessage = {
+					type: 'test',
+					test: test.title,
 					state: 'skipped'
 				};
 

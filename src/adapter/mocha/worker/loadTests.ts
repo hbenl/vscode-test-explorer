@@ -1,5 +1,5 @@
 import * as Mocha from 'mocha';
-import { TestSuiteInfo, TestInfo, TestTreeInfo } from '../../api';
+import { TestSuiteInfo, TestInfo } from '../../api';
 
 let sendMessage: (message: any) => void;
 
@@ -32,22 +32,23 @@ async function loadTests(files: string[], ui: string) {
 
 async function convertSuite(suite: Mocha.ISuite): Promise<TestSuiteInfo> {
 
-	const childSuites: TestTreeInfo[] = await Promise.all(suite.suites.map((suite) => convertSuite(suite)));
-	const childTests: TestTreeInfo[] = await Promise.all(suite.tests.map((test) => convertTest(test)));
+	const childSuites: TestSuiteInfo[] = await Promise.all(suite.suites.map((suite) => convertSuite(suite)));
+	const childTests: TestInfo[] = await Promise.all(suite.tests.map((test) => convertTest(test)));
+	const children = (<(TestSuiteInfo | TestInfo)[]>childSuites).concat(childTests);
 
 	return {
 		type: 'suite',
-		id: suite.fullTitle(),
+		id: suite.title,
 		label: suite.title,
 		file: suite.file,
-		children: childSuites.concat(childTests)
+		children
 	};
 }
 
 async function convertTest(test: Mocha.ITest): Promise<TestInfo> {
 	return {
 		type: 'test',
-		id: test.fullTitle(),
+		id: test.title,
 		label: test.title,
 		file: test.file,
 	}

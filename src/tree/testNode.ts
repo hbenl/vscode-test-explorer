@@ -18,10 +18,9 @@ export class TestNode implements TreeNode {
 	constructor(
 		public readonly collection: TestCollection,
 		public readonly info: TestInfo,
-		public readonly parent: TestSuiteNode | undefined,
-		oldNodesById: Map<string, TreeNode> | undefined
+		public readonly parent: TestSuiteNode,
+		oldNode?: TestNode
 	) {
-		const oldNode = oldNodesById ? oldNodesById.get(info.id) : undefined;
 		if (oldNode) {
 			this._state = oldNode.state;
 			this._log = oldNode.log || "";
@@ -47,7 +46,7 @@ export class TestNode implements TreeNode {
 		}
 
 		this.neededUpdates = 'send';
-		let ancestor = this.parent;
+		let ancestor: TestSuiteNode | undefined = this.parent;
 		while (ancestor) {
 			ancestor.neededUpdates = 'recalc';
 			ancestor = ancestor.parent;
@@ -71,12 +70,6 @@ export class TestNode implements TreeNode {
 		}
 	}
 
-	collectTestNodes(testNodes: Map<string, TestNode>, filter?: (n: TestNode) => boolean): void {
-		if ((filter === undefined) || filter(this)) {
-			testNodes.set(this.info.id, this);
-		}
-	}
-
 	getTreeItem(): vscode.TreeItem {
 
 		this.neededUpdates = 'none';
@@ -92,4 +85,10 @@ export class TestNode implements TreeNode {
 
 		return treeItem;
 	}
+
+	getPath(): string[] {
+		const path = this.parent.getPath();
+		path.push(this.info.id);
+		return path;
+}
 }

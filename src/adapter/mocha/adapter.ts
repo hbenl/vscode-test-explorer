@@ -1,17 +1,19 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { fork, ChildProcess } from 'child_process';
-import { TestCollectionAdapter, TestSuiteInfo, TestStateMessage } from '../api';
+import { TestCollectionAdapter, TestSuiteInfo, TestMessage, TestInfo } from '../api';
 import { MochaOpts } from './opts';
 
 export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 
+	private rootSuite: TestSuiteInfo | undefined;
+
 	private runningTestProcess: ChildProcess | undefined;
 
 	private readonly testsEmitter = new vscode.EventEmitter<TestSuiteInfo>();
-	private readonly statesEmitter = new vscode.EventEmitter<TestStateMessage>();
+	private readonly statesEmitter = new vscode.EventEmitter<TestMessage>();
 	private readonly autorunEmitter = new vscode.EventEmitter<void>();
-	
+
 	constructor(
 		public readonly workspaceFolder: vscode.WorkspaceFolder
 	) {
@@ -26,7 +28,7 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 		return this.testsEmitter.event;
 	}
 
-	get testStates(): vscode.Event<TestStateMessage> {
+	get testStates(): vscode.Event<TestMessage> {
 		return this.statesEmitter.event;
 	}
 
@@ -58,6 +60,8 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 					info.label = this.workspaceFolder.name;
 				}
 
+				this.rootSuite = info;
+
 				this.testsEmitter.fire(info);
 			});
 
@@ -72,7 +76,13 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 		});
 	}
 
-	async startTests(tests: string[]): Promise<void> {
+	async startTests(path: string[]): Promise<void> {
+		if (!this.rootSuite) return;
+
+		const info = this.findInfoForPath(this.rootSuite, path);
+		if (info === undefined) return;
+		const tests: string[] = [];
+		this.collectTests(info, tests);
 
 		const config = this.getConfiguration();
 		const testFiles = await this.lookupFiles(config);
@@ -91,7 +101,7 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 			);
 
 			this.runningTestProcess.on('message',
-				message => this.statesEmitter.fire(<TestStateMessage>message));
+				message => this.statesEmitter.fire(<TestMessage>message));
 
 			this.runningTestProcess.on('exit', () => {
 				this.runningTestProcess = undefined;
@@ -100,7 +110,13 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 		});
 	}
 
-	async debugTests(tests: string[]): Promise<void> {
+	async debugTests(path: string[]): Promise<void> {
+		if (!this.rootSuite) return;
+
+		const info = this.findInfoForPath(this.rootSuite, path);
+		if (info === undefined) return;
+		const tests: string[] = [];
+		this.collectTests(info, tests);
 
 		const config = this.getConfiguration();
 		const testFiles = await this.lookupFiles(config);
@@ -164,6 +180,31 @@ export class MochaTestCollectionAdapter implements TestCollectionAdapter {
 			ui: config.get<string>('ui')!,
 			timeout: config.get<number>('timeout')!,
 			retries: config.get<number>('retries')!
+		}
+	}
+
+	private findInfoForPath(parent: TestSuiteInfo, path: string[]): TestSuiteInfo | TestInfo | undefined {
+		if (path.length === 0) return parent;
+		const childId = path.shift();
+		const child = parent.children.find(child => child.id === childId);
+		if (child === undefined) return undefined;
+		if (child.type === 'test') {
+			if (path.length === 0) {
+				return child;
+			} else {
+				return undefined;
+			}
+		}
+		return this.findInfoForPath(child, path);
+	}
+
+	private collectTests(info: TestSuiteInfo | TestInfo, tests: string[]): void {
+		if (info.type === 'suite') {
+			for (const child of info.children) {
+				this.collectTests(child, tests);
+			}
+		} else {
+			tests.push(info.id);
 		}
 	}
 }

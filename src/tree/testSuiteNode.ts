@@ -19,14 +19,20 @@ export class TestSuiteNode implements TreeNode {
 		public readonly collection: TestCollection,
 		public readonly info: TestSuiteInfo,
 		public readonly parent: TestSuiteNode | undefined,
-		oldNodesById: Map<string, TreeNode> | undefined
+		oldNode?: TestSuiteNode
 	) {
 
-		this._children = info.children.map((childInfo) => {
+		this._children = info.children.map(childInfo => {
+
 			if (childInfo.type === 'test') {
-				return new TestNode(collection, childInfo, this, oldNodesById);
+
+				const oldChildNode = oldNode ? oldNode.findChildTestNode(childInfo.id) : undefined;
+				return new TestNode(collection, childInfo, this, oldChildNode);
+
 			} else {
-				return new TestSuiteNode(collection, childInfo, this, oldNodesById);
+
+				const oldChildNode = oldNode ? oldNode.findChildTestSuiteNode(childInfo.id) : undefined;
+				return new TestSuiteNode(collection, childInfo, this, oldChildNode);
 			}
 		});
 
@@ -80,12 +86,6 @@ export class TestSuiteNode implements TreeNode {
 		}
 	}
 
-	collectTestNodes(testNodes: Map<string, TestNode>, filter?: (n: TestNode) => boolean): void {
-		for (const child of this._children) {
-			child.collectTestNodes(testNodes, filter);
-		}
-	}
-
 	getTreeItem(): vscode.TreeItem {
 
 		if (this.neededUpdates === 'send') {
@@ -97,5 +97,28 @@ export class TestSuiteNode implements TreeNode {
 		treeItem.contextValue = (this.parent !== undefined) ? 'suite' : 'collection';
 
 		return treeItem;
+	}
+
+	getPath(): string[] {
+		if (this.parent === undefined) {
+			return [];
+		} else {
+			const path = this.parent.getPath();
+			path.push(this.info.id);
+			return path;
+		}
+	}
+
+	private findChildNode(type: 'suite' | 'test', id: string): TreeNode | undefined {
+		return this.children.find(childNode =>
+			(childNode.info.type === type) && (childNode.info.id === id));
+	}
+
+	findChildTestSuiteNode(id: string): TestSuiteNode | undefined {
+		return <TestSuiteNode | undefined>this.findChildNode('suite', id);
+	}
+
+	findChildTestNode(id: string): TestNode | undefined {
+		return <TestNode | undefined>this.findChildNode('test', id);
 	}
 }

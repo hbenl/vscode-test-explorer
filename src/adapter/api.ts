@@ -1,28 +1,31 @@
 import * as vscode from 'vscode';
 
-export type TestTreeInfo = TestInfo | TestSuiteInfo;
-
-interface TestTreeInfoBase {
-	type: string;
+export interface TestSuiteInfo {
+	type: 'suite';
 	id: string;
 	label: string;
-}
-
-export interface TestSuiteInfo extends TestTreeInfoBase {
-	type: 'suite';
 	file?: string;
 	line?: number;
-	readonly children: TestTreeInfo[];
+	children: (TestSuiteInfo | TestInfo)[];
 }
 
-export interface TestInfo extends TestTreeInfoBase {
+export interface TestInfo {
 	type: 'test';
+	id: string;
+	label: string;
 	file?: string;
 	line?: number;
 }
 
-export interface TestStateMessage {
-	testId: string;
+export interface TestSuiteMessage {
+	type: 'suite';
+	suite: string | TestSuiteInfo;
+	state: 'running' | 'completed';
+}
+
+export interface TestMessage {
+	type: 'test';
+	test: string | TestInfo;
 	state: 'running' | 'passed' | 'failed' | 'skipped';
 	message?: string;
 }
@@ -31,8 +34,8 @@ export interface TestCollectionAdapter {
 	workspaceFolder?: vscode.WorkspaceFolder;
 	readonly tests: vscode.Event<TestSuiteInfo | undefined>;
 	reloadTests(): Promise<void>;
-	readonly testStates: vscode.Event<TestStateMessage>;
-	startTests(tests: string[]): Promise<void>;
+	readonly testStates: vscode.Event<TestSuiteMessage | TestMessage>;
+	startTests(path: string[]): Promise<void>;
 	cancelTests(): void;
 	debugTests(tests: string[]): void;
 	readonly autorun: vscode.Event<void>;

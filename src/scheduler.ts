@@ -7,7 +7,7 @@ import { TestCollection } from './tree/testCollection';
 
 export class TestRunScheduler {
 
-	private pendingTestRuns: TestNode[][] = [];
+	private pendingTestRuns: TreeNode[] = [];
 	private currentTestRun: [TestCollection, Promise<void>] | undefined;
 
 	constructor(
@@ -15,14 +15,8 @@ export class TestRunScheduler {
 	) {}
 
 	schedule(node: TreeNode, filter?: (n: TestNode) => boolean): void {
-
-		const testNodes = new Map<string, TestNode>();
-		node.collectTestNodes(testNodes, filter);
-
-		if (testNodes.size > 0) {
-			this.pendingTestRuns.push([...testNodes.values()]);
-			this.doNext();
-		}
+		this.pendingTestRuns.push(node);
+		this.doNext();
 	}
 
 	async cancel(): Promise<void> {
@@ -38,19 +32,21 @@ export class TestRunScheduler {
 	private doNext() {
 		if (this.currentTestRun) return;
 
-		const testNodes = this.pendingTestRuns.shift();
-		if (!testNodes) return;
+		const treeNode = this.pendingTestRuns.shift();
+		if (!treeNode) return;
 
-		this.runTests(testNodes);
+		this.runTests(treeNode);
 	}
 
-	private async runTests(testNodes: TestNode[]) {
+	private async runTests(treeNode: TreeNode) {
 
-		const collection = testNodes[0]!.collection;
+		const collection = treeNode.collection;
 
 		if (collection.shouldOutdateStateOnStart()) {
 			collection.outdateState();
 		}
+		const testNodes: TestNode[] = [];
+		this.collectTests(treeNode, testNodes);
 		for (const testNode of testNodes) {
 			testNode.setCurrentState('scheduled');
 		}
@@ -58,8 +54,7 @@ export class TestRunScheduler {
 
 		vscode.commands.executeCommand('setContext', 'testsRunning', true);
 
-		const testIds = testNodes.map(testNode => testNode.info.id);
-		const testRunPromise = collection.adapter.startTests(testIds);
+		const testRunPromise = collection.adapter.startTests(treeNode.getPath());
 		this.currentTestRun = [collection, testRunPromise];
 
 		await testRunPromise;
@@ -75,5 +70,15 @@ export class TestRunScheduler {
 		}
 
 		this.doNext();
+	}
+
+	private collectTests(treeNode: TreeNode, testNodes: TestNode[]): void {
+		if (treeNode.info.type === 'suite') {
+			for (const child of treeNode.children) {
+				this.collectTests(child, testNodes);
+			}
+		} else {
+			testNodes.push(<TestNode>treeNode);
+		}
 	}
 }
