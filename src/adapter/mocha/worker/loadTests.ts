@@ -16,7 +16,7 @@ if (process.send) {
 	console.log('This script is designed to run in a child process!');
 }
 
-async function loadTests(files: string[], ui: string) {
+function loadTests(files: string[], ui: string) {
 
 	const mocha = new Mocha();
 	mocha.ui(ui);
@@ -27,13 +27,13 @@ async function loadTests(files: string[], ui: string) {
 
 	mocha.loadFiles();
 
-	sendMessage(await convertSuite(mocha.suite));
+	sendMessage(convertSuite(mocha.suite));
 }
 
-async function convertSuite(suite: Mocha.ISuite): Promise<TestSuiteInfo> {
+function convertSuite(suite: Mocha.ISuite): TestSuiteInfo {
 
-	const childSuites: TestSuiteInfo[] = await Promise.all(suite.suites.map((suite) => convertSuite(suite)));
-	const childTests: TestInfo[] = await Promise.all(suite.tests.map((test) => convertTest(test)));
+	const childSuites: TestSuiteInfo[] = suite.suites.map((suite) => convertSuite(suite));
+	const childTests: TestInfo[] = suite.tests.map((test) => convertTest(test));
 	const children = (<(TestSuiteInfo | TestInfo)[]>childSuites).concat(childTests);
 
 	return {
@@ -45,7 +45,7 @@ async function convertSuite(suite: Mocha.ISuite): Promise<TestSuiteInfo> {
 	};
 }
 
-async function convertTest(test: Mocha.ITest): Promise<TestInfo> {
+function convertTest(test: Mocha.ITest): TestInfo {
 	return {
 		type: 'test',
 		id: test.title,
