@@ -63,6 +63,8 @@ export class TestCollection {
 						if (testSuiteNode === undefined) {
 							if (typeof testStateMessage.suite === 'object') {
 								testSuiteNode = new TestSuiteNode(this, testStateMessage.suite, this.runningSuite);
+								this.runningSuite.children.push(testSuiteNode);
+								this.runningSuite.neededUpdates = 'recalc';
 							}
 						}
 
@@ -91,6 +93,7 @@ export class TestCollection {
 						if (typeof testStateMessage.test === 'object') {
 							testNode = new TestNode(this, testStateMessage.test, this.runningSuite);
 							this.runningSuite.children.push(testNode);
+							this.runningSuite.neededUpdates = 'recalc';
 						}
 					}
 

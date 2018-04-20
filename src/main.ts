@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { TestExplorer } from './explorer';
 import { initMocha } from './adapter/mocha/adapterFactory';
+import { initJasmine } from './adapter/jasmine/adapterFactory';
 
 export let testExplorer: TestExplorer;
 
@@ -8,6 +9,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	testExplorer = new TestExplorer(context);
 	initMocha();
+	initJasmine();
 
 	const registerCommand = (command: string, callback: (...args: any[]) => any) => {
 		context.subscriptions.push(vscode.commands.registerCommand(command, callback));
