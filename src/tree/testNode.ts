@@ -70,7 +70,7 @@ export class TestNode implements TreeNode {
 		}
 	}
 
-	outdateState(): void {
+	retireState(): void {
 		if ((this.state.current === 'passed') || (this.state.current === 'failed')) {
 			this._state.current = 'pending';
 			this.neededUpdates = 'send';

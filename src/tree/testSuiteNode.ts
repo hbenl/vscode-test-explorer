@@ -66,10 +66,10 @@ export class TestSuiteNode implements TreeNode {
 		}
 	}
 
-	outdateState(): void {
+	retireState(): void {
 
 		for (const child of this._children) {
-			child.outdateState();
+			child.retireState();
 		}
 
 		this.neededUpdates = 'recalc';

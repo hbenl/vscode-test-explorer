@@ -43,7 +43,7 @@ export class TestRunScheduler {
 		const collection = treeNode.collection;
 
 		if (collection.shouldOutdateStateOnStart()) {
-			collection.outdateState();
+			collection.retireState();
 		}
 		const testNodes: TestNode[] = [];
 		this.collectTests(treeNode, testNodes);

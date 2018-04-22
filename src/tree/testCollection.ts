@@ -27,7 +27,7 @@ export class TestCollection {
 				this.rootSuite = new TestSuiteNode(this, testSuiteInfo, undefined, this.rootSuite);
 
 				if (this.shouldOutdateStateOnReload()) {
-					this.rootSuite.outdateState();
+					this.rootSuite.retireState();
 				}
 
 			} else {
@@ -121,11 +121,11 @@ export class TestCollection {
 		}
 	}
 
-	outdateState(node?: TreeNode): void {
+	retireState(node?: TreeNode): void {
 
 		if (node) {
 
-			node.outdateState();
+			node.retireState();
 
 			let ancestor = node.parent;
 			while (ancestor) {
@@ -135,7 +135,7 @@ export class TestCollection {
 
 		} else if (this.rootSuite) {
 
-			this.rootSuite.outdateState();
+			this.rootSuite.retireState();
 
 		}
 
@@ -185,11 +185,11 @@ export class TestCollection {
 	}
 
 	shouldOutdateStateOnStart(): boolean {
-		return this.getConfiguration().get('outdateOnStart') || false;
+		return this.getConfiguration().get('retireOnStart') || false;
 	}
 
 	shouldOutdateStateOnReload(): boolean {
-		return this.getConfiguration().get('outdateOnReload') || false;
+		return this.getConfiguration().get('retireOnReload') || false;
 	}
 
 	private getConfiguration(): vscode.WorkspaceConfiguration {

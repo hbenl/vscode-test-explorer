@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	registerCommand('extension.test-explorer.disable-autorun', (node) => testExplorer.clearAutorun(node.collection));
 
-	registerCommand('extension.test-explorer.outdate', (node) => testExplorer.outdateState(node));
+	registerCommand('extension.test-explorer.retire', (node) => testExplorer.retireState(node));
 
 	registerCommand('extension.test-explorer.reset', (node) => testExplorer.resetState(node));
 

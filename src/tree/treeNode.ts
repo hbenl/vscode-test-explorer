@@ -16,7 +16,7 @@ export interface TreeNode {
 	readonly children: TreeNode[];
 	getPath(): string[];
 	recalcState(autorun: boolean): void;
-	outdateState(): void;
+	retireState(): void;
 	resetState(): void;
 	getTreeItem(): vscode.TreeItem;
 }
