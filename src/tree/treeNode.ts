@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { NodeState } from './state';
 import { TestCollection } from './testCollection';
 import { TestSuiteNode } from './testSuiteNode';
-import { TestSuiteInfo, TestInfo } from '../adapter/api';
+import { TestSuiteInfo, TestInfo } from 'vscode-test-adapter-api';
 
 export type TreeNodeUpdates = 'none' | 'send' | 'recalc';
 

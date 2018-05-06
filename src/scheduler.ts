@@ -24,7 +24,7 @@ export class TestRunScheduler {
 		this.pendingTestRuns = [];
 
 		if (this.currentTestRun) {
-			this.currentTestRun[0].adapter.cancelTests();
+			this.currentTestRun[0].adapter.cancel();
 			await this.currentTestRun[1];
 		}
 	}
@@ -42,7 +42,7 @@ export class TestRunScheduler {
 
 		const collection = treeNode.collection;
 
-		if (collection.shouldOutdateStateOnStart()) {
+		if (collection.shouldRetireStateOnStart()) {
 			collection.retireState();
 		}
 		const testNodes: TestNode[] = [];
@@ -54,7 +54,7 @@ export class TestRunScheduler {
 
 		vscode.commands.executeCommand('setContext', 'testsRunning', true);
 
-		const testRunPromise = collection.adapter.startTests(treeNode.getPath());
+		const testRunPromise = collection.adapter.run(treeNode.info);
 		this.currentTestRun = [collection, testRunPromise];
 
 		await testRunPromise;

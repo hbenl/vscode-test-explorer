@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TestSuiteNode } from './testSuiteNode';
-import { TestCollectionAdapter } from '../adapter/api';
+import { TestAdapter } from 'vscode-test-adapter-api';
 import { TestNode } from './testNode';
 import { TestExplorer } from '../explorer';
 import { TreeNode } from './treeNode';
@@ -16,31 +16,9 @@ export class TestCollection {
 	get autorunNode() { return this._autorunNode; }
 
 	constructor(
-		public readonly adapter: TestCollectionAdapter,
+		public readonly adapter: TestAdapter,
 		private readonly explorer: TestExplorer
 	) {
-
-		adapter.tests((testSuiteInfo) => {
-
-			if (testSuiteInfo) {
-
-				this.rootSuite = new TestSuiteNode(this, testSuiteInfo, undefined, this.rootSuite);
-
-				if (this.shouldOutdateStateOnReload()) {
-					this.rootSuite.retireState();
-				}
-
-			} else {
-
-				this.rootSuite = undefined;
-
-			}
-
-			this.runningSuite = undefined;
-			this._autorunNode = undefined;
-
-			explorer.sendTreeChangedEvent();
-		});
 
 		adapter.testStates((testStateMessage) => {
 			if (this.rootSuite === undefined) return;
@@ -106,13 +84,43 @@ export class TestCollection {
 			this.sendNodeChangedEvents();
 		});
 
-		adapter.autorun(() => {
-			if (this._autorunNode) {
-				this.explorer.start(this._autorunNode);
-			}
-		});
+		if (adapter.reload) {
+			adapter.reload(() => this.loadTests());
+		}
 
-		this.adapter.reloadTests();
+		if (adapter.autorun) {
+			adapter.autorun(() => {
+				if (this._autorunNode) {
+					this.explorer.start(this._autorunNode);
+				}
+			});
+		}
+
+		this.loadTests();
+	}
+
+	async loadTests(): Promise<void> {
+
+		const testSuiteInfo = await this.adapter.load();
+
+		if (testSuiteInfo) {
+
+			this.rootSuite = new TestSuiteNode(this, testSuiteInfo, undefined, this.rootSuite);
+
+			if (this.shouldRetireStateOnReload()) {
+				this.rootSuite.retireState();
+			}
+
+		} else {
+
+			this.rootSuite = undefined;
+
+		}
+
+		this.runningSuite = undefined;
+		this._autorunNode = undefined;
+
+		this.explorer.sendTreeChangedEvent();
 	}
 
 	recalcState(): void {
@@ -184,11 +192,11 @@ export class TestCollection {
 		this.explorer.sendNodeChangedEvents(false);
 	}
 
-	shouldOutdateStateOnStart(): boolean {
+	shouldRetireStateOnStart(): boolean {
 		return this.getConfiguration().get('retireOnStart') || false;
 	}
 
-	shouldOutdateStateOnReload(): boolean {
+	shouldRetireStateOnReload(): boolean {
 		return this.getConfiguration().get('retireOnReload') || false;
 	}
 

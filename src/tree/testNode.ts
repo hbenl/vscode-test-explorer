@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TestInfo } from "../adapter/api";
+import { TestInfo } from "vscode-test-adapter-api";
 import { TreeNode, TreeNodeUpdates } from "./treeNode";
 import { NodeState, stateIconPath, CurrentNodeState, defaultState } from "./state";
 import { TestSuiteNode } from './testSuiteNode';

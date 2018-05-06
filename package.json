@@ -4,7 +4,7 @@
   "description": "Run your tests in the Sidebar of Visual Studio Code",
   "author": "Holger Benl <hbenl@evandor.de>",
   "publisher": "hbenl",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "license": "MIT",
   "categories": [
     "Other"
@@ -25,22 +25,18 @@
   },
   "dependencies": {
     "escape-string-regexp": "^1.0.5",
-    "fs-extra": "^4.0.3",
-    "jasmine": "3.1.0",
-    "mocha": "^4.0.1",
-    "tslib": "^1.8.0"
+    "fs-extra": "^6.0.0",
+    "tslib": "^1.9.0"
   },
   "devDependencies": {
     "@types/escape-string-regexp": "0.0.32",
-    "@types/fs-extra": "^4.0.5",
-    "@types/jasmine": "^2.8.6",
-    "@types/mocha": "^2.2.44",
-    "typescript": "^2.5.3",
-    "vsce": "^1.32.0",
-    "vscode": "^1.1.6"
+    "@types/fs-extra": "^5.0.2",
+    "typescript": "^2.8.3",
+    "vsce": "^1.40.0",
+    "vscode": "^1.1.17"
   },
   "engines": {
-    "vscode": "^1.17.0"
+    "vscode": "^1.23.0"
   },
   "activationEvents": [
     "onView:extension.test-explorer.tests"
@@ -60,44 +56,6 @@
           "description": "Retire all test states whenever a test run is started",
           "type": "boolean",
           "default": false,
-          "scope": "resource"
-        },
-        "mochaExplorer.files": {
-          "description": "The glob describing the location of your test files (relative to the workspace folder)",
-          "type": "string",
-          "default": "test/**/*.js",
-          "scope": "resource"
-        },
-        "mochaExplorer.env": {
-          "description": "Environment variables to be set when running the tests",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "default": {},
-          "scope": "resource"
-        },
-        "mochaExplorer.cwd": {
-          "description": "The working directory where mocha is run (relative to the workspace folder)",
-          "type": "string",
-          "scope": "resource"
-        },
-        "mochaExplorer.ui": {
-          "description": "The mocha ui used by the tests",
-          "type": "string",
-          "default": "bdd",
-          "scope": "resource"
-        },
-        "mochaExplorer.timeout": {
-          "description": "The test-case timeout in milliseconds",
-          "type": "number",
-          "default": 2000,
-          "scope": "resource"
-        },
-        "mochaExplorer.retries": {
-          "description": "The number of times to retry failed tests",
-          "type": "number",
-          "default": 0,
           "scope": "resource"
         }
       }

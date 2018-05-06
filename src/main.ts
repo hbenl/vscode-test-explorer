@@ -1,15 +1,10 @@
 import * as vscode from 'vscode';
+import { TestExplorerExtension } from 'vscode-test-adapter-api';
 import { TestExplorer } from './explorer';
-import { initMocha } from './adapter/mocha/adapterFactory';
-import { initJasmine } from './adapter/jasmine/adapterFactory';
 
-export let testExplorer: TestExplorer;
+export function activate(context: vscode.ExtensionContext): TestExplorerExtension {
 
-export function activate(context: vscode.ExtensionContext) {
-
-	testExplorer = new TestExplorer(context);
-	initMocha();
-	initJasmine();
+	const testExplorer = new TestExplorer(context);
 
 	const registerCommand = (command: string, callback: (...args: any[]) => any) => {
 		context.subscriptions.push(vscode.commands.registerCommand(command, callback));
@@ -40,4 +35,9 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.window.registerTreeDataProvider(
 		'extension.test-explorer.tests', testExplorer
 	));
+
+	return {
+		registerAdapter: adapter => testExplorer.registerAdapter(adapter),
+		unregisterAdapter: adapter => testExplorer.unregisterAdapter(adapter)
+	}
 }

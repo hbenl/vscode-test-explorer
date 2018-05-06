@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as RegExpEscape from 'escape-string-regexp';
-import { TestCollectionAdapter } from './adapter/api';
+import { TestAdapter } from 'vscode-test-adapter-api';
 import { TestCollection } from './tree/testCollection';
 import { TreeNode } from './tree/treeNode';
 import { IconPaths } from './iconPaths';
@@ -34,11 +34,11 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		this.onDidChangeTreeData = this.treeDataChanged.event;
 	}
 
-	registerCollection(adapter: TestCollectionAdapter): void {
+	registerAdapter(adapter: TestAdapter): void {
 		this.collections.push(new TestCollection(adapter, this));
 	}
 
-	unregisterCollection(adapter: TestCollectionAdapter): void {
+	unregisterAdapter(adapter: TestAdapter): void {
 		var index = this.collections.findIndex((collection) => (collection.adapter === adapter));
 		if (index >= 0) {
 			this.collections.splice(index, 1);
@@ -72,10 +72,10 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 	reload(collection?: TestCollection): void {
 		if (collection) {
-			collection.adapter.reloadTests();
+			collection.loadTests();
 		} else {
 			for (const collection of this.collections) {
-				collection.adapter.reloadTests();
+				collection.loadTests();
 			}
 		}
 	}
@@ -96,7 +96,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 		await this.scheduler.cancel();
 
-		node.collection.adapter.debugTests(node.getPath());
+		node.collection.adapter.debug(node.info);
 	}
 
 	cancel(): void {
