@@ -65,7 +65,7 @@
       }
     },
     "views": {
-      "explorer": [
+      "test": [
         {
           "id": "extension.test-explorer.tests",
           "name": "Test Explorer"
