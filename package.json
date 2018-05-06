@@ -6,6 +6,10 @@
   "publisher": "hbenl",
   "version": "0.1.0",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hbenl/vscode-test-explorer.git"
+  },
   "categories": [
     "Other"
   ],
