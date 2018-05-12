@@ -31,7 +31,7 @@ export function parentCurrentNodeState(children: TreeNode[]): CurrentNodeState {
 
 	if (children.every((child) => (child.state.current === 'skipped'))) {
 
-		return 'pending';
+		return 'skipped';
 
 	} else if (children.some((child) => (child.state.current === 'running'))) {
 
