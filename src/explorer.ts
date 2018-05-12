@@ -96,7 +96,12 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 		await this.scheduler.cancel();
 
-		node.collection.adapter.debug(node.info);
+		try {
+			await node.collection.adapter.debug(node.info);
+		} catch(e) {
+			vscode.window.showErrorMessage(`Error while debugging test: ${e}`);
+			return;
+		}
 	}
 
 	cancel(): void {

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TestSuiteNode } from './testSuiteNode';
-import { TestAdapter } from 'vscode-test-adapter-api';
+import { TestAdapter, TestSuiteInfo } from 'vscode-test-adapter-api';
 import { TestNode } from './testNode';
 import { TestExplorer } from '../explorer';
 import { TreeNode } from './treeNode';
@@ -101,7 +101,13 @@ export class TestCollection {
 
 	async loadTests(): Promise<void> {
 
-		const testSuiteInfo = await this.adapter.load();
+		let testSuiteInfo: TestSuiteInfo | undefined;
+		try {
+			testSuiteInfo = await this.adapter.load();
+		} catch(e) {
+			vscode.window.showErrorMessage(`Error while loading tests: ${e}`);
+			return;
+		}
 
 		if (testSuiteInfo) {
 

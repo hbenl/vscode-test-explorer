@@ -54,10 +54,16 @@ export class TestRunScheduler {
 
 		vscode.commands.executeCommand('setContext', 'testsRunning', true);
 
-		const testRunPromise = collection.adapter.run(treeNode.info);
-		this.currentTestRun = [collection, testRunPromise];
+		try {
 
-		await testRunPromise;
+			const testRunPromise = collection.adapter.run(treeNode.info);
+			this.currentTestRun = [collection, testRunPromise];
+	
+			await testRunPromise;
+
+		} catch(e) {
+			vscode.window.showErrorMessage(`Error while running tests: ${e}`);
+		}
 
 		this.currentTestRun = undefined;
 
