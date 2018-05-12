@@ -44,7 +44,7 @@
     "vscode": "^1.23.0"
   },
   "activationEvents": [
-    "onView:extension.test-explorer.tests"
+    "onView:test-explorer"
   ],
   "contributes": {
     "configuration": {
@@ -58,7 +58,7 @@
           "scope": "resource"
         },
         "testExplorer.retireOnReload": {
-          "description": "Retire all test states whenever a test run is started",
+          "description": "Retire all test states whenever the test tree is reloaded",
           "type": "boolean",
           "default": false,
           "scope": "resource"
@@ -68,22 +68,34 @@
     "views": {
       "test": [
         {
-          "id": "extension.test-explorer.tests",
+          "id": "test-explorer",
           "name": "Test Explorer"
         }
       ]
     },
     "commands": [
       {
-        "command": "extension.test-explorer.reload",
-        "title": "Reload the test tree"
+        "command": "test-explorer.reload",
+        "title": "Test Explorer: Reload tests",
+        "icon": {
+          "dark": "./icons/reload-dark.svg",
+          "light": "./icons/reload-light.svg"
+        }
       },
       {
-        "command": "extension.test-explorer.reload-collection",
-        "title": "Reload this test collection"
+        "command": "test-explorer.reload-collection",
+        "title": "Reload tests"
       },
       {
-        "command": "extension.test-explorer.start",
+        "command": "test-explorer.start-all",
+        "title": "Test Explorer: Run all tests",
+        "icon": {
+          "dark": "./icons/start-dark.svg",
+          "light": "./icons/start-light.svg"
+        }
+      },
+      {
+        "command": "test-explorer.start",
         "title": "Run tests",
         "icon": {
           "dark": "./icons/start-dark.svg",
@@ -91,113 +103,158 @@
         }
       },
       {
-        "command": "extension.test-explorer.cancel",
+        "command": "test-explorer.debug",
+        "title": "Debug this test",
+        "icon": {
+          "dark": "./icons/debug-dark.svg",
+          "light": "./icons/debug-light.svg"
+        }
+      },
+      {
+        "command": "test-explorer.cancel",
         "title": "Cancel running tests",
         "icon": "./icons/stop.svg"
       },
       {
-        "command": "extension.test-explorer.debug",
-        "title": "Debug tests"
-      },
-      {
-        "command": "extension.test-explorer.selected",
+        "command": "test-explorer.selected",
         "title": "Test tree item selected"
       },
       {
-        "command": "extension.test-explorer.show-source",
+        "command": "test-explorer.show-source",
         "title": "Show source"
       },
       {
-        "command": "extension.test-explorer.enable-autorun",
+        "command": "test-explorer.enable-autorun",
         "title": "Enable autorun"
       },
       {
-        "command": "extension.test-explorer.disable-autorun",
+        "command": "test-explorer.disable-autorun",
         "title": "Disable autorun"
       },
       {
-        "command": "extension.test-explorer.retire",
-        "title": "Outdate test states"
+        "command": "test-explorer.retire",
+        "title": "Retire test states"
       },
       {
-        "command": "extension.test-explorer.reset",
+        "command": "test-explorer.reset",
         "title": "Reset test states"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "extension.test-explorer.reload",
-          "when": "view == extension.test-explorer.tests"
+          "command": "test-explorer.start-all",
+          "group": "navigation@1",
+          "when": "view == test-explorer && !testsRunning"
         },
         {
-          "command": "extension.test-explorer.start",
-          "group": "navigation",
-          "when": "view == extension.test-explorer.tests && !testsRunning"
+          "command": "test-explorer.cancel",
+          "group": "navigation@2",
+          "when": "view == test-explorer && testsRunning"
         },
         {
-          "command": "extension.test-explorer.cancel",
-          "group": "navigation",
-          "when": "view == extension.test-explorer.tests && testsRunning"
+          "command": "test-explorer.reload",
+          "group": "navigation@3",
+          "when": "view == test-explorer"
+        },
+        {
+          "command": "test-explorer.enable-autorun",
+          "group": "1_autorun@1",
+          "when": "view == test-explorer"
+        },
+        {
+          "command": "test-explorer.disable-autorun",
+          "group": "1_autorun@2",
+          "when": "view == test-explorer"
+        },
+        {
+          "command": "test-explorer.retire",
+          "group": "2_state@3",
+          "when": "view == test-explorer"
+        },
+        {
+          "command": "test-explorer.reset",
+          "group": "2_state@4",
+          "when": "view == test-explorer"
         }
       ],
       "view/item/context": [
         {
-          "command": "extension.test-explorer.reload-collection",
-          "when": "view == extension.test-explorer.tests && viewItem == collection"
+          "command": "test-explorer.start",
+          "group": "inline@2",
+          "when": "view == test-explorer"
         },
         {
-          "command": "extension.test-explorer.start",
-          "when": "view == extension.test-explorer.tests"
+          "command": "test-explorer.debug",
+          "group": "inline@1",
+          "when": "view == test-explorer && viewItem == test"
         },
         {
-          "command": "extension.test-explorer.debug",
-          "when": "view == extension.test-explorer.tests"
+          "command": "test-explorer.reload-collection",
+          "group": "1_reload",
+          "when": "view == test-explorer && viewItem == collection"
         },
         {
-          "command": "extension.test-explorer.show-source",
-          "when": "view == extension.test-explorer.tests"
+          "command": "test-explorer.show-source",
+          "group": "3_show@3",
+          "when": "view == test-explorer && viewItem == test"
         },
         {
-          "command": "extension.test-explorer.enable-autorun",
-          "when": "view == extension.test-explorer.tests"
+          "command": "test-explorer.enable-autorun",
+          "group": "4_autorun@4",
+          "when": "view == test-explorer"
         },
         {
-          "command": "extension.test-explorer.disable-autorun",
-          "when": "view == extension.test-explorer.tests"
+          "command": "test-explorer.disable-autorun",
+          "group": "4_autorun@5",
+          "when": "view == test-explorer"
         },
         {
-          "command": "extension.test-explorer.retire",
-          "when": "view == extension.test-explorer.tests"
+          "command": "test-explorer.retire",
+          "group": "5_state@6",
+          "when": "view == test-explorer"
         },
         {
-          "command": "extension.test-explorer.reset",
-          "when": "view == extension.test-explorer.tests"
+          "command": "test-explorer.reset",
+          "group": "5_state@7",
+          "when": "view == test-explorer"
         }
       ],
       "commandPalette": [
         {
-          "command": "extension.test-explorer.reload",
+          "command": "test-explorer.reload-collection",
           "when": "false"
         },
         {
-          "command": "extension.test-explorer.reload-collection",
+          "command": "test-explorer.start",
           "when": "false"
         },
         {
-          "command": "extension.test-explorer.start",
+          "command": "test-explorer.debug",
           "when": "false"
         },
         {
-          "command": "extension.test-explorer.cancel",
+          "command": "test-explorer.selected",
           "when": "false"
         },
         {
-          "command": "extension.test-explorer.debug",
+          "command": "test-explorer.show-source",
           "when": "false"
         },
         {
-          "command": "extension.test-explorer.selected",
+          "command": "test-explorer.enable-autorun",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.disable-autorun",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.retire",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.reset",
           "when": "false"
         }
       ]

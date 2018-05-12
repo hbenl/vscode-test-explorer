@@ -94,7 +94,7 @@ export class TestNode implements TreeNode {
 		treeItem.contextValue = 'test';
 		treeItem.command = {
 			title: '',
-			command: 'extension.test-explorer.selected',
+			command: 'test-explorer.selected',
 			arguments: [ this ]
 		};
 

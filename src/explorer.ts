@@ -80,7 +80,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		}
 	}
 
-	start(node: TreeNode | undefined): void {
+	start(node?: TreeNode): void {
 		if (node) {
 			this.scheduler.schedule(node);
 		} else {

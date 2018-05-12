@@ -10,31 +10,31 @@ export function activate(context: vscode.ExtensionContext): TestExplorerExtensio
 		context.subscriptions.push(vscode.commands.registerCommand(command, callback));
 	};
 
-	registerCommand('extension.test-explorer.reload', () => testExplorer.reload());
+	registerCommand('test-explorer.reload', () => testExplorer.reload());
 
-	registerCommand('extension.test-explorer.reload-collection', (collection) => testExplorer.reload(collection));
+	registerCommand('test-explorer.reload-collection', (collection) => testExplorer.reload(collection));
 
-	registerCommand('extension.test-explorer.start', (node) => testExplorer.start(node));
+	registerCommand('test-explorer.start-all', () => testExplorer.start());
 
-	registerCommand('extension.test-explorer.cancel', () => testExplorer.cancel());
+	registerCommand('test-explorer.start', (node) => testExplorer.start(node));
 
-	registerCommand('extension.test-explorer.debug', (node) => testExplorer.debug(node));
+	registerCommand('test-explorer.cancel', () => testExplorer.cancel());
 
-	registerCommand('extension.test-explorer.selected', (node) => testExplorer.selected(node));
+	registerCommand('test-explorer.debug', (node) => testExplorer.debug(node));
 
-	registerCommand('extension.test-explorer.show-source', (node) => testExplorer.showSource(node));
+	registerCommand('test-explorer.selected', (node) => testExplorer.selected(node));
 
-	registerCommand('extension.test-explorer.enable-autorun', (node) => testExplorer.setAutorun(node));
+	registerCommand('test-explorer.show-source', (node) => testExplorer.showSource(node));
 
-	registerCommand('extension.test-explorer.disable-autorun', (node) => testExplorer.clearAutorun(node.collection));
+	registerCommand('test-explorer.enable-autorun', (node) => testExplorer.setAutorun(node));
 
-	registerCommand('extension.test-explorer.retire', (node) => testExplorer.retireState(node));
+	registerCommand('test-explorer.disable-autorun', (node) => testExplorer.clearAutorun(node.collection));
 
-	registerCommand('extension.test-explorer.reset', (node) => testExplorer.resetState(node));
+	registerCommand('test-explorer.retire', (node) => testExplorer.retireState(node));
 
-	context.subscriptions.push(vscode.window.registerTreeDataProvider(
-		'extension.test-explorer.tests', testExplorer
-	));
+	registerCommand('test-explorer.reset', (node) => testExplorer.resetState(node));
+
+	context.subscriptions.push(vscode.window.registerTreeDataProvider('test-explorer', testExplorer));
 
 	return {
 		registerAdapter: adapter => testExplorer.registerAdapter(adapter),
