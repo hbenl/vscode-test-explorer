@@ -4,8 +4,8 @@ import { TestAdapter } from 'vscode-test-adapter-api';
 import { TestCollection } from './tree/testCollection';
 import { TreeNode } from './tree/treeNode';
 import { IconPaths } from './iconPaths';
-import { TreeEventDebouncer } from './debouncer';
-import { TestRunScheduler } from './scheduler';
+import { TreeEventDebouncer } from './treeEventDebouncer';
+import { TestRunScheduler } from './testRunScheduler';
 
 export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
@@ -80,7 +80,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		}
 	}
 
-	start(node?: TreeNode): void {
+	run(node?: TreeNode): void {
 		if (node) {
 			this.scheduler.schedule(node);
 		} else {

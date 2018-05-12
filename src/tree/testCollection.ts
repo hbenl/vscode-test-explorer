@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { TestSuiteNode } from './testSuiteNode';
 import { TestAdapter, TestSuiteInfo } from 'vscode-test-adapter-api';
 import { TestNode } from './testNode';
-import { TestExplorer } from '../explorer';
+import { TestExplorer } from '../testExplorer';
 import { TreeNode } from './treeNode';
 
 export class TestCollection {
@@ -91,7 +91,7 @@ export class TestCollection {
 		if (adapter.autorun) {
 			adapter.autorun(() => {
 				if (this._autorunNode) {
-					this.explorer.start(this._autorunNode);
+					this.explorer.run(this._autorunNode);
 				}
 			});
 		}

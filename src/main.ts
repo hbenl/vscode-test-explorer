@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TestExplorerExtension } from 'vscode-test-adapter-api';
-import { TestExplorer } from './explorer';
+import { TestExplorer } from './testExplorer';
 
 export function activate(context: vscode.ExtensionContext): TestExplorerExtension {
 
@@ -14,9 +14,9 @@ export function activate(context: vscode.ExtensionContext): TestExplorerExtensio
 
 	registerCommand('test-explorer.reload-collection', (collection) => testExplorer.reload(collection));
 
-	registerCommand('test-explorer.start-all', () => testExplorer.start());
+	registerCommand('test-explorer.run-all', () => testExplorer.run());
 
-	registerCommand('test-explorer.start', (node) => testExplorer.start(node));
+	registerCommand('test-explorer.run', (node) => testExplorer.run(node));
 
 	registerCommand('test-explorer.cancel', () => testExplorer.cancel());
 

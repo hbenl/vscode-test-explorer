@@ -46,7 +46,7 @@
   "activationEvents": [
     "onView:test-explorer",
     "onCommand:test-explorer.reload",
-    "onCommand:test-explorer.start-all",
+    "onCommand:test-explorer.run-all",
     "onCommand:test-explorer.cancel"
   ],
   "contributes": {
@@ -90,7 +90,7 @@
         "title": "Reload tests"
       },
       {
-        "command": "test-explorer.start-all",
+        "command": "test-explorer.run-all",
         "title": "Test Explorer: Run all tests",
         "icon": {
           "dark": "./icons/start-dark.svg",
@@ -98,7 +98,7 @@
         }
       },
       {
-        "command": "test-explorer.start",
+        "command": "test-explorer.run",
         "title": "Run tests",
         "icon": {
           "dark": "./icons/start-dark.svg",
@@ -146,7 +146,7 @@
     "menus": {
       "view/title": [
         {
-          "command": "test-explorer.start-all",
+          "command": "test-explorer.run-all",
           "group": "navigation@1",
           "when": "view == test-explorer && !testsRunning"
         },
@@ -183,7 +183,7 @@
       ],
       "view/item/context": [
         {
-          "command": "test-explorer.start",
+          "command": "test-explorer.run",
           "group": "inline@2",
           "when": "view == test-explorer"
         },
@@ -229,7 +229,7 @@
           "when": "false"
         },
         {
-          "command": "test-explorer.start",
+          "command": "test-explorer.run",
           "when": "false"
         },
         {

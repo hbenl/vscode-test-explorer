@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { TreeNode } from "./tree/treeNode";
 import { TestNode } from "./tree/testNode";
-import { TestExplorer } from "./explorer";
+import { TestExplorer } from "./testExplorer";
 import { TestCollection } from './tree/testCollection';
 
 
