@@ -137,12 +137,24 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		}
 	}
 
-	setAutorun(node: TreeNode): void {
-		node.collection.setAutorun(node);
+	setAutorun(node?: TreeNode): void {
+		if (node) {
+			node.collection.setAutorun(node);
+		} else {
+			for (const collection of this.collections) {
+				collection.setAutorun(collection.suite);
+			}
+		}
 	}
 
-	clearAutorun(collection: TestCollection): void {
-		collection.setAutorun(undefined);
+	clearAutorun(node?: TreeNode): void {
+		if (node) {
+			node.collection.setAutorun(undefined);
+		} else {
+			for (const collection of this.collections) {
+				collection.setAutorun(undefined);
+			}
+		}
 	}
 
 	retireState(node: TreeNode): void {
