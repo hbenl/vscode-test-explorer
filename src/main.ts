@@ -12,7 +12,7 @@ export function activate(context: vscode.ExtensionContext): TestExplorerExtensio
 
 	registerCommand('test-explorer.reload', () => testExplorer.reload());
 
-	registerCommand('test-explorer.reload-collection', (collection) => testExplorer.reload(collection));
+	registerCommand('test-explorer.reload-collection', (node) => testExplorer.reload(node));
 
 	registerCommand('test-explorer.run-all', () => testExplorer.run());
 

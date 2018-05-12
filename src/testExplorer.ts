@@ -70,9 +70,9 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		}
 	}
 
-	reload(collection?: TestCollection): void {
-		if (collection) {
-			collection.loadTests();
+	reload(node?: TreeNode): void {
+		if (node) {
+			node.collection.loadTests();
 		} else {
 			for (const collection of this.collections) {
 				collection.loadTests();
