@@ -44,7 +44,10 @@
     "vscode": "^1.23.0"
   },
   "activationEvents": [
-    "onView:test-explorer"
+    "onView:test-explorer",
+    "onCommand:test-explorer.reload",
+    "onCommand:test-explorer.start-all",
+    "onCommand:test-explorer.cancel"
   ],
   "contributes": {
     "configuration": {
@@ -112,7 +115,7 @@
       },
       {
         "command": "test-explorer.cancel",
-        "title": "Cancel running tests",
+        "title": "Test Explorer: Cancel running tests",
         "icon": "./icons/stop.svg"
       },
       {
