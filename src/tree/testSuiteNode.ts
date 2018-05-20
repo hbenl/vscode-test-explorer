@@ -77,7 +77,8 @@ export class TestSuiteNode implements TreeNode {
 
 	resetState(): void {
 
-		if ((this.state.current !== 'pending') || (this.state.previous !== 'other') || (this.neededUpdates === 'recalc')) {
+		if ((this.parent === undefined) || (this.state.current !== 'pending') ||
+			(this.state.previous !== 'other') || (this.neededUpdates === 'recalc')) {
 
 			this.state.current = 'pending';
 			this.state.previous = 'other';
