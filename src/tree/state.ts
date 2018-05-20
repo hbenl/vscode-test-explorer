@@ -11,9 +11,9 @@ export interface NodeState {
 	autorun: boolean
 }
 
-export function defaultState(): NodeState {
+export function defaultState(skipped?: boolean): NodeState {
 	return {
-		current: 'pending',
+		current: skipped ? 'skipped' : 'pending',
 		previous: 'other',
 		autorun: false
 	};

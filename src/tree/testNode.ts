@@ -25,7 +25,7 @@ export class TestNode implements TreeNode {
 			this._state = oldNode.state;
 			this._log = oldNode.log || "";
 		} else {
-			this._state = defaultState();
+			this._state = defaultState(info.skipped);
 		}
 	}
 
