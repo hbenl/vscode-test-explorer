@@ -54,16 +54,30 @@
       "type": "object",
       "title": "Configuration for the Test Explorer extension",
       "properties": {
-        "testExplorer.retireOnStart": {
-          "description": "Retire all test states whenever a test run is started",
-          "type": "boolean",
-          "default": false,
+        "testExplorer.onStart": {
+          "description": "Retire or reset all test states whenever a test run is started",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "retire",
+            "reset",
+            null
+          ],
           "scope": "resource"
         },
-        "testExplorer.retireOnReload": {
-          "description": "Retire all test states whenever the test tree is reloaded",
-          "type": "boolean",
-          "default": false,
+        "testExplorer.onReload": {
+          "description": "Retire or reset all test states whenever the test tree is reloaded",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "retire",
+            "reset",
+            null
+          ],
           "scope": "resource"
         }
       }

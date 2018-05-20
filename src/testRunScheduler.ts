@@ -44,7 +44,10 @@ export class TestRunScheduler {
 
 		if (collection.shouldRetireStateOnStart()) {
 			collection.retireState();
+		} else if (collection.shouldResetStateOnStart()) {
+			collection.resetState();
 		}
+
 		const testNodes: TestNode[] = [];
 		this.collectTests(treeNode, testNodes);
 		for (const testNode of testNodes) {

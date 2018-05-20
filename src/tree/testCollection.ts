@@ -115,6 +115,8 @@ export class TestCollection {
 
 			if (this.shouldRetireStateOnReload()) {
 				this.rootSuite.retireState();
+			} else if (this.shouldResetStateOnReload()) {
+				this.rootSuite.resetState();
 			}
 
 		} else {
@@ -199,11 +201,19 @@ export class TestCollection {
 	}
 
 	shouldRetireStateOnStart(): boolean {
-		return this.getConfiguration().get('retireOnStart') || false;
+		return (this.getConfiguration().get('onStart') === 'retire');
+	}
+
+	shouldResetStateOnStart(): boolean {
+		return (this.getConfiguration().get('onStart') === 'reset');
 	}
 
 	shouldRetireStateOnReload(): boolean {
-		return this.getConfiguration().get('retireOnReload') || false;
+		return (this.getConfiguration().get('onReload') === 'retire');
+	}
+
+	shouldResetStateOnReload(): boolean {
+		return (this.getConfiguration().get('onReload') === 'reset');
 	}
 
 	private getConfiguration(): vscode.WorkspaceConfiguration {
