@@ -163,11 +163,23 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 	}
 
 	retireState(node: TreeNode): void {
-		node.collection.retireState(node);
+		if (node) {
+			node.collection.retireState(node);
+		} else {
+			for (const collection of this.collections) {
+				collection.retireState();
+			}
+		}
 	}
 
 	resetState(node: TreeNode): void {
-		node.collection.resetState(node);
+		if (node) {
+			node.collection.resetState(node);
+		} else {
+			for (const collection of this.collections) {
+				collection.resetState();
+			}
+		}
 	}
 
 	sendNodeChangedEvents(immediately: boolean): void {
