@@ -40,6 +40,7 @@ export class TestCollection {
 						let testSuiteNode = this.runningSuite.findChildTestSuiteNode(suiteId);
 						if (testSuiteNode === undefined) {
 							if (typeof testStateMessage.suite === 'object') {
+								this.runningSuite.info.children.push(testStateMessage.suite);
 								testSuiteNode = new TestSuiteNode(this, testStateMessage.suite, this.runningSuite);
 								this.runningSuite.children.push(testSuiteNode);
 								this.runningSuite.neededUpdates = 'recalc';
@@ -69,6 +70,7 @@ export class TestCollection {
 
 					if (testNode === undefined) {
 						if (typeof testStateMessage.test === 'object') {
+							this.runningSuite.info.children.push(testStateMessage.test);
 							testNode = new TestNode(this, testStateMessage.test, this.runningSuite);
 							this.runningSuite.children.push(testNode);
 							this.runningSuite.neededUpdates = 'recalc';
