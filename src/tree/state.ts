@@ -29,13 +29,17 @@ export function parentNodeState(children: TreeNode[]): NodeState {
 
 export function parentCurrentNodeState(children: TreeNode[]): CurrentNodeState {
 
-	if (children.every((child) => (child.state.current === 'skipped'))) {
+	if (children.length === 0) {
+
+		return 'pending';
+
+	} else if (children.every((child) => (child.state.current === 'skipped'))) {
 
 		return 'skipped';
 
 	} else if (children.some((child) => (child.state.current === 'running'))) {
 
-		if (children.some((child) => (child.state.current === 'failed'))) {
+		if (children.some((child) => child.state.current.endsWith('failed'))) {
 
 			return 'running-failed';
 
@@ -47,7 +51,7 @@ export function parentCurrentNodeState(children: TreeNode[]): CurrentNodeState {
 
 	} else if (children.some((child) => (child.state.current === 'scheduled'))) {
 
-		if (children.some((child) => (child.state.current === 'failed'))) {
+		if (children.some((child) => child.state.current.endsWith('failed'))) {
 
 			return 'running-failed';
 
@@ -60,6 +64,10 @@ export function parentCurrentNodeState(children: TreeNode[]): CurrentNodeState {
 			return 'scheduled';
 
 		}
+
+	} else if (children.some((child) => (child.state.current === 'running-failed'))) {
+
+		return 'running-failed';
 
 	} else if (children.some((child) => (child.state.current === 'failed'))) {
 
