@@ -83,11 +83,11 @@ export class TestSuiteNode implements TreeNode {
 			this.state.current = 'pending';
 			this.state.previous = 'other';
 
-			for (const child of this._children) {
-				child.resetState();
-			}
-
 			this.neededUpdates = 'send';
+		}
+
+		for (const child of this._children) {
+			child.resetState();
 		}
 	}
 
