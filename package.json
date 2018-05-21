@@ -1,11 +1,11 @@
 {
   "name": "vscode-test-explorer",
-  "displayName": "Test Explorer for Visual Studio Code",
+  "displayName": "Test Explorer UI",
   "description": "Run your tests in the Sidebar of Visual Studio Code",
   "icon": "icon.png",
   "author": "Holger Benl <hbenl@evandor.de>",
   "publisher": "hbenl",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "homepage": "https://github.com/hbenl/vscode-test-explorer",
   "repository": {

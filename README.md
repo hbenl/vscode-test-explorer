@@ -1,11 +1,11 @@
-# Test Explorer for Visual Studio Code
+# Test Explorer UI for Visual Studio Code
 
 This extension provides a user interface for running automated tests.
 It needs Test Adapter extensions to provide the integration with different testing frameworks.
 Currently the following Test Adapters are under development:
 
-* [Mocha Test Adapter](https://github.com/hbenl/vscode-mocha-test-adapter)
-* [Jasmine Test Adapter](https://github.com/hbenl/vscode-jasmine-test-adapter) (not published yet)
+* [Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter)
+* [Jasmine Test Explorer](https://github.com/hbenl/vscode-jasmine-test-adapter) (not published yet)
 
 This extension will be automatically installed when you install one of the Test Adapters,
 so there is usually no need to install this extension manually.
