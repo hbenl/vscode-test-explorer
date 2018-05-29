@@ -5,7 +5,8 @@ It needs Test Adapter extensions to provide the integration with different testi
 Currently the following Test Adapters are under development:
 
 * [Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter)
-* [Jasmine Test Explorer](https://github.com/hbenl/vscode-jasmine-test-adapter) (not published yet)
+* [Jasmine Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-jasmine-test-adapter)
+* [Google Test Explorer](https://marketplace.visualstudio.com/items?itemName=OpenNingia.vscode-google-test-adapter)
 
 This extension will be automatically installed when you install one of the Test Adapters,
 so there is usually no need to install this extension manually.
