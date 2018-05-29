@@ -1,3 +1,6 @@
+### Version 0.1.4
+* update list of test adapters
+
 ### Version 0.1.3
 * bugfix for registration of tests and suites during a test run
 * bugfix for computation of state of test suites
