@@ -7,7 +7,7 @@ import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './treeEventDebouncer';
 import { TestRunScheduler } from './testRunScheduler';
 
-export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
+export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.CodeLensProvider {
 
 	public readonly iconPaths: IconPaths;
 	private readonly debouncer: TreeEventDebouncer;
@@ -16,6 +16,9 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 	private readonly treeDataChanged = new vscode.EventEmitter<TreeNode>();
 	public readonly onDidChangeTreeData: vscode.Event<TreeNode>;
+
+	public readonly codeLensesChanged = new vscode.EventEmitter<void>();
+	public readonly onDidChangeCodeLenses: vscode.Event<void>;
 
 	private readonly collections: TestCollection[] = [];
 
@@ -32,6 +35,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 		context.subscriptions.push(this.outputChannel);
 
 		this.onDidChangeTreeData = this.treeDataChanged.event;
+		this.onDidChangeCodeLenses = this.codeLensesChanged.event;
 	}
 
 	registerAdapter(adapter: TestAdapter): void {
@@ -188,6 +192,14 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode> {
 
 	sendTreeChangedEvent(): void {
 		this.debouncer.sendTreeChangedEvent();
+	}
+
+	provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] {
+
+		const file = document.uri.fsPath;
+		const codeLenses = this.collections.map(collection => collection.getCodeLenses(file));
+
+		return (<vscode.CodeLens[]>[]).concat(...codeLenses);
 	}
 
 	private findLineContaining(needle: string, haystack: string | undefined): number | undefined {

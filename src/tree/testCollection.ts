@@ -10,6 +10,7 @@ export class TestCollection {
 	private rootSuite: TestSuiteNode | undefined;
 	private runningSuite: TestSuiteNode | undefined;
 	private _autorunNode: TreeNode | undefined;
+	private readonly codeLenses = new Map<string, vscode.CodeLens[]>();
 
 	get suite() { return this.rootSuite; }
 	get iconPaths() { return this.explorer.iconPaths; }
@@ -130,6 +131,9 @@ export class TestCollection {
 		this.runningSuite = undefined;
 		this._autorunNode = undefined;
 
+		this.computeCodeLenses();
+		this.explorer.codeLensesChanged.fire();
+
 		this.explorer.sendTreeChangedEvent();
 	}
 
@@ -218,6 +222,10 @@ export class TestCollection {
 		return (this.getConfiguration().get('onReload') === 'reset');
 	}
 
+	getCodeLenses(file: string): vscode.CodeLens[] {
+		return this.codeLenses.get(file) || [];
+	}
+
 	private getConfiguration(): vscode.WorkspaceConfiguration {
 		const workspaceFolder = this.adapter.workspaceFolder;
 		var workspaceUri = workspaceFolder ? workspaceFolder.uri : undefined;
@@ -241,5 +249,93 @@ export class TestCollection {
 			_node.neededUpdates = 'recalc';
 			_node = _node.parent;
 		}
+	}
+
+	private computeCodeLenses(): void {
+
+		this.codeLenses.clear();
+
+		if (this.rootSuite === undefined) return;
+
+		const locatedNodes = new Map<string, Map<number, TreeNode[]>>();
+		this.collectLocatedNodes(this.rootSuite, locatedNodes);
+
+		for (const [ file, fileLocatedNodes ] of locatedNodes) {
+
+			const fileCodeLenses: vscode.CodeLens[] = [];
+
+			for (const [ line, lineLocatedNodes ] of fileLocatedNodes) {
+				fileCodeLenses.push(this.createRunCodeLens(line, lineLocatedNodes));
+				fileCodeLenses.push(this.createDebugCodeLens(line, lineLocatedNodes));
+			}
+
+			this.codeLenses.set(file, fileCodeLenses);
+		}
+	}
+
+	private collectLocatedNodes(
+		node: TreeNode,
+		locatedNodes: Map<string, Map<number, TreeNode[]>>
+	): void {
+
+		this.addLocatedNode(node, locatedNodes);
+
+		for (const child of node.children) {
+			if (child.info.type === 'test') {
+				this.addLocatedNode(child, locatedNodes);
+			} else {
+				this.collectLocatedNodes(child, locatedNodes);
+			}
+		}
+	}
+
+	private addLocatedNode(
+		node: TreeNode,
+		locatedNodes: Map<string, Map<number, TreeNode[]>>
+	): void {
+
+		if ((node.info.file === undefined) || (node.info.line === undefined)) return;
+
+		let fileLocatedNodes = locatedNodes.get(node.info.file);
+		if (!fileLocatedNodes) {
+			fileLocatedNodes = new Map<number, TreeNode[]>()
+			locatedNodes.set(node.info.file, fileLocatedNodes);
+		}
+
+		let lineLocatedNodes = fileLocatedNodes.get(node.info.line);
+		if (!lineLocatedNodes) {
+			lineLocatedNodes = [];
+			fileLocatedNodes.set(node.info.line, lineLocatedNodes);
+		}
+
+		lineLocatedNodes.push(node);
+	}
+
+	private createRunCodeLens(
+		line: number,
+		nodes: TreeNode[]
+	): vscode.CodeLens {
+
+		const range = new vscode.Range(line, 0, line, 0);
+
+		return new vscode.CodeLens(range, {
+			title: 'Run',
+			command: 'test-explorer.run',
+			arguments: nodes
+		});
+	}
+
+	private createDebugCodeLens(
+		line: number,
+		nodes: TreeNode[]
+	): vscode.CodeLens {
+
+		const range = new vscode.Range(line, 0, line, 0);
+
+		return new vscode.CodeLens(range, {
+			title: 'Debug',
+			command: 'test-explorer.debug',
+			arguments: nodes
+		});
 	}
 }
