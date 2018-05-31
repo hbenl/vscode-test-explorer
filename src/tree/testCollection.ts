@@ -132,7 +132,6 @@ export class TestCollection {
 		this._autorunNode = undefined;
 
 		this.computeCodeLenses();
-		this.explorer.codeLensesChanged.fire();
 
 		this.explorer.sendTreeChangedEvent();
 	}
@@ -222,6 +221,30 @@ export class TestCollection {
 		return (this.getConfiguration().get('onReload') === 'reset');
 	}
 
+	computeCodeLenses(): void {
+
+		this.codeLenses.clear();
+
+		if (this.rootSuite === undefined) return;
+
+		const locatedNodes = new Map<string, Map<number, TreeNode[]>>();
+		this.collectLocatedNodes(this.rootSuite, locatedNodes);
+
+		for (const [ file, fileLocatedNodes ] of locatedNodes) {
+
+			const fileCodeLenses: vscode.CodeLens[] = [];
+
+			for (const [ line, lineLocatedNodes ] of fileLocatedNodes) {
+				fileCodeLenses.push(this.createRunCodeLens(line, lineLocatedNodes));
+				fileCodeLenses.push(this.createDebugCodeLens(line, lineLocatedNodes));
+			}
+
+			this.codeLenses.set(file, fileCodeLenses);
+		}
+
+		this.explorer.codeLensesChanged.fire();
+	}
+
 	getCodeLenses(file: string): vscode.CodeLens[] {
 		return this.codeLenses.get(file) || [];
 	}
@@ -248,28 +271,6 @@ export class TestCollection {
 		while (_node !== undefined) {
 			_node.neededUpdates = 'recalc';
 			_node = _node.parent;
-		}
-	}
-
-	private computeCodeLenses(): void {
-
-		this.codeLenses.clear();
-
-		if (this.rootSuite === undefined) return;
-
-		const locatedNodes = new Map<string, Map<number, TreeNode[]>>();
-		this.collectLocatedNodes(this.rootSuite, locatedNodes);
-
-		for (const [ file, fileLocatedNodes ] of locatedNodes) {
-
-			const fileCodeLenses: vscode.CodeLens[] = [];
-
-			for (const [ line, lineLocatedNodes ] of fileLocatedNodes) {
-				fileCodeLenses.push(this.createRunCodeLens(line, lineLocatedNodes));
-				fileCodeLenses.push(this.createDebugCodeLens(line, lineLocatedNodes));
-			}
-
-			this.codeLenses.set(file, fileCodeLenses);
 		}
 	}
 

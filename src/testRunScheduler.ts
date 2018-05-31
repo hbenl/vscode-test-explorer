@@ -78,6 +78,8 @@ export class TestRunScheduler {
 			}
 		}
 
+		treeNode.collection.computeCodeLenses();
+
 		this.doNext();
 	}
 
