@@ -1,3 +1,6 @@
+### Version 0.2.0
+* provide CodeLenses for running and debugging tests
+
 ### Version 0.1.4
 * update list of test adapters
 
