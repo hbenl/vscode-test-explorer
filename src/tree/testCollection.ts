@@ -221,10 +221,15 @@ export class TestCollection {
 		return (this.getConfiguration().get('onReload') === 'reset');
 	}
 
+	shouldShowCodeLens(): boolean {
+		return (this.getConfiguration().get('codeLens') !== false);
+	}
+
 	computeCodeLenses(): void {
 
 		this.codeLenses.clear();
 
+		if (!this.shouldShowCodeLens()) return;
 		if (this.rootSuite === undefined) return;
 
 		const locatedNodes = new Map<string, Map<number, TreeNode[]>>();

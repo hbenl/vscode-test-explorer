@@ -85,6 +85,12 @@
             null
           ],
           "scope": "resource"
+        },
+        "testExplorer.codeLens": {
+          "description": "Show a CodeLens above each test or suite for running or debugging the tests",
+          "type": "boolean",
+          "default": true,
+          "scope": "resource"
         }
       }
     },
