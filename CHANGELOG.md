@@ -1,3 +1,6 @@
+### Version 0.2.1
+* add configuration option for turning off CodeLenses
+
 ### Version 0.2.0
 * provide CodeLenses for running and debugging tests
 
