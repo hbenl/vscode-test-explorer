@@ -1,3 +1,6 @@
+### Version 0.3.0
+* provide Gutter Decorations showing the test states
+
 ### Version 0.2.1
 * add configuration option for turning off CodeLenses
 
