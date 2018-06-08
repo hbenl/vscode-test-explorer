@@ -36,15 +36,15 @@
   "dependencies": {
     "escape-string-regexp": "^1.0.5",
     "fs-extra": "^6.0.1",
-    "tslib": "^1.9.1",
+    "tslib": "^1.9.2",
     "vscode-test-adapter-api": "^0.3.0"
   },
   "devDependencies": {
     "@types/escape-string-regexp": "0.0.32",
-    "@types/fs-extra": "^5.0.2",
-    "typescript": "^2.8.3",
-    "vsce": "^1.40.0",
-    "vscode": "^1.1.17"
+    "@types/fs-extra": "^5.0.3",
+    "typescript": "^2.9.1",
+    "vsce": "^1.42.0",
+    "vscode": "^1.1.18"
   },
   "engines": {
     "vscode": "^1.23.0"
