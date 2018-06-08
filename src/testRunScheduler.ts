@@ -53,7 +53,7 @@ export class TestRunScheduler {
 		for (const testNode of testNodes) {
 			testNode.setCurrentState('scheduled');
 		}
-		this.explorer.sendNodeChangedEvents(false);
+		this.explorer.treeEvents.sendNodeChangedEvents(false);
 
 		vscode.commands.executeCommand('setContext', 'testsRunning', true);
 

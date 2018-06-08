@@ -109,7 +109,7 @@ export class TestNode implements TreeNode {
 		this.neededUpdates = 'none';
 
 		const treeItem = new vscode.TreeItem(this.info.label, vscode.TreeItemCollapsibleState.None);
-		treeItem.iconPath = this.collection.iconPaths[stateIcon(this.state)];
+		treeItem.iconPath = this.collection.explorer.iconPaths[stateIcon(this.state)];
 		treeItem.contextValue = 'test';
 		treeItem.command = {
 			title: '',

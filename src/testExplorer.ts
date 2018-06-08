@@ -6,15 +6,13 @@ import { TreeNode } from './tree/treeNode';
 import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './treeEventDebouncer';
 import { TestRunScheduler } from './testRunScheduler';
-import { DecorationTypes } from './decorationTypes';
 import { Decorator } from './decorator';
 
 export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.CodeLensProvider {
 
 	public readonly iconPaths: IconPaths;
-	public readonly decorationTypes: DecorationTypes;
 	public readonly decorator: Decorator;
-	private readonly debouncer: TreeEventDebouncer;
+	public readonly treeEvents: TreeEventDebouncer;
 
 	private readonly outputChannel: vscode.OutputChannel;
 
@@ -32,9 +30,8 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 		context: vscode.ExtensionContext
 	) {
 		this.iconPaths = new IconPaths(context);
-		this.decorationTypes = new DecorationTypes(this.iconPaths);
 		this.decorator = new Decorator(context, this);
-		this.debouncer = new TreeEventDebouncer(this.collections, this.treeDataChanged);
+		this.treeEvents = new TreeEventDebouncer(this.collections, this.treeDataChanged);
 
 		this.outputChannel = vscode.window.createOutputChannel("Test Explorer");
 		context.subscriptions.push(this.outputChannel);
@@ -189,14 +186,6 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 				collection.resetState();
 			}
 		}
-	}
-
-	sendNodeChangedEvents(immediately: boolean): void {
-		this.debouncer.sendNodeChangedEvents(immediately);
-	}
-
-	sendTreeChangedEvent(): void {
-		this.debouncer.sendTreeChangedEvent();
 	}
 
 	provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] {

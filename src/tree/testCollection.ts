@@ -14,7 +14,6 @@ export class TestCollection {
 	private readonly codeLenses = new Map<string, vscode.CodeLens[]>();
 
 	get suite() { return this.rootSuite; }
-	get iconPaths() { return this.explorer.iconPaths; }
 	get autorunNode() { return this._autorunNode; }
 
 	constructor(
@@ -135,7 +134,7 @@ export class TestCollection {
 		this.computeCodeLenses();
 		this.explorer.decorator.updateDecorationsNow();
 
-		this.explorer.sendTreeChangedEvent();
+		this.explorer.treeEvents.sendTreeChangedEvent();
 	}
 
 	recalcState(): void {
@@ -200,11 +199,11 @@ export class TestCollection {
 			this._autorunNode = node;
 		}
 
-		this.explorer.sendNodeChangedEvents(true);
+		this.explorer.treeEvents.sendNodeChangedEvents(true);
 	}
 
 	sendNodeChangedEvents(): void {
-		this.explorer.sendNodeChangedEvents(false);
+		this.explorer.treeEvents.sendNodeChangedEvents(false);
 	}
 
 	shouldRetireStateOnStart(): boolean {

@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
 import { TestExplorer } from './testExplorer';
 import { stateIcon } from './tree/state';
+import { DecorationTypes } from './decorationTypes';
 
 export class Decorator {
 
+	private readonly decorationTypes: DecorationTypes
 	private activeTextEditor: vscode.TextEditor | undefined;
 	private timeout: NodeJS.Timer | undefined;
 
@@ -11,6 +13,9 @@ export class Decorator {
 		context: vscode.ExtensionContext,
 		private readonly testExplorer: TestExplorer
 	) {
+
+		this.decorationTypes = new DecorationTypes(this.testExplorer.iconPaths);
+
 		context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
 			this.activeTextEditor = editor;
 			this.updateDecorationsNow();
@@ -33,10 +38,9 @@ export class Decorator {
 		if (!this.activeTextEditor) return;
 
 		const file = this.activeTextEditor.document.fileName;
-		const decorationTypes = this.testExplorer.decorationTypes;
 
 		const decorations = new Map<vscode.TextEditorDecorationType, vscode.Range[]>();
-		for (const decorationType of decorationTypes.all) {
+		for (const decorationType of this.decorationTypes.all) {
 			decorations.set(decorationType, []);
 		}
 
@@ -47,7 +51,7 @@ export class Decorator {
 					for (const [ line, treeNodes ] of locatedNodes) {
 						for (const treeNode of treeNodes) {
 							if (treeNode.info.type === 'test') {
-								const decorationType = decorationTypes[stateIcon(treeNodes[0].state)];
+								const decorationType = this.decorationTypes[stateIcon(treeNodes[0].state)];
 								decorations.get(decorationType)!.push(new vscode.Range(line, 0, line, 0));
 								break;
 							}
