@@ -41,14 +41,16 @@ export class Decorator {
 		}
 
 		for (const collection of this.testExplorer.collections) {
-			const locatedNodes = collection.getLocatedNodes(file);
-			if (locatedNodes) {
-				for (const [ line, treeNodes ] of locatedNodes) {
-					for (const treeNode of treeNodes) {
-						if (treeNode.info.type === 'test') {
-							const decorationType = decorationTypes[stateIcon(treeNodes[0].state)];
-							decorations.get(decorationType)!.push(new vscode.Range(line, 0, line, 0));
-							break;
+			if (collection.shouldShowGutterDecoration()) {
+				const locatedNodes = collection.getLocatedNodes(file);
+				if (locatedNodes) {
+					for (const [ line, treeNodes ] of locatedNodes) {
+						for (const treeNode of treeNodes) {
+							if (treeNode.info.type === 'test') {
+								const decorationType = decorationTypes[stateIcon(treeNodes[0].state)];
+								decorations.get(decorationType)!.push(new vscode.Range(line, 0, line, 0));
+								break;
+							}
 						}
 					}
 				}

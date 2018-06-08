@@ -18,6 +18,7 @@ The following configuration properties are available:
 * `testExplorer.onStart`: Retire or reset all test states whenever a test run is started
 * `testExplorer.onReload`: Retire or reset all test states whenever the test tree is reloaded
 * `testExplorer.codeLens`: Show a CodeLens above each test or suite for running or debugging the tests
+* `testExplorer.gutterDecoration`: Show the state of each test in the editor using Gutter Decorations
 
 Further configuration options are provided by the Test Adapters.
 

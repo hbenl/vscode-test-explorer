@@ -227,6 +227,10 @@ export class TestCollection {
 		return (this.getConfiguration().get('codeLens') !== false);
 	}
 
+	shouldShowGutterDecoration(): boolean {
+		return (this.getConfiguration().get('gutterDecoration') !== false);
+	}
+
 	computeCodeLenses(): void {
 
 		this.codeLenses.clear();

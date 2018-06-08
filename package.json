@@ -91,6 +91,12 @@
           "type": "boolean",
           "default": true,
           "scope": "resource"
+        },
+        "testExplorer.gutterDecoration": {
+          "description": "Show the state of each test in the editor using Gutter Decorations",
+          "type": "boolean",
+          "default": true,
+          "scope": "resource"
         }
       }
     },
