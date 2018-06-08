@@ -10,6 +10,7 @@ export class TestCollection {
 	private rootSuite: TestSuiteNode | undefined;
 	private runningSuite: TestSuiteNode | undefined;
 	private _autorunNode: TreeNode | undefined;
+	private readonly locatedNodes = new Map<string, Map<number, TreeNode[]>>();
 	private readonly codeLenses = new Map<string, vscode.CodeLens[]>();
 
 	get suite() { return this.rootSuite; }
@@ -18,7 +19,7 @@ export class TestCollection {
 
 	constructor(
 		public readonly adapter: TestAdapter,
-		private readonly explorer: TestExplorer
+		public readonly explorer: TestExplorer
 	) {
 
 		adapter.testStates((testStateMessage) => {
@@ -132,6 +133,7 @@ export class TestCollection {
 		this._autorunNode = undefined;
 
 		this.computeCodeLenses();
+		this.explorer.decorator.updateDecorationsNow();
 
 		this.explorer.sendTreeChangedEvent();
 	}
@@ -232,10 +234,10 @@ export class TestCollection {
 		if (!this.shouldShowCodeLens()) return;
 		if (this.rootSuite === undefined) return;
 
-		const locatedNodes = new Map<string, Map<number, TreeNode[]>>();
-		this.collectLocatedNodes(this.rootSuite, locatedNodes);
+		this.locatedNodes.clear();
+		this.collectLocatedNodes(this.rootSuite);
 
-		for (const [ file, fileLocatedNodes ] of locatedNodes) {
+		for (const [ file, fileLocatedNodes ] of this.locatedNodes) {
 
 			const fileCodeLenses: vscode.CodeLens[] = [];
 
@@ -252,6 +254,10 @@ export class TestCollection {
 
 	getCodeLenses(file: string): vscode.CodeLens[] {
 		return this.codeLenses.get(file) || [];
+	}
+
+	getLocatedNodes(file: string): Map<number, TreeNode[]> | undefined {
+		return this.locatedNodes.get(file);
 	}
 
 	private getConfiguration(): vscode.WorkspaceConfiguration {
@@ -279,33 +285,27 @@ export class TestCollection {
 		}
 	}
 
-	private collectLocatedNodes(
-		node: TreeNode,
-		locatedNodes: Map<string, Map<number, TreeNode[]>>
-	): void {
+	private collectLocatedNodes(node: TreeNode): void {
 
-		this.addLocatedNode(node, locatedNodes);
+		this.addLocatedNode(node);
 
 		for (const child of node.children) {
 			if (child.info.type === 'test') {
-				this.addLocatedNode(child, locatedNodes);
+				this.addLocatedNode(child);
 			} else {
-				this.collectLocatedNodes(child, locatedNodes);
+				this.collectLocatedNodes(child);
 			}
 		}
 	}
 
-	private addLocatedNode(
-		node: TreeNode,
-		locatedNodes: Map<string, Map<number, TreeNode[]>>
-	): void {
+	private addLocatedNode(node: TreeNode): void {
 
 		if ((node.info.file === undefined) || (node.info.line === undefined)) return;
 
-		let fileLocatedNodes = locatedNodes.get(node.info.file);
+		let fileLocatedNodes = this.locatedNodes.get(node.info.file);
 		if (!fileLocatedNodes) {
 			fileLocatedNodes = new Map<number, TreeNode[]>()
-			locatedNodes.set(node.info.file, fileLocatedNodes);
+			this.locatedNodes.set(node.info.file, fileLocatedNodes);
 		}
 
 		let lineLocatedNodes = fileLocatedNodes.get(node.info.line);

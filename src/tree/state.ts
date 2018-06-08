@@ -1,5 +1,4 @@
 import { TreeNode } from './treeNode';
-import { IconPaths, IconPath } from '../iconPaths';
 
 export type CurrentNodeState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed' | 'running-failed' | 'skipped';
 
@@ -105,33 +104,37 @@ export function parentPreviousNodeState(children: TreeNode[]): PreviousNodeState
 	}
 }
 
-export function stateIconPath(state: NodeState, iconPaths: IconPaths): IconPath {
+export type StateIconType = 'pending' | 'pendingAutorun' | 'scheduled' | 'running' |
+	'runningFailed' | 'passed' | 'passedAutorun' | 'failed' | 'failedAutorun' | 'skipped' |
+	'passedFaint' | 'passedFaintAutorun' | 'failedFaint' | 'failedFaintAutorun';
+
+export function stateIcon(state: NodeState): StateIconType {
 
 	switch (state.current) {
 
 		case 'scheduled':
 
-			return iconPaths.scheduled;
+			return 'scheduled';
 
 		case 'running':
 
-			return iconPaths.running;
+			return 'running';
 
 		case 'running-failed':
 
-			return iconPaths.runningFailed;
+			return 'runningFailed';
 
 		case 'passed':
 
-			return state.autorun ? iconPaths.passedAutorun : iconPaths.passed;
+			return state.autorun ? 'passedAutorun' : 'passed';
 
 		case 'failed':
 
-			return state.autorun ? iconPaths.failedAutorun : iconPaths.failed;
+			return state.autorun ? 'failedAutorun' : 'failed';
 
 		case 'skipped':
 
-			return iconPaths.skipped;
+			return 'skipped';
 
 		default:
 
@@ -139,15 +142,15 @@ export function stateIconPath(state: NodeState, iconPaths: IconPaths): IconPath 
 
 				case 'passed':
 
-					return state.autorun ? iconPaths.passedFaintAutorun : iconPaths.passedFaint;
+					return state.autorun ? 'passedFaintAutorun' : 'passedFaint';
 
 				case 'failed':
 
-					return state.autorun ? iconPaths.failedFaintAutorun : iconPaths.failedFaint;
+					return state.autorun ? 'failedFaintAutorun' : 'failedFaint';
 
 				default:
 
-					return state.autorun ? iconPaths.pendingAutorun : iconPaths.pending;
+					return state.autorun ? 'pendingAutorun' : 'pending';
 			}
 	}
 }

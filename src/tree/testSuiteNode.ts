@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { TestSuiteInfo } from "vscode-test-adapter-api";
 import { TreeNode, TreeNodeUpdates } from "./treeNode";
-import { NodeState, stateIconPath, parentNodeState, parentCurrentNodeState, parentPreviousNodeState } from "./state";
+import { NodeState, stateIcon, parentNodeState, parentCurrentNodeState, parentPreviousNodeState } from "./state";
 import { TestCollection } from './testCollection';
 import { TestNode } from './testNode';
 
@@ -104,7 +104,7 @@ export class TestSuiteNode implements TreeNode {
 		}
 
 		const treeItem = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.Collapsed);
-		treeItem.iconPath = stateIconPath(this.state, this.collection.iconPaths);
+		treeItem.iconPath = this.collection.iconPaths[stateIcon(this.state)];
 		treeItem.contextValue = this.parent ? 'suite' : 'collection';
 
 		return treeItem;

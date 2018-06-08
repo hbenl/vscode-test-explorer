@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { TestInfo } from "vscode-test-adapter-api";
 import { TreeNode, TreeNodeUpdates } from "./treeNode";
-import { NodeState, stateIconPath, CurrentNodeState, defaultState } from "./state";
+import { NodeState, stateIcon, CurrentNodeState, defaultState } from "./state";
 import { TestSuiteNode } from './testSuiteNode';
 import { TestCollection } from './testCollection';
 
@@ -53,6 +53,10 @@ export class TestNode implements TreeNode {
 		}
 
 		this.collection.sendNodeChangedEvents();
+
+		if (this.info.file) {
+			this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
+		}
 	}
 
 	recalcState(autorun: boolean): void {
@@ -65,6 +69,10 @@ export class TestNode implements TreeNode {
 			this.state.autorun = newAutorunFlag;
 			this.neededUpdates = 'send';
 
+			if (this.info.file) {
+				this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
+			}
+	
 		} else {
 			this.neededUpdates = 'none';
 		}
@@ -72,16 +80,27 @@ export class TestNode implements TreeNode {
 
 	retireState(): void {
 		if ((this.state.current === 'passed') || (this.state.current === 'failed')) {
+
 			this._state.current = 'pending';
 			this.neededUpdates = 'send';
+
+			if (this.info.file) {
+				this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
+			}
 		}
 	}
 
 	resetState(): void {
 		if ((this.state.current !== 'pending') || (this.state.previous !== 'other')) {
+
 			this._state.current = 'pending';
 			this._state.previous = 'other';
 			this.neededUpdates = 'send';
+
+
+			if (this.info.file) {
+				this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
+			}
 		}
 	}
 
@@ -90,7 +109,7 @@ export class TestNode implements TreeNode {
 		this.neededUpdates = 'none';
 
 		const treeItem = new vscode.TreeItem(this.info.label, vscode.TreeItemCollapsibleState.None);
-		treeItem.iconPath = stateIconPath(this.state, this.collection.iconPaths);
+		treeItem.iconPath = this.collection.iconPaths[stateIcon(this.state)];
 		treeItem.contextValue = 'test';
 		treeItem.command = {
 			title: '',
