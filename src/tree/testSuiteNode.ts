@@ -77,18 +77,11 @@ export class TestSuiteNode implements TreeNode {
 
 	resetState(): void {
 
-		if ((this.parent === undefined) || (this.state.current !== 'pending') ||
-			(this.state.previous !== 'other') || (this.neededUpdates === 'recalc')) {
-
-			this.state.current = 'pending';
-			this.state.previous = 'other';
-
-			this.neededUpdates = 'send';
-		}
-
 		for (const child of this._children) {
 			child.resetState();
 		}
+
+		this.neededUpdates = 'recalc';
 	}
 
 	getTreeItem(): vscode.TreeItem {

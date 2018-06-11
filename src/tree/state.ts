@@ -2,7 +2,7 @@ import { TreeNode } from './treeNode';
 
 export type CurrentNodeState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed' | 'running-failed' | 'skipped';
 
-export type PreviousNodeState = 'passed' | 'failed' | 'other';
+export type PreviousNodeState = 'pending' | 'passed' | 'failed' | 'skipped';
 
 export interface NodeState {
 	current: CurrentNodeState,
@@ -13,7 +13,7 @@ export interface NodeState {
 export function defaultState(skipped?: boolean): NodeState {
 	return {
 		current: skipped ? 'skipped' : 'pending',
-		previous: 'other',
+		previous: skipped ? 'skipped' : 'pending',
 		autorun: false
 	};
 }
@@ -87,15 +87,19 @@ export function parentPreviousNodeState(children: TreeNode[]): PreviousNodeState
 
 	if (children.length === 0) {
 
-		return 'other';
+		return 'pending';
+
+	} else if (children.every((child) => (child.state.previous === 'skipped'))) {
+
+		return 'skipped';
 
 	} else if (children.some((child) => (child.state.previous === 'failed'))) {
 
 		return 'failed';
 
-	} else if (children.some((child) => (child.state.previous === 'other'))) {
+	} else if (children.some((child) => (child.state.previous === 'pending'))) {
 
-		return 'other';
+		return 'pending';
 
 	} else {
 

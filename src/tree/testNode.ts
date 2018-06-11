@@ -91,12 +91,12 @@ export class TestNode implements TreeNode {
 	}
 
 	resetState(): void {
-		if ((this.state.current !== 'pending') || (this.state.previous !== 'other')) {
+		if (((this.state.current !== 'pending') && (this.state.current !== 'skipped')) ||
+			((this.state.previous !== 'pending') && (this.state.previous !== 'skipped'))) {
 
 			this._state.current = 'pending';
-			this._state.previous = 'other';
+			this._state.previous = 'pending';
 			this.neededUpdates = 'send';
-
 
 			if (this.info.file) {
 				this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
