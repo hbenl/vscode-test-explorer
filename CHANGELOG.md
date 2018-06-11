@@ -1,3 +1,6 @@
+### Version 0.3.1
+* bugfixes for CodeLenses not appearing in non-javascript files and inconsistent handling of skipped tests
+
 ### Version 0.3.0
 * provide Gutter Decorations showing the test states
 
