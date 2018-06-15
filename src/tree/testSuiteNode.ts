@@ -103,16 +103,6 @@ export class TestSuiteNode implements TreeNode {
 		return treeItem;
 	}
 
-	getPath(): string[] {
-		if (this.parent === undefined) {
-			return [];
-		} else {
-			const path = this.parent.getPath();
-			path.push(this.info.id);
-			return path;
-		}
-	}
-
 	private findChildNode(type: 'suite' | 'test', id: string): TreeNode | undefined {
 		return this.children.find(childNode =>
 			(childNode.info.type === type) && (childNode.info.id === id));

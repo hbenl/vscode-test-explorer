@@ -119,10 +119,4 @@ export class TestNode implements TreeNode {
 
 		return treeItem;
 	}
-
-	getPath(): string[] {
-		const path = this.parent.getPath();
-		path.push(this.info.id);
-		return path;
-	}
 }

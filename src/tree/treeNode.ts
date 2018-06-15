@@ -14,7 +14,6 @@ export interface TreeNode {
 	readonly collection: TestCollection;
 	readonly parent: TestSuiteNode | undefined;
 	readonly children: TreeNode[];
-	getPath(): string[];
 	recalcState(autorun: boolean): void;
 	retireState(): void;
 	resetState(): void;
