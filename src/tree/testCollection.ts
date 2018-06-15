@@ -13,6 +13,7 @@ export class TestCollection {
 	private readonly nodesById = new Map<string, TreeNode>();
 	private readonly locatedNodes = new Map<string, Map<number, TreeNode[]>>();
 	private readonly codeLenses = new Map<string, vscode.CodeLens[]>();
+	private collectionChangedWhileRunning = false;
 
 	get suite() { return this.rootSuite; }
 	get autorunNode() { return this._autorunNode; }
@@ -40,6 +41,7 @@ export class TestCollection {
 						this.runningSuite.children.push(testSuiteNode);
 						this.runningSuite.neededUpdates = 'recalc';
 						this.nodesById.set(suiteId, testSuiteNode);
+						this.collectionChangedWhileRunning = true;
 
 					}
 
@@ -68,6 +70,7 @@ export class TestCollection {
 					this.runningSuite.children.push(testNode);
 					this.runningSuite.neededUpdates = 'recalc';
 					this.nodesById.set(testId, testNode);
+					this.collectionChangedWhileRunning = true;
 
 				}
 
@@ -132,6 +135,17 @@ export class TestCollection {
 		this.explorer.decorator.updateDecorationsNow();
 
 		this.explorer.treeEvents.sendTreeChangedEvent();
+	}
+
+	testRunStarting(): void {
+		this.collectionChangedWhileRunning = false;
+	}
+
+	testRunFinished(): void {
+		if (this.collectionChangedWhileRunning) {
+			this.collectionChangedWhileRunning = false;
+			this.computeCodeLenses();
+		}
 	}
 
 	recalcState(): void {

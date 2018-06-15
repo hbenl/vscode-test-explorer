@@ -48,6 +48,8 @@ export class TestRunScheduler {
 			collection.resetState();
 		}
 
+		collection.testRunStarting();
+
 		const testNodes: TestNode[] = [];
 		this.collectTests(treeNode, testNodes);
 		for (const testNode of testNodes) {
@@ -78,7 +80,7 @@ export class TestRunScheduler {
 			}
 		}
 
-		treeNode.collection.computeCodeLenses();
+		collection.testRunFinished();
 
 		this.doNext();
 	}
