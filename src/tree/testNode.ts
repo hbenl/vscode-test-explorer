@@ -19,9 +19,10 @@ export class TestNode implements TreeNode {
 		public readonly collection: TestCollection,
 		public readonly info: TestInfo,
 		public readonly parent: TestSuiteNode,
-		oldNode?: TestNode
+		oldNodesById?: Map<string, TreeNode>
 	) {
-		if (oldNode) {
+		const oldNode = oldNodesById ? oldNodesById.get(info.id) : undefined;
+		if (oldNode && (oldNode.info.type === 'test')) {
 			this._state = oldNode.state;
 			this._log = oldNode.log || "";
 		} else {

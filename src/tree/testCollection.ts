@@ -10,6 +10,7 @@ export class TestCollection {
 	private rootSuite: TestSuiteNode | undefined;
 	private runningSuite: TestSuiteNode | undefined;
 	private _autorunNode: TreeNode | undefined;
+	private readonly nodesById = new Map<string, TreeNode>();
 	private readonly locatedNodes = new Map<string, Map<number, TreeNode[]>>();
 	private readonly codeLenses = new Map<string, vscode.CodeLens[]>();
 
@@ -27,31 +28,23 @@ export class TestCollection {
 			if (testStateMessage.type === 'suite') {
 
 				const suiteId = (typeof testStateMessage.suite === 'string') ? testStateMessage.suite : testStateMessage.suite.id;
+				const node = this.nodesById.get(suiteId);
+				let testSuiteNode = (node && (node.info.type === 'suite')) ? <TestSuiteNode>node : undefined;
 
 				if (testStateMessage.state === 'running') {
 
-					if (this.runningSuite === undefined) {
+					if (!testSuiteNode && this.runningSuite && (typeof testStateMessage.suite === 'object')) {
 
-						if (suiteId === this.rootSuite.info.id) {
-							this.runningSuite = this.rootSuite;
-						}
+						this.runningSuite.info.children.push(testStateMessage.suite);
+						testSuiteNode = new TestSuiteNode(this, testStateMessage.suite, this.runningSuite);
+						this.runningSuite.children.push(testSuiteNode);
+						this.runningSuite.neededUpdates = 'recalc';
+						this.nodesById.set(suiteId, testSuiteNode);
 
-					} else {
+					}
 
-						let testSuiteNode = this.runningSuite.findChildTestSuiteNode(suiteId);
-						if (testSuiteNode === undefined) {
-							if (typeof testStateMessage.suite === 'object') {
-								this.runningSuite.info.children.push(testStateMessage.suite);
-								testSuiteNode = new TestSuiteNode(this, testStateMessage.suite, this.runningSuite);
-								this.runningSuite.children.push(testSuiteNode);
-								this.runningSuite.neededUpdates = 'recalc';
-							}
-						}
-
-						if (testSuiteNode) {
-							this.runningSuite = testSuiteNode;
-						}
-
+					if (testSuiteNode) {
+						this.runningSuite = testSuiteNode;
 					}
 
 				} else { // testStateMessage.state === 'completed'
@@ -64,23 +57,22 @@ export class TestCollection {
 
 			} else { // testStateMessage.type === 'test'
 
-				if (this.runningSuite) {
+				const testId = (typeof testStateMessage.test === 'string') ? testStateMessage.test : testStateMessage.test.id;
+				const node = this.nodesById.get(testId);
+				let testNode = (node && (node.info.type === 'test')) ? <TestNode>node : undefined;
 
-					const testId = (typeof testStateMessage.test === 'string') ? testStateMessage.test : testStateMessage.test.id;
-					let testNode = this.runningSuite.findChildTestNode(testId);
+				if (!testNode && this.runningSuite && (typeof testStateMessage.test === 'object')) {
 
-					if (testNode === undefined) {
-						if (typeof testStateMessage.test === 'object') {
-							this.runningSuite.info.children.push(testStateMessage.test);
-							testNode = new TestNode(this, testStateMessage.test, this.runningSuite);
-							this.runningSuite.children.push(testNode);
-							this.runningSuite.neededUpdates = 'recalc';
-						}
-					}
+					this.runningSuite.info.children.push(testStateMessage.test);
+					testNode = new TestNode(this, testStateMessage.test, this.runningSuite);
+					this.runningSuite.children.push(testNode);
+					this.runningSuite.neededUpdates = 'recalc';
+					this.nodesById.set(testId, testNode);
 
-					if (testNode) {
-						testNode.setCurrentState(testStateMessage.state, testStateMessage.message);
-					}
+				}
+
+				if (testNode) {
+					testNode.setCurrentState(testStateMessage.state, testStateMessage.message);
 				}
 			}
 
@@ -114,7 +106,7 @@ export class TestCollection {
 
 		if (testSuiteInfo) {
 
-			this.rootSuite = new TestSuiteNode(this, testSuiteInfo, undefined, this.rootSuite);
+			this.rootSuite = new TestSuiteNode(this, testSuiteInfo, undefined, this.nodesById);
 
 			if (this.shouldRetireStateOnReload()) {
 				this.rootSuite.retireState();
@@ -130,6 +122,11 @@ export class TestCollection {
 
 		this.runningSuite = undefined;
 		this._autorunNode = undefined;
+
+		this.nodesById.clear();
+		if (this.rootSuite) {
+			this.collectNodesById(this.rootSuite);
+		}
 
 		this.computeCodeLenses();
 		this.explorer.decorator.updateDecorationsNow();
@@ -285,6 +282,15 @@ export class TestCollection {
 		while (_node !== undefined) {
 			_node.neededUpdates = 'recalc';
 			_node = _node.parent;
+		}
+	}
+
+	private collectNodesById(node: TreeNode): void {
+
+		this.nodesById.set(node.info.id, node);
+
+		for (const child of node.children) {
+			this.collectNodesById(child);
 		}
 	}
 

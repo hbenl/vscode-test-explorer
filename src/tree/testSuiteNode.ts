@@ -19,20 +19,14 @@ export class TestSuiteNode implements TreeNode {
 		public readonly collection: TestCollection,
 		public readonly info: TestSuiteInfo,
 		public readonly parent: TestSuiteNode | undefined,
-		oldNode?: TestSuiteNode
+		oldNodesById?: Map<string, TreeNode>
 	) {
 
 		this._children = info.children.map(childInfo => {
-
 			if (childInfo.type === 'test') {
-
-				const oldChildNode = oldNode ? oldNode.findChildTestNode(childInfo.id) : undefined;
-				return new TestNode(collection, childInfo, this, oldChildNode);
-
+				return new TestNode(collection, childInfo, this, oldNodesById);
 			} else {
-
-				const oldChildNode = oldNode ? oldNode.findChildTestSuiteNode(childInfo.id) : undefined;
-				return new TestSuiteNode(collection, childInfo, this, oldChildNode);
+				return new TestSuiteNode(collection, childInfo, this, oldNodesById);
 			}
 		});
 
@@ -101,18 +95,5 @@ export class TestSuiteNode implements TreeNode {
 		treeItem.contextValue = this.parent ? 'suite' : 'collection';
 
 		return treeItem;
-	}
-
-	private findChildNode(type: 'suite' | 'test', id: string): TreeNode | undefined {
-		return this.children.find(childNode =>
-			(childNode.info.type === type) && (childNode.info.id === id));
-	}
-
-	findChildTestSuiteNode(id: string): TestSuiteNode | undefined {
-		return <TestSuiteNode | undefined>this.findChildNode('suite', id);
-	}
-
-	findChildTestNode(id: string): TestNode | undefined {
-		return <TestNode | undefined>this.findChildNode('test', id);
 	}
 }
