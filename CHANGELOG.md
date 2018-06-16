@@ -1,3 +1,6 @@
+### Version 0.3.2
+* simplification of Test Adapter API: events for test suites are now optional
+
 ### Version 0.3.1
 * bugfixes for CodeLenses not appearing in non-javascript files and inconsistent handling of skipped tests
 
