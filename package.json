@@ -122,6 +122,14 @@
         "title": "Reload tests"
       },
       {
+        "command": "test-explorer.reloading",
+        "title": "Test Explorer: Reloading tests",
+        "icon": {
+          "dark": "./icons/reloading-dark.svg",
+          "light": "./icons/reloading-light.svg"
+        }
+      },
+      {
         "command": "test-explorer.run-all",
         "title": "Test Explorer: Run all tests",
         "icon": {
@@ -190,7 +198,12 @@
         {
           "command": "test-explorer.reload",
           "group": "navigation@3",
-          "when": "view == test-explorer"
+          "when": "view == test-explorer && !testsLoading"
+        },
+        {
+          "command": "test-explorer.reloading",
+          "group": "navigation@4",
+          "when": "view == test-explorer && testsLoading"
         },
         {
           "command": "test-explorer.enable-autorun",
@@ -258,6 +271,10 @@
       "commandPalette": [
         {
           "command": "test-explorer.reload-collection",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.reloading",
           "when": "false"
         },
         {

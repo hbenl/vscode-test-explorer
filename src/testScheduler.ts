@@ -63,6 +63,8 @@ export class TestScheduler {
 
 	private async loadTests(collection: TestCollection): Promise<void> {
 
+		vscode.commands.executeCommand('setContext', 'testsLoading', true);
+
 		this.currentReload = collection;
 
 		try {
@@ -72,6 +74,8 @@ export class TestScheduler {
 		}
 
 		this.currentReload = undefined;
+
+		vscode.commands.executeCommand('setContext', 'testsLoading', false);
 
 		this.doNext();
 	}
