@@ -83,7 +83,7 @@ export class TestCollection {
 		});
 
 		if (adapter.reload) {
-			adapter.reload(() => this.loadTests());
+			adapter.reload(() => this.explorer.scheduler.scheduleReload(this));
 		}
 
 		if (adapter.autorun) {
@@ -94,7 +94,7 @@ export class TestCollection {
 			});
 		}
 
-		this.loadTests();
+		this.explorer.scheduler.scheduleReload(this);
 	}
 
 	async loadTests(): Promise<void> {

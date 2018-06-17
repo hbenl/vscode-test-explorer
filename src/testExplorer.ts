@@ -5,7 +5,7 @@ import { TestCollection } from './tree/testCollection';
 import { TreeNode } from './tree/treeNode';
 import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './treeEventDebouncer';
-import { TestRunScheduler } from './testRunScheduler';
+import { TestScheduler } from './testScheduler';
 import { Decorator } from './decorator';
 
 export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.CodeLensProvider {
@@ -24,7 +24,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 
 	public readonly collections: TestCollection[] = [];
 
-	private scheduler = new TestRunScheduler(this);
+	public readonly scheduler = new TestScheduler(this);
 
 	constructor(
 		context: vscode.ExtensionContext
@@ -78,21 +78,21 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 
 	reload(node?: TreeNode): void {
 		if (node) {
-			node.collection.loadTests();
+			this.scheduler.scheduleReload(node.collection);
 		} else {
 			for (const collection of this.collections) {
-				collection.loadTests();
+				this.scheduler.scheduleReload(collection);
 			}
 		}
 	}
 
 	run(node?: TreeNode): void {
 		if (node) {
-			this.scheduler.schedule(node);
+			this.scheduler.scheduleTestRun(node);
 		} else {
 			for (const collection of this.collections) {
 				if (collection.suite) {
-					this.scheduler.schedule(collection.suite);
+					this.scheduler.scheduleTestRun(collection.suite);
 				}
 			}
 		}
