@@ -1,3 +1,6 @@
+### Version 0.3.3
+* animate the reload icon while tests are loading
+
 ### Version 0.3.2
 * simplification of Test Adapter API: events for test suites are now optional
 
