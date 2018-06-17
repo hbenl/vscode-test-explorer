@@ -24,7 +24,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 
 	public readonly collections: TestCollection[] = [];
 
-	public readonly scheduler = new TestScheduler(this);
+	public readonly scheduler = new TestScheduler();
 
 	constructor(
 		context: vscode.ExtensionContext

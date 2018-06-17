@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { TreeNode } from "./tree/treeNode";
 import { TestNode } from "./tree/testNode";
-import { TestExplorer } from "./testExplorer";
 import { TestCollection } from './tree/testCollection';
 
 export class TestScheduler {
@@ -11,22 +10,33 @@ export class TestScheduler {
 	private pendingTestRuns: TreeNode[] = [];
 	private currentTestRun: [TestCollection, Promise<void>] | undefined;
 
-	constructor(
-		private readonly explorer: TestExplorer
-	) {}
-
 	scheduleReload(collection: TestCollection): void {
+
 		this.pendingReloads.push(collection);
+
 		this.doNext();
 	}
 
 	scheduleTestRun(node: TreeNode): void {
+
 		this.pendingTestRuns.push(node);
+
+		for (const testNode of this.collectTests(node)) {
+			testNode.setCurrentState('scheduled');
+		}
+
 		this.doNext();
 	}
 
 	async cancel(): Promise<void> {
 
+		for (const treeNode of this.pendingTestRuns) {
+			for (const testNode of this.collectTests(treeNode)) {
+				if ((testNode.state.current === 'scheduled') || (testNode.state.current === 'running')) {
+					testNode.setCurrentState('pending');
+				}
+			}
+		}
 		this.pendingTestRuns = [];
 
 		if (this.currentTestRun) {
@@ -76,16 +86,8 @@ export class TestScheduler {
 			collection.resetState();
 		}
 
-		collection.testRunStarting();
-
-		const testNodes: TestNode[] = [];
-		this.collectTests(treeNode, testNodes);
-		for (const testNode of testNodes) {
-			testNode.setCurrentState('scheduled');
-		}
-		this.explorer.treeEvents.sendNodeChangedEvents(false);
-
 		vscode.commands.executeCommand('setContext', 'testsRunning', true);
+		collection.testRunStarting();
 
 		try {
 
@@ -100,26 +102,25 @@ export class TestScheduler {
 
 		this.currentTestRun = undefined;
 
-		vscode.commands.executeCommand('setContext', 'testsRunning', false);
-
-		for (const testNode of testNodes) {
+		for (const testNode of this.collectTests(treeNode)) {
 			if ((testNode.state.current === 'scheduled') || (testNode.state.current === 'running')) {
 				testNode.setCurrentState('pending');
 			}
 		}
 
 		collection.testRunFinished();
+		vscode.commands.executeCommand('setContext', 'testsRunning', false);
 
 		this.doNext();
 	}
 
-	private collectTests(treeNode: TreeNode, testNodes: TestNode[]): void {
+	private *collectTests(treeNode: TreeNode): IterableIterator<TestNode> {
 		if (treeNode.info.type === 'suite') {
 			for (const child of treeNode.children) {
-				this.collectTests(child, testNodes);
+				yield* this.collectTests(child);
 			}
 		} else {
-			testNodes.push(<TestNode>treeNode);
+			yield <TestNode>treeNode;
 		}
 	}
 }
