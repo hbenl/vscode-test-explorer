@@ -5,14 +5,14 @@ import { TestCollection } from './tree/testCollection';
 
 export class TestScheduler {
 
-	private pendingReloads: TestCollection[] = [];
+	private pendingReloads: [TestCollection, boolean][] = [];
 	private currentReload: TestCollection | undefined;
 	private pendingTestRuns: TreeNode[] = [];
 	private currentTestRun: [TestCollection, Promise<void>] | undefined;
 
-	scheduleReload(collection: TestCollection): void {
+	scheduleReload(collection: TestCollection, autorunAfterReload: boolean): void {
 
-		this.pendingReloads.push(collection);
+		this.pendingReloads.push([collection, autorunAfterReload]);
 
 		this.doNext();
 	}
@@ -48,9 +48,9 @@ export class TestScheduler {
 	private doNext() {
 		if (this.currentReload || this.currentTestRun) return;
 
-		const collection = this.pendingReloads.shift();
-		if (collection) {
-			this.loadTests(collection);
+		if (this.pendingReloads.length > 0) {
+			const [collection, autorunAfterReload] = this.pendingReloads.shift()!;
+			this.loadTests(collection, autorunAfterReload);
 			return;
 		}
 
@@ -61,7 +61,7 @@ export class TestScheduler {
 		}
 	}
 
-	private async loadTests(collection: TestCollection): Promise<void> {
+	private async loadTests(collection: TestCollection, autorunAfterReload: boolean): Promise<void> {
 
 		vscode.commands.executeCommand('setContext', 'testsLoading', true);
 
@@ -76,6 +76,10 @@ export class TestScheduler {
 		this.currentReload = undefined;
 
 		vscode.commands.executeCommand('setContext', 'testsLoading', false);
+
+		if (autorunAfterReload && collection.autorunNode) {
+			this.scheduleTestRun(collection.autorunNode);
+		}
 
 		this.doNext();
 	}

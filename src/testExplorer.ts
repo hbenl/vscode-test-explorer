@@ -78,10 +78,10 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 
 	reload(node?: TreeNode): void {
 		if (node) {
-			this.scheduler.scheduleReload(node.collection);
+			this.scheduler.scheduleReload(node.collection, false);
 		} else {
 			for (const collection of this.collections) {
-				this.scheduler.scheduleReload(collection);
+				this.scheduler.scheduleReload(collection, false);
 			}
 		}
 	}
