@@ -1,3 +1,7 @@
+### Version 0.4.0
+* start an autorun after automatically reloading the tests
+* bugfix for the autorun state not being displayed correctly
+
 ### Version 0.3.3
 * animate the reload icon while tests are loading
 
