@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { TestSuiteInfo } from "vscode-test-adapter-api";
 import { TreeNode, TreeNodeUpdates } from "./treeNode";
-import { NodeState, stateIcon, parentNodeState, parentCurrentNodeState, parentPreviousNodeState } from "./state";
+import { NodeState, stateIcon, parentNodeState, parentCurrentNodeState, parentPreviousNodeState, parentAutorunFlag } from "./state";
 import { TestCollection } from './testCollection';
 import { TestNode } from './testNode';
 
@@ -33,30 +33,41 @@ export class TestSuiteNode implements TreeNode {
 		this._state = parentNodeState(this._children);
 	}
 
-	recalcState(autorun: boolean): void {
-		if (this.neededUpdates !== 'recalc') return;
+	recalcState(): boolean {
 
-		const newAutorunFlag = autorun || (this.collection.autorunNode === this);
-
+		let someChildChanged = false;
 		for (const child of this.children) {
-			child.recalcState(newAutorunFlag);
+			if (child instanceof TestSuiteNode) {
+				someChildChanged = child.recalcState() || someChildChanged;
+			}
 		}
 
-		const newCurrentNodeState = parentCurrentNodeState(this.children);
-		const newPreviousNodeState = parentPreviousNodeState(this.children);
+		if ((this.neededUpdates === 'recalc') || someChildChanged) {
 
-		if ((this.state.current !== newCurrentNodeState) ||
-			(this.state.previous !== newPreviousNodeState) ||
-			(this.state.autorun !== newAutorunFlag)
-		) {
+			const newCurrentNodeState = parentCurrentNodeState(this.children);
+			const newPreviousNodeState = parentPreviousNodeState(this.children);
+			const newAutorunFlag = parentAutorunFlag(this.children);
 
-			this.state.current = newCurrentNodeState;
-			this.state.previous = newPreviousNodeState;
-			this.state.autorun = newAutorunFlag;
-			this.neededUpdates = 'send';
+			if ((this.state.current !== newCurrentNodeState) ||
+				(this.state.previous !== newPreviousNodeState) ||
+				(this.state.autorun !== newAutorunFlag)
+			) {
+	
+				this.state.current = newCurrentNodeState;
+				this.state.previous = newPreviousNodeState;
+				this.state.autorun = newAutorunFlag;
+				this.neededUpdates = 'send';
+				return true;
+
+			} else {
+
+				this.neededUpdates = 'none';
+				return false;
+
+			}
 
 		} else {
-			this.neededUpdates = 'none';
+			return false;
 		}
 	}
 
@@ -78,11 +89,21 @@ export class TestSuiteNode implements TreeNode {
 		this.neededUpdates = 'recalc';
 	}
 
+	setAutorun(autorun: boolean): void {
+
+		for (const child of this._children) {
+			child.setAutorun(autorun);
+		}
+
+		this.neededUpdates = 'recalc';
+	}
+
 	getTreeItem(): vscode.TreeItem {
 
-		if (this.neededUpdates === 'send') {
-			this.neededUpdates = 'none';
+		if (this.neededUpdates === 'recalc') {
+			this.recalcState();
 		}
+		this.neededUpdates = 'none';
 
 		let label = this.info.label;
 		if ((this.parent === undefined) && this.collection.adapter.workspaceFolder &&

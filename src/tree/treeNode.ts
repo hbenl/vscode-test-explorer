@@ -14,8 +14,8 @@ export interface TreeNode {
 	readonly collection: TestCollection;
 	readonly parent: TestSuiteNode | undefined;
 	readonly children: TreeNode[];
-	recalcState(autorun: boolean): void;
 	retireState(): void;
 	resetState(): void;
+	setAutorun(autorun: boolean): void;
 	getTreeItem(): vscode.TreeItem;
 }

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TestInfo } from "vscode-test-adapter-api";
-import { TreeNode, TreeNodeUpdates } from "./treeNode";
+import { TreeNode } from "./treeNode";
 import { NodeState, stateIcon, CurrentNodeState, defaultState } from "./state";
 import { TestSuiteNode } from './testSuiteNode';
 import { TestCollection } from './testCollection';
@@ -11,7 +11,7 @@ export class TestNode implements TreeNode {
 	private _log: string = "";
 
 	get state(): NodeState { return this._state; }
-	neededUpdates: TreeNodeUpdates = 'none';
+	neededUpdates: 'none' | 'send' = 'none';
 	get log(): string { return this._log; }
 	readonly children: TreeNode[] = [];
 
@@ -47,35 +47,14 @@ export class TestNode implements TreeNode {
 		}
 
 		this.neededUpdates = 'send';
-		let ancestor: TestSuiteNode | undefined = this.parent;
-		while (ancestor) {
-			ancestor.neededUpdates = 'recalc';
-			ancestor = ancestor.parent;
+		if (this.parent) {
+			this.parent.neededUpdates = 'recalc';
 		}
 
 		this.collection.sendNodeChangedEvents();
 
 		if (this.info.file) {
 			this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
-		}
-	}
-
-	recalcState(autorun: boolean): void {
-		if (this.neededUpdates !== 'recalc') return;
-
-		const newAutorunFlag = autorun || (this.collection.autorunNode === this);
-
-		if (this.state.autorun !== newAutorunFlag) {
-
-			this.state.autorun = newAutorunFlag;
-			this.neededUpdates = 'send';
-
-			if (this.info.file) {
-				this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
-			}
-	
-		} else {
-			this.neededUpdates = 'none';
 		}
 	}
 
@@ -103,6 +82,11 @@ export class TestNode implements TreeNode {
 				this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
 			}
 		}
+	}
+
+	setAutorun(autorun: boolean): void {
+		this._state.autorun = autorun;
+		this.neededUpdates = 'send';
 	}
 
 	getTreeItem(): vscode.TreeItem {

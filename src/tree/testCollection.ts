@@ -123,13 +123,17 @@ export class TestCollection {
 
 		}
 
-		this.runningSuite = undefined;
-		this._autorunNode = undefined;
-
 		this.nodesById.clear();
 		if (this.rootSuite) {
 			this.collectNodesById(this.rootSuite);
 		}
+
+		if (this._autorunNode) {
+			const newAutorunNode = this.nodesById.get(this._autorunNode.info.id);
+			this.setAutorun(newAutorunNode);
+		}
+
+		this.runningSuite = undefined;
 
 		this.computeCodeLenses();
 		this.explorer.decorator.updateDecorationsNow();
@@ -150,7 +154,7 @@ export class TestCollection {
 
 	recalcState(): void {
 		if (this.rootSuite) {
-			this.rootSuite.recalcState(this.rootSuite === this._autorunNode);
+			this.rootSuite.recalcState();
 		}
 	}
 
@@ -160,10 +164,8 @@ export class TestCollection {
 
 			node.retireState();
 
-			let ancestor = node.parent;
-			while (ancestor) {
-				ancestor.neededUpdates = 'recalc';
-				ancestor = ancestor.parent;
+			if (node.parent) {
+				node.parent.neededUpdates = 'recalc';
 			}
 
 		} else if (this.rootSuite) {
@@ -181,10 +183,8 @@ export class TestCollection {
 
 			node.resetState();
 
-			let ancestor = node.parent;
-			while (ancestor) {
-				ancestor.neededUpdates = 'recalc';
-				ancestor = ancestor.parent;
+			if (node.parent) {
+				node.parent.neededUpdates = 'recalc';
 			}
 
 		} else if (this.rootSuite) {
@@ -199,14 +199,18 @@ export class TestCollection {
 	setAutorun(node: TreeNode | undefined): void {
 
 		if (this._autorunNode) {
-			this.setRecalcNeededOnAncestors(this._autorunNode);
-			this.setRecalcNeededOnDescendants(this._autorunNode);
+			this._autorunNode.setAutorun(false);
+			if (this._autorunNode.parent) {
+				this._autorunNode.parent.neededUpdates = 'recalc';
+			}
 			this._autorunNode = undefined;
 		}
 
 		if (this.rootSuite && node) {
-			this.setRecalcNeededOnAncestors(node);
-			this.setRecalcNeededOnDescendants(node);
+			node.setAutorun(true);
+			if (node.parent) {
+				node.parent.neededUpdates = 'recalc';
+			}
 			this._autorunNode = node;
 		}
 
@@ -278,25 +282,6 @@ export class TestCollection {
 		const workspaceFolder = this.adapter.workspaceFolder;
 		var workspaceUri = workspaceFolder ? workspaceFolder.uri : undefined;
 		return vscode.workspace.getConfiguration('testExplorer', workspaceUri);
-	}
-
-	private setRecalcNeededOnDescendants(node: TreeNode): void {
-
-		node.neededUpdates = 'recalc';
-
-		for (const child of node.children) {
-			this.setRecalcNeededOnDescendants(child);
-		}
-	}
-
-	private setRecalcNeededOnAncestors(node: TreeNode): void {
-
-		let _node: TreeNode | undefined = node;
-
-		while (_node !== undefined) {
-			_node.neededUpdates = 'recalc';
-			_node = _node.parent;
-		}
 	}
 
 	private collectNodesById(node: TreeNode): void {

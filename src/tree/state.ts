@@ -22,7 +22,7 @@ export function parentNodeState(children: TreeNode[]): NodeState {
 	return {
 		current: parentCurrentNodeState(children),
 		previous: parentPreviousNodeState(children),
-		autorun: children.some(child => child.state.autorun)
+		autorun: false
 	};
 }
 
@@ -106,6 +106,10 @@ export function parentPreviousNodeState(children: TreeNode[]): PreviousNodeState
 		return 'passed';
 
 	}
+}
+
+export function parentAutorunFlag(children: TreeNode[]): boolean {
+	return children.some(child => child.state.autorun);
 }
 
 export type StateIconType = 'pending' | 'pendingAutorun' | 'scheduled' | 'running' |
