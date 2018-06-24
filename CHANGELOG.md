@@ -1,3 +1,6 @@
+### Version 0.4.1
+* bugfix for another state display bug
+
 ### Version 0.4.0
 * start an autorun after automatically reloading the tests
 * bugfix for the autorun state not being displayed correctly
