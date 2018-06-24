@@ -33,16 +33,15 @@ export class TestSuiteNode implements TreeNode {
 		this._state = parentNodeState(this._children);
 	}
 
-	recalcState(): boolean {
+	recalcState(): void {
 
-		let someChildChanged = false;
 		for (const child of this.children) {
 			if (child instanceof TestSuiteNode) {
-				someChildChanged = child.recalcState() || someChildChanged;
+				child.recalcState();
 			}
 		}
 
-		if ((this.neededUpdates === 'recalc') || someChildChanged) {
+		if (this.neededUpdates === 'recalc') {
 
 			const newCurrentNodeState = parentCurrentNodeState(this.children);
 			const newPreviousNodeState = parentPreviousNodeState(this.children);
@@ -57,17 +56,15 @@ export class TestSuiteNode implements TreeNode {
 				this.state.previous = newPreviousNodeState;
 				this.state.autorun = newAutorunFlag;
 				this.neededUpdates = 'send';
-				return true;
+				if (this.parent) {
+					this.parent.neededUpdates = 'recalc';
+				}
 
 			} else {
 
 				this.neededUpdates = 'none';
-				return false;
 
 			}
-
-		} else {
-			return false;
 		}
 	}
 
