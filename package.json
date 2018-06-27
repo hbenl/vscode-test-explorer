@@ -58,7 +58,7 @@
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": "Configuration for the Test Explorer extension",
+      "title": "testExplorer configuration",
       "properties": {
         "testExplorer.onStart": {
           "description": "Retire or reset all test states whenever a test run is started",
