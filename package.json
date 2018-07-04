@@ -238,6 +238,11 @@
           "when": "view == test-explorer && viewItem == test"
         },
         {
+          "command": "test-explorer.show-source",
+          "group": "inline@3",
+          "when": "view == test-explorer"
+        },
+        {
           "command": "test-explorer.reload-collection",
           "group": "1_reload",
           "when": "view == test-explorer && viewItem == collection"
