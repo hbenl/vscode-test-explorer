@@ -164,7 +164,11 @@
       },
       {
         "command": "test-explorer.show-source",
-        "title": "Show source"
+        "title": "Show source",
+        "icon": {
+          "dark": "./icons/open-file-dark.svg",
+          "light": "./icons/open-file-light.svg"
+        }
       },
       {
         "command": "test-explorer.enable-autorun",
