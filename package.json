@@ -252,11 +252,6 @@
           "when": "view == test-explorer && viewItem == collection"
         },
         {
-          "command": "test-explorer.show-source",
-          "group": "3_show@3",
-          "when": "view == test-explorer && viewItem == test"
-        },
-        {
           "command": "test-explorer.enable-autorun",
           "group": "4_autorun@4",
           "when": "view == test-explorer"
