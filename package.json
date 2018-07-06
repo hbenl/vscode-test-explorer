@@ -164,7 +164,11 @@
       },
       {
         "command": "test-explorer.show-source",
-        "title": "Show source"
+        "title": "Show source",
+        "icon": {
+          "dark": "./icons/open-file-dark.svg",
+          "light": "./icons/open-file-light.svg"
+        }
       },
       {
         "command": "test-explorer.enable-autorun",
@@ -236,6 +240,11 @@
           "command": "test-explorer.debug",
           "group": "inline@1",
           "when": "view == test-explorer && viewItem == test"
+        },
+        {
+          "command": "test-explorer.show-source",
+          "group": "inline@3",
+          "when": "view == test-explorer"
         },
         {
           "command": "test-explorer.reload-collection",
