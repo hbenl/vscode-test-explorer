@@ -1,3 +1,6 @@
+### Version 0.4.2
+* turn "Show source" context menu item into an inline menu item
+
 ### Version 0.4.1
 * bugfix for another state display bug
 
