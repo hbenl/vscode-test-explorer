@@ -59,7 +59,10 @@ export class TestSuiteNode implements TreeNode {
 				if (this.parent) {
 					this.parent.neededUpdates = 'recalc';
 				}
-
+				if (this.info.file) {
+					this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
+				}
+		
 			} else {
 
 				this.neededUpdates = 'none';

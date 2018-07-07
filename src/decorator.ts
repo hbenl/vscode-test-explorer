@@ -75,13 +75,11 @@ export class Decorator {
 			if (locatedNodes) {
 				for (const [ line, treeNodes ] of locatedNodes) {
 					for (const treeNode of treeNodes) {
-						if (treeNode.info.type === 'test') {
-							const decorationType = this.stateDecorationTypes[stateIcon(treeNodes[0].state)];
-							decorations.get(decorationType)!.push({
-								range: new vscode.Range(line, 0, line, 0)
-							});
-							break;
-						}
+						const decorationType = this.stateDecorationTypes[stateIcon(treeNode.state)];
+						decorations.get(decorationType)!.push({
+							range: new vscode.Range(line, 0, line, 0)
+						});
+						break;
 					}
 				}
 			}
