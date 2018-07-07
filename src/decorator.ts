@@ -18,12 +18,13 @@ export class Decorator {
 		private readonly testExplorer: TestExplorer
 	) {
 
-		this.stateDecorationTypes = new StateDecorationTypes(this.testExplorer.iconPaths);
+		this.stateDecorationTypes = new StateDecorationTypes(context, this.testExplorer.iconPaths);
 		this.errorDecorationType = vscode.window.createTextEditorDecorationType({
 			backgroundColor: 'rgba(255,0,0,0.3)',
 			isWholeLine: true,
 			overviewRulerColor: 'rgba(255,0,0,0.3)',
 		});
+		context.subscriptions.push(this.errorDecorationType);
 
 		context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
 			this.activeTextEditor = editor;

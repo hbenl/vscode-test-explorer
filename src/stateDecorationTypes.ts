@@ -20,7 +20,10 @@ export class StateDecorationTypes {
 
 	readonly all: vscode.TextEditorDecorationType[];
 
-	constructor(iconPaths: IconPaths) {
+	constructor(
+		context: vscode.ExtensionContext,
+		iconPaths: IconPaths
+	) {
 		this.pending = toDecorationType(iconPaths.pending);
 		this.pendingAutorun = toDecorationType(iconPaths.pendingAutorun);
 		this.scheduled = toDecorationType(iconPaths.scheduled);
@@ -41,6 +44,10 @@ export class StateDecorationTypes {
 			this.passed, this.failed, this.passedFaint, this.failedFaint, this.passedAutorun,
 			this.failedAutorun, this.passedFaintAutorun, this.failedFaintAutorun, this.skipped
 		];
+
+		for (const decorationType of this.all) {
+			context.subscriptions.push(decorationType);
+		}
 	}
 }
 
