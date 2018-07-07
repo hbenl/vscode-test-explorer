@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TestInfo } from "vscode-test-adapter-api";
+import { TestInfo, TestDecoration } from "vscode-test-adapter-api";
 import { TreeNode } from "./treeNode";
 import { NodeState, stateIcon, CurrentNodeState, defaultState } from "./state";
 import { TestSuiteNode } from './testSuiteNode';
@@ -9,10 +9,12 @@ export class TestNode implements TreeNode {
 
 	private _state: NodeState;
 	private _log: string = "";
+	private _decorations: TestDecoration[] = [];
 
 	get state(): NodeState { return this._state; }
 	neededUpdates: 'none' | 'send' = 'none';
 	get log(): string { return this._log; }
+	get decorations(): TestDecoration[] { return this._decorations; }
 	readonly children: TreeNode[] = [];
 
 	constructor(
@@ -30,7 +32,11 @@ export class TestNode implements TreeNode {
 		}
 	}
 
-	setCurrentState(currentState: CurrentNodeState, logMessage?: string): void {
+	setCurrentState(
+		currentState: CurrentNodeState,
+		logMessage?: string,
+		decorations?: TestDecoration[]
+	): void {
 
 		this.state.current = currentState;
 
@@ -40,10 +46,15 @@ export class TestNode implements TreeNode {
 
 		if (currentState === 'scheduled') {
 			this._log = "";
+			this._decorations = [];
 		}
 
 		if (logMessage) {
 			this._log += logMessage + "\n";
+		}
+
+		if (decorations) {
+			this._decorations = this._decorations.concat(decorations);
 		}
 
 		this.neededUpdates = 'send';

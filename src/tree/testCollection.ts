@@ -75,7 +75,11 @@ export class TestCollection {
 				}
 
 				if (testNode) {
-					testNode.setCurrentState(testStateMessage.state, testStateMessage.message);
+					testNode.setCurrentState(
+						testStateMessage.state,
+						testStateMessage.message,
+						testStateMessage.decorations
+					);
 				}
 			}
 
@@ -243,6 +247,10 @@ export class TestCollection {
 
 	shouldShowGutterDecoration(): boolean {
 		return (this.getConfiguration().get('gutterDecoration') !== false);
+	}
+
+	shouldShowErrorDecoration(): boolean {
+		return (this.getConfiguration().get('errorDecoration') !== false);
 	}
 
 	computeCodeLenses(): void {

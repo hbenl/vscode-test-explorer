@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { IconPaths, IconPath } from './iconPaths';
 
-export class DecorationTypes {
+export class StateDecorationTypes {
 
 	readonly pending: vscode.TextEditorDecorationType;
 	readonly pendingAutorun: vscode.TextEditorDecorationType;
