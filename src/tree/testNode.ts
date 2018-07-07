@@ -23,12 +23,29 @@ export class TestNode implements TreeNode {
 		public readonly parent: TestSuiteNode,
 		oldNodesById?: Map<string, TreeNode>
 	) {
+
 		const oldNode = oldNodesById ? oldNodesById.get(info.id) : undefined;
 		if (oldNode && (oldNode.info.type === 'test')) {
-			this._state = oldNode.state;
+
+			let currentState = oldNode.state.current;
+			if (info.skipped) {
+				currentState = 'skipped';
+			} else if (currentState === 'skipped') {
+				currentState = 'pending';
+			}
+
+			this._state = {
+				current: currentState,
+				previous: oldNode.state.previous,
+				autorun: oldNode.state.autorun
+			}
 			this._log = oldNode.log || "";
+
 		} else {
+
 			this._state = defaultState(info.skipped);
+			this._log = "";
+
 		}
 	}
 
