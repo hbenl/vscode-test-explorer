@@ -107,7 +107,7 @@ export class TestCollection {
 		if (adapter.autorun) {
 			adapter.autorun(() => {
 				if (this._autorunNode) {
-					this.explorer.run(this._autorunNode);
+					this.explorer.run([this._autorunNode]);
 				}
 			});
 		}
@@ -360,7 +360,7 @@ export class TestCollection {
 		return new vscode.CodeLens(range, {
 			title: 'Run',
 			command: 'test-explorer.run',
-			arguments: nodes
+			arguments: [nodes]
 		});
 	}
 
@@ -374,7 +374,7 @@ export class TestCollection {
 		return new vscode.CodeLens(range, {
 			title: 'Debug',
 			command: 'test-explorer.debug',
-			arguments: nodes
+			arguments: [nodes]
 		});
 	}
 }

@@ -86,10 +86,17 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 		}
 	}
 
-	run(node?: TreeNode): void {
-		if (node) {
-			this.scheduler.scheduleTestRun(node);
+	async run(nodes?: TreeNode[]): Promise<void> {
+
+		if (nodes) {
+
+			const node = await this.pickNode(nodes);
+			if (node) {
+				this.scheduler.scheduleTestRun(node);
+			}
+
 		} else {
+
 			for (const collection of this.collections) {
 				if (collection.suite) {
 					this.scheduler.scheduleTestRun(collection.suite);
@@ -98,15 +105,18 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 		}
 	}
 
-	async debug(node: TreeNode): Promise<void> {
+	async debug(nodes: TreeNode[]): Promise<void> {
 
 		await this.scheduler.cancel();
 
-		try {
-			await node.collection.adapter.debug(node.info);
-		} catch(e) {
-			vscode.window.showErrorMessage(`Error while debugging test: ${e}`);
-			return;
+		const node = await this.pickNode(nodes);
+		if (node) {
+			try {
+				await node.collection.adapter.debug(node.info);
+			} catch(e) {
+				vscode.window.showErrorMessage(`Error while debugging test: ${e}`);
+				return;
+			}
 		}
 	}
 
@@ -204,5 +214,22 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 		if (index < 0) return undefined;
 	
 		return haystack.substr(0, index).split('\n').length - 1;
+	}
+
+	private async pickNode(nodes: TreeNode[]): Promise<TreeNode | undefined> {
+
+		if (nodes.length === 1) {
+
+			return nodes[0];
+
+		} else if (nodes.length > 1) {
+
+			const labels = nodes.map(node => node.info.label);
+			const pickedLabel = await vscode.window.showQuickPick(labels);
+			return nodes.find(node => (node.info.label === pickedLabel));
+			
+		} else {
+			return undefined;
+		}
 	}
 }

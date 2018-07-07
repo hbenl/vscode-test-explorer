@@ -18,11 +18,11 @@ export function activate(context: vscode.ExtensionContext): TestExplorerExtensio
 
 	registerCommand('test-explorer.run-all', () => testExplorer.run());
 
-	registerCommand('test-explorer.run', (node) => testExplorer.run(node));
+	registerCommand('test-explorer.run', (nodes) => testExplorer.run(nodes));
 
 	registerCommand('test-explorer.cancel', () => testExplorer.cancel());
 
-	registerCommand('test-explorer.debug', (node) => testExplorer.debug(node));
+	registerCommand('test-explorer.debug', (nodes) => testExplorer.debug(nodes));
 
 	registerCommand('test-explorer.selected', (node) => testExplorer.selected(node));
 
