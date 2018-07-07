@@ -23,6 +23,20 @@ export class TestCollection {
 		public readonly explorer: TestExplorer
 	) {
 
+		const workspaceUri = adapter.workspaceFolder ? adapter.workspaceFolder.uri : undefined;
+
+		vscode.workspace.onDidChangeConfiguration(configChange => {
+
+			if (configChange.affectsConfiguration('testExplorer.codeLens', workspaceUri)) {
+				this.computeCodeLenses();
+			}
+
+			if (configChange.affectsConfiguration('testExplorer.gutterDecoration', workspaceUri) ||
+				configChange.affectsConfiguration('testExplorer.errorDecoration', workspaceUri)) {
+				this.explorer.decorator.updateDecorationsNow();
+			}
+		});
+
 		adapter.testStates((testStateMessage) => {
 			if (this.rootSuite === undefined) return;
 
