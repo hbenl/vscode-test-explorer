@@ -1,3 +1,6 @@
+### Version 1.0.1
+* bugfix for broken CodeLenses
+
 ### Version 1.0.0
 * show error decorations
 * show state decorations for test suites
