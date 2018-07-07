@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TestExplorer } from './testExplorer';
-import { stateIcon } from './tree/state';
+import { stateIcon, parentNodeState, StateIconType } from './tree/state';
 import { StateDecorationTypes } from './stateDecorationTypes';
 import { TestCollection } from './tree/testCollection';
 import { allTests } from './util';
@@ -74,13 +74,18 @@ export class Decorator {
 			const locatedNodes = collection.getLocatedNodes(file);
 			if (locatedNodes) {
 				for (const [ line, treeNodes ] of locatedNodes) {
-					for (const treeNode of treeNodes) {
-						const decorationType = this.stateDecorationTypes[stateIcon(treeNode.state)];
-						decorations.get(decorationType)!.push({
-							range: new vscode.Range(line, 0, line, 0)
-						});
-						break;
+
+					let stateIconType: StateIconType;
+					if (treeNodes.length === 1) {
+						stateIconType = stateIcon(treeNodes[0]!.state);
+					} else {
+						stateIconType = stateIcon(parentNodeState(treeNodes));
 					}
+
+					const decorationType = this.stateDecorationTypes[stateIconType];
+					decorations.get(decorationType)!.push({
+						range: new vscode.Range(line, 0, line, 0)
+					});
 				}
 			}
 		}
