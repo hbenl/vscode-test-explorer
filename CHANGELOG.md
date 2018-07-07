@@ -1,3 +1,9 @@
+### Version 1.0.0
+* show error decorations
+* show state decorations for test suites
+* bugfixes for CodeLenses or decorations not being updated in some situations
+* add support for multiple (dynamically generated) tests on one line
+
 ### Version 0.4.2
 * turn "Show source" context menu item into an inline menu item
 
