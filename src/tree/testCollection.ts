@@ -7,6 +7,8 @@ import { TreeNode } from './treeNode';
 
 export class TestCollection {
 
+	private disposables: vscode.Disposable[] = [];
+
 	private rootSuite: TestSuiteNode | undefined;
 	private runningSuite: TestSuiteNode | undefined;
 	private _autorunNode: TreeNode | undefined;
@@ -25,7 +27,7 @@ export class TestCollection {
 
 		const workspaceUri = adapter.workspaceFolder ? adapter.workspaceFolder.uri : undefined;
 
-		vscode.workspace.onDidChangeConfiguration(configChange => {
+		this.disposables.push(vscode.workspace.onDidChangeConfiguration(configChange => {
 
 			if (configChange.affectsConfiguration('testExplorer.codeLens', workspaceUri)) {
 				this.computeCodeLenses();
@@ -35,7 +37,7 @@ export class TestCollection {
 				configChange.affectsConfiguration('testExplorer.errorDecoration', workspaceUri)) {
 				this.explorer.decorator.updateDecorationsNow();
 			}
-		});
+		}));
 
 		adapter.testStates((testStateMessage) => {
 			if (this.rootSuite === undefined) return;
@@ -279,14 +281,14 @@ export class TestCollection {
 			if (this.shouldShowCodeLens()) {
 
 				for (const [ file, fileLocatedNodes ] of this.locatedNodes) {
-	
+
 					const fileCodeLenses: vscode.CodeLens[] = [];
-		
+
 					for (const [ line, lineLocatedNodes ] of fileLocatedNodes) {
 						fileCodeLenses.push(this.createRunCodeLens(line, lineLocatedNodes));
 						fileCodeLenses.push(this.createDebugCodeLens(line, lineLocatedNodes));
 					}
-		
+
 					this.codeLenses.set(file, fileCodeLenses);
 				}
 			}
@@ -301,6 +303,13 @@ export class TestCollection {
 
 	getLocatedNodes(file: string): Map<number, TreeNode[]> | undefined {
 		return this.locatedNodes.get(file);
+	}
+
+	dispose(): void {
+		for (const disposable of this.disposables) {
+			disposable.dispose();
+		}
+		this.disposables = [];
 	}
 
 	private getConfiguration(): vscode.WorkspaceConfiguration {

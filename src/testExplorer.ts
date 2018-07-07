@@ -47,6 +47,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 	unregisterAdapter(adapter: TestAdapter): void {
 		var index = this.collections.findIndex((collection) => (collection.adapter === adapter));
 		if (index >= 0) {
+			this.collections[index].dispose();
 			this.collections.splice(index, 1);
 		}
 	}
