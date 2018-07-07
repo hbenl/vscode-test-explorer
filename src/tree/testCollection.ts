@@ -256,23 +256,26 @@ export class TestCollection {
 	computeCodeLenses(): void {
 
 		this.codeLenses.clear();
-
-		if (!this.shouldShowCodeLens()) return;
-		if (this.rootSuite === undefined) return;
-
 		this.locatedNodes.clear();
-		this.collectLocatedNodes(this.rootSuite);
 
-		for (const [ file, fileLocatedNodes ] of this.locatedNodes) {
+		if (this.rootSuite !== undefined) {
 
-			const fileCodeLenses: vscode.CodeLens[] = [];
+			this.collectLocatedNodes(this.rootSuite);
 
-			for (const [ line, lineLocatedNodes ] of fileLocatedNodes) {
-				fileCodeLenses.push(this.createRunCodeLens(line, lineLocatedNodes));
-				fileCodeLenses.push(this.createDebugCodeLens(line, lineLocatedNodes));
+			if (this.shouldShowCodeLens()) {
+
+				for (const [ file, fileLocatedNodes ] of this.locatedNodes) {
+	
+					const fileCodeLenses: vscode.CodeLens[] = [];
+		
+					for (const [ line, lineLocatedNodes ] of fileLocatedNodes) {
+						fileCodeLenses.push(this.createRunCodeLens(line, lineLocatedNodes));
+						fileCodeLenses.push(this.createDebugCodeLens(line, lineLocatedNodes));
+					}
+		
+					this.codeLenses.set(file, fileCodeLenses);
+				}
 			}
-
-			this.codeLenses.set(file, fileCodeLenses);
 		}
 
 		this.explorer.codeLensesChanged.fire();
