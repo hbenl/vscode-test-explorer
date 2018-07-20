@@ -1,3 +1,7 @@
+### Version 1.1.0
+* add commands for running all tests in the current file or the test at the current cursor position
+* remove error decorations when resetting the test states
+
 ### Version 1.0.1
 * bugfix for broken CodeLenses
 
