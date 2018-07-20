@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { TestExplorerExtension } from 'vscode-test-adapter-api';
 import { TestExplorer } from './testExplorer';
-import { runTestsInFile } from './util';
+import { runTestsInFile, runTestAtCursor } from './util';
 
 export function activate(context: vscode.ExtensionContext): TestExplorerExtension {
 
@@ -22,6 +22,8 @@ export function activate(context: vscode.ExtensionContext): TestExplorerExtensio
 	registerCommand('test-explorer.run', (...nodes) => testExplorer.run(nodes));
 
 	registerCommand('test-explorer.run-file', (file?: string) => runTestsInFile(file, testExplorer));
+
+	registerCommand('test-explorer.run-test-at-cursor', () => runTestAtCursor(testExplorer));
 
 	registerCommand('test-explorer.cancel', () => testExplorer.cancel());
 

@@ -13,7 +13,7 @@ export function* allTests(treeNode: TreeNode): IterableIterator<TestNode> {
 	}
 }
 
-export function runTestsInFile(file: string | undefined, testExplorer: TestExplorer) {
+export function runTestsInFile(file: string | undefined, testExplorer: TestExplorer): void {
 
 	if (!file && vscode.window.activeTextEditor) {
 		file = vscode.window.activeTextEditor.document.fileName;
@@ -53,4 +53,52 @@ function findFileNode(file: string, searchNode: TreeNode): TreeNode | undefined 
 	}
 
 	return undefined;
+}
+
+export function runTestAtCursor(testExplorer: TestExplorer): void {
+
+	const editor = vscode.window.activeTextEditor;
+	if (editor) {
+
+		const nodes = findNodesLocatedAboveCursor(
+			editor.document.fileName,
+			editor.selection.active.line,
+			testExplorer
+		);
+
+		if (nodes.length > 0) {
+			testExplorer.run(nodes);
+		}
+	}
+}
+
+function findNodesLocatedAboveCursor(file: string, cursorLine: number, testExplorer: TestExplorer): TreeNode[] {
+
+	let currentLine = -1;
+	let currentNodes: TreeNode[] = [];
+
+	for (const collection of testExplorer.collections) {
+
+		const locatedNodes = collection.getLocatedNodes(file);
+		if (locatedNodes) {
+			
+			for (const line of locatedNodes.keys()) {
+				if ((line > cursorLine) || (line < currentLine)) continue;
+
+				const lineNodes = locatedNodes.get(line)!;
+
+				if (line === currentLine) {
+
+					currentNodes.push(...lineNodes);
+
+				} else { // line > currentLine
+
+					currentLine = line;
+					currentNodes = [...lineNodes];
+				}
+			}
+		}
+	}
+
+	return currentNodes;
 }

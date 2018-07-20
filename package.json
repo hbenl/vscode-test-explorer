@@ -153,11 +153,11 @@
       },
       {
         "command": "test-explorer.run-file",
-        "title": "Test Explorer: Run tests in current file",
-        "icon": {
-          "dark": "./icons/start-dark.svg",
-          "light": "./icons/start-light.svg"
-        }
+        "title": "Test Explorer: Run tests in current file"
+      },
+      {
+        "command": "test-explorer.run-test-at-cursor",
+        "title": "Test Explorer: Run the test at the current cursor position"
       },
       {
         "command": "test-explorer.debug",
