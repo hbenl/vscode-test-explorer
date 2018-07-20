@@ -39,7 +39,7 @@ export class TestCollection {
 			}
 		}));
 
-		adapter.testStates((testStateMessage) => {
+		this.disposables.push(adapter.testStates((testStateMessage) => {
 			if (this.rootSuite === undefined) return;
 
 			if (testStateMessage.type === 'suite') {
@@ -100,18 +100,18 @@ export class TestCollection {
 			}
 
 			this.sendNodeChangedEvents();
-		});
+		}));
 
 		if (adapter.reload) {
-			adapter.reload(() => this.explorer.scheduler.scheduleReload(this, true));
+			this.disposables.push(adapter.reload(() => this.explorer.scheduler.scheduleReload(this, true)));
 		}
 
 		if (adapter.autorun) {
-			adapter.autorun(() => {
+			this.disposables.push(adapter.autorun(() => {
 				if (this._autorunNode) {
 					this.explorer.run([this._autorunNode]);
 				}
-			});
+			}));
 		}
 
 		this.explorer.scheduler.scheduleReload(this, false);
