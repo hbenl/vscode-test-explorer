@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as RegExpEscape from 'escape-string-regexp';
 import { TestAdapter } from 'vscode-test-adapter-api';
 import { TestCollection } from './tree/testCollection';
 import { TreeNode } from './tree/treeNode';
@@ -7,6 +6,7 @@ import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './treeEventDebouncer';
 import { TestScheduler } from './testScheduler';
 import { Decorator } from './decorator';
+import { pickNode, findLineContaining } from './util';
 
 export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.CodeLensProvider {
 
@@ -91,7 +91,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 
 		if (nodes) {
 
-			const node = await this.pickNode(nodes);
+			const node = await pickNode(nodes);
 			if (node) {
 				this.scheduler.scheduleTestRun(node);
 			}
@@ -110,7 +110,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 
 		await this.scheduler.cancel();
 
-		const node = await this.pickNode(nodes);
+		const node = await pickNode(nodes);
 		if (node) {
 			try {
 				await node.collection.adapter.debug(node.info);
@@ -150,7 +150,7 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 
 			let line = node.info.line;
 			if (line === undefined) {
-				line = this.findLineContaining(node.info.label, document.getText());
+				line = findLineContaining(node.info.label, document.getText());
 				node.info.line = line;
 			}
 
@@ -205,32 +205,5 @@ export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.C
 		const codeLenses = this.collections.map(collection => collection.getCodeLenses(file));
 
 		return (<vscode.CodeLens[]>[]).concat(...codeLenses);
-	}
-
-	private findLineContaining(needle: string, haystack: string | undefined): number | undefined {
-
-		if (!haystack) return undefined;
-	
-		const index = haystack.search(RegExpEscape(needle));
-		if (index < 0) return undefined;
-	
-		return haystack.substr(0, index).split('\n').length - 1;
-	}
-
-	private async pickNode(nodes: TreeNode[]): Promise<TreeNode | undefined> {
-
-		if (nodes.length === 1) {
-
-			return nodes[0];
-
-		} else if (nodes.length > 1) {
-
-			const labels = nodes.map(node => node.info.label);
-			const pickedLabel = await vscode.window.showQuickPick(labels);
-			return nodes.find(node => (node.info.label === pickedLabel));
-			
-		} else {
-			return undefined;
-		}
 	}
 }

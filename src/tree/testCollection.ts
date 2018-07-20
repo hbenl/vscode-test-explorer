@@ -4,6 +4,7 @@ import { TestAdapter, TestSuiteInfo } from 'vscode-test-adapter-api';
 import { TestNode } from './testNode';
 import { TestExplorer } from '../testExplorer';
 import { TreeNode } from './treeNode';
+import { createRunCodeLens, createDebugCodeLens } from '../util';
 
 export class TestCollection {
 
@@ -285,8 +286,8 @@ export class TestCollection {
 					const fileCodeLenses: vscode.CodeLens[] = [];
 
 					for (const [ line, lineLocatedNodes ] of fileLocatedNodes) {
-						fileCodeLenses.push(this.createRunCodeLens(line, lineLocatedNodes));
-						fileCodeLenses.push(this.createDebugCodeLens(line, lineLocatedNodes));
+						fileCodeLenses.push(createRunCodeLens(line, lineLocatedNodes));
+						fileCodeLenses.push(createDebugCodeLens(line, lineLocatedNodes));
 					}
 
 					this.codeLenses.set(file, fileCodeLenses);
@@ -357,33 +358,5 @@ export class TestCollection {
 		}
 
 		lineLocatedNodes.push(node);
-	}
-
-	private createRunCodeLens(
-		line: number,
-		nodes: TreeNode[]
-	): vscode.CodeLens {
-
-		const range = new vscode.Range(line, 0, line, 0);
-
-		return new vscode.CodeLens(range, {
-			title: 'Run',
-			command: 'test-explorer.run',
-			arguments: nodes
-		});
-	}
-
-	private createDebugCodeLens(
-		line: number,
-		nodes: TreeNode[]
-	): vscode.CodeLens {
-
-		const range = new vscode.Range(line, 0, line, 0);
-
-		return new vscode.CodeLens(range, {
-			title: 'Debug',
-			command: 'test-explorer.debug',
-			arguments: nodes
-		});
 	}
 }

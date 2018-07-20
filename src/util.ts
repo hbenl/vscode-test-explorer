@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as RegExpEscape from 'escape-string-regexp';
 import { TestExplorer } from './testExplorer';
 import { TreeNode } from './tree/treeNode';
 import { TestNode } from './tree/testNode';
@@ -101,4 +102,53 @@ function findNodesLocatedAboveCursor(file: string, cursorLine: number, testExplo
 	}
 
 	return currentNodes;
+}
+
+export function findLineContaining(needle: string, haystack: string | undefined): number | undefined {
+
+	if (!haystack) return undefined;
+
+	const index = haystack.search(RegExpEscape(needle));
+	if (index < 0) return undefined;
+
+	return haystack.substr(0, index).split('\n').length - 1;
+}
+
+export async function pickNode(nodes: TreeNode[]): Promise<TreeNode | undefined> {
+
+	if (nodes.length === 1) {
+
+		return nodes[0];
+
+	} else if (nodes.length > 1) {
+
+		const labels = nodes.map(node => node.info.label);
+		const pickedLabel = await vscode.window.showQuickPick(labels);
+		return nodes.find(node => (node.info.label === pickedLabel));
+		
+	} else {
+		return undefined;
+	}
+}
+
+export function createRunCodeLens(line: number, nodes: TreeNode[]): vscode.CodeLens {
+
+	const range = new vscode.Range(line, 0, line, 0);
+
+	return new vscode.CodeLens(range, {
+		title: 'Run',
+		command: 'test-explorer.run',
+		arguments: nodes
+	});
+}
+
+export function createDebugCodeLens(line: number, nodes: TreeNode[]): vscode.CodeLens {
+
+	const range = new vscode.Range(line, 0, line, 0);
+
+	return new vscode.CodeLens(range, {
+		title: 'Debug',
+		command: 'test-explorer.debug',
+		arguments: nodes
+	});
 }
