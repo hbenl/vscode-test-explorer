@@ -152,6 +152,14 @@
         }
       },
       {
+        "command": "test-explorer.run-file",
+        "title": "Test Explorer: Run tests in current file",
+        "icon": {
+          "dark": "./icons/start-dark.svg",
+          "light": "./icons/start-light.svg"
+        }
+      },
+      {
         "command": "test-explorer.debug",
         "title": "Debug this test",
         "icon": {
