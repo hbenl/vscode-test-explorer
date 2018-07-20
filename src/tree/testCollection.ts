@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TestSuiteNode } from './testSuiteNode';
-import { TestAdapter, TestSuiteInfo } from 'vscode-test-adapter-api';
+import { TestAdapter, TestSuiteInfo, TestEvent, TestSuiteEvent } from 'vscode-test-adapter-api';
 import { TestNode } from './testNode';
 import { TestExplorer } from '../testExplorer';
 import { TreeNode } from './treeNode';
@@ -40,68 +40,7 @@ export class TestCollection {
 			}
 		}));
 
-		this.disposables.push(adapter.testStates((testStateMessage) => {
-			if (this.rootSuite === undefined) return;
-
-			if (testStateMessage.type === 'suite') {
-
-				const suiteId = (typeof testStateMessage.suite === 'string') ? testStateMessage.suite : testStateMessage.suite.id;
-				const node = this.nodesById.get(suiteId);
-				let testSuiteNode = (node && (node.info.type === 'suite')) ? <TestSuiteNode>node : undefined;
-
-				if (testStateMessage.state === 'running') {
-
-					if (!testSuiteNode && this.runningSuite && (typeof testStateMessage.suite === 'object')) {
-
-						this.runningSuite.info.children.push(testStateMessage.suite);
-						testSuiteNode = new TestSuiteNode(this, testStateMessage.suite, this.runningSuite);
-						this.runningSuite.children.push(testSuiteNode);
-						this.runningSuite.neededUpdates = 'recalc';
-						this.nodesById.set(suiteId, testSuiteNode);
-						this.collectionChangedWhileRunning = true;
-
-					}
-
-					if (testSuiteNode) {
-						this.runningSuite = testSuiteNode;
-					}
-
-				} else { // testStateMessage.state === 'completed'
-
-					if (this.runningSuite) {
-						this.runningSuite = this.runningSuite.parent;
-					}
-
-				}
-
-			} else { // testStateMessage.type === 'test'
-
-				const testId = (typeof testStateMessage.test === 'string') ? testStateMessage.test : testStateMessage.test.id;
-				const node = this.nodesById.get(testId);
-				let testNode = (node && (node.info.type === 'test')) ? <TestNode>node : undefined;
-
-				if (!testNode && this.runningSuite && (typeof testStateMessage.test === 'object')) {
-
-					this.runningSuite.info.children.push(testStateMessage.test);
-					testNode = new TestNode(this, testStateMessage.test, this.runningSuite);
-					this.runningSuite.children.push(testNode);
-					this.runningSuite.neededUpdates = 'recalc';
-					this.nodesById.set(testId, testNode);
-					this.collectionChangedWhileRunning = true;
-
-				}
-
-				if (testNode) {
-					testNode.setCurrentState(
-						testStateMessage.state,
-						testStateMessage.message,
-						testStateMessage.decorations
-					);
-				}
-			}
-
-			this.sendNodeChangedEvents();
-		}));
+		this.disposables.push(adapter.testStates(testRunEvent => this.onTestRunEvent(testRunEvent)));
 
 		if (adapter.reload) {
 			this.disposables.push(adapter.reload(() => this.explorer.scheduler.scheduleReload(this, true)));
@@ -171,6 +110,69 @@ export class TestCollection {
 			this.collectionChangedWhileRunning = false;
 			this.computeCodeLenses();
 		}
+	}
+
+	private onTestRunEvent(testRunEvent: TestSuiteEvent | TestEvent): void {
+		if (this.rootSuite === undefined) return;
+
+		if (testRunEvent.type === 'suite') {
+
+			const suiteId = (typeof testRunEvent.suite === 'string') ? testRunEvent.suite : testRunEvent.suite.id;
+			const node = this.nodesById.get(suiteId);
+			let testSuiteNode = (node && (node.info.type === 'suite')) ? <TestSuiteNode>node : undefined;
+
+			if (testRunEvent.state === 'running') {
+
+				if (!testSuiteNode && this.runningSuite && (typeof testRunEvent.suite === 'object')) {
+
+					this.runningSuite.info.children.push(testRunEvent.suite);
+					testSuiteNode = new TestSuiteNode(this, testRunEvent.suite, this.runningSuite);
+					this.runningSuite.children.push(testSuiteNode);
+					this.runningSuite.neededUpdates = 'recalc';
+					this.nodesById.set(suiteId, testSuiteNode);
+					this.collectionChangedWhileRunning = true;
+
+				}
+
+				if (testSuiteNode) {
+					this.runningSuite = testSuiteNode;
+				}
+
+			} else { // testStateMessage.state === 'completed'
+
+				if (this.runningSuite) {
+					this.runningSuite = this.runningSuite.parent;
+				}
+
+			}
+
+		} else { // testStateMessage.type === 'test'
+
+			const testId = (typeof testRunEvent.test === 'string') ? testRunEvent.test : testRunEvent.test.id;
+			const node = this.nodesById.get(testId);
+			let testNode = (node && (node.info.type === 'test')) ? <TestNode>node : undefined;
+
+			if (!testNode && this.runningSuite && (typeof testRunEvent.test === 'object')) {
+
+				this.runningSuite.info.children.push(testRunEvent.test);
+				testNode = new TestNode(this, testRunEvent.test, this.runningSuite);
+				this.runningSuite.children.push(testNode);
+				this.runningSuite.neededUpdates = 'recalc';
+				this.nodesById.set(testId, testNode);
+				this.collectionChangedWhileRunning = true;
+
+			}
+
+			if (testNode) {
+				testNode.setCurrentState(
+					testRunEvent.state,
+					testRunEvent.message,
+					testRunEvent.decorations
+				);
+			}
+		}
+
+		this.sendNodeChangedEvents();
 	}
 
 	recalcState(): void {
