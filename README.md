@@ -15,13 +15,27 @@ so there is usually no need to install this extension manually.
 
 The following configuration properties are available:
 
-* `testExplorer.onStart`: Retire or reset all test states whenever a test run is started
-* `testExplorer.onReload`: Retire or reset all test states whenever the test tree is reloaded
-* `testExplorer.codeLens`: Show a CodeLens above each test or suite for running or debugging the tests
-* `testExplorer.gutterDecoration`: Show the state of each test in the editor using Gutter Decorations
-* `testExplorer.errorDecoration`: Show error messages from test failures as decorations in the editor
+Property                        | Description
+--------------------------------|---------------------------------------------------------------
+`testExplorer.onStart`          | Retire or reset all test states whenever a test run is started
+`testExplorer.onReload`         | Retire or reset all test states whenever the test tree is reloaded
+`testExplorer.codeLens`         | Show a CodeLens above each test or suite for running or debugging the tests
+`testExplorer.gutterDecoration` | Show the state of each test in the editor using Gutter Decorations
+`testExplorer.errorDecoration`  | Show error messages from test failures as decorations in the editor
 
 Further configuration options are provided by the Test Adapters.
+
+## Commands
+
+The following commands are available in VS Code's command palette, use the ID to add them to your keyboard shortcuts:
+
+ID                                 | Command
+-----------------------------------|--------------------------------------------
+`test-explorer.reload`             | Reload tests
+`test-explorer.run-all`            | Run all tests
+`test-explorer.run-file`           | Run tests in current file
+`test-explorer.run-test-at-cursor` | Run the test at the current cursor position
+`test-explorer.cancel`             | Cancel running tests
 
 ## Writing your own Test Adapter
 
