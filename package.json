@@ -53,7 +53,9 @@
     "onView:test-explorer",
     "onCommand:test-explorer.reload",
     "onCommand:test-explorer.run-all",
-    "onCommand:test-explorer.cancel"
+    "onCommand:test-explorer.cancel",
+    "onCommand:test-explorer.run-file",
+    "onCommand:test-explorer.run-test-at-cursor"
   ],
   "contributes": {
     "configuration": {
