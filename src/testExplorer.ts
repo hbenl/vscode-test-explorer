@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TestAdapter } from 'vscode-test-adapter-api';
+import { TestAdapter, TestController } from 'vscode-test-adapter-api';
 import { TestCollection } from './tree/testCollection';
 import { TreeNode } from './tree/treeNode';
 import { IconPaths } from './iconPaths';
@@ -8,7 +8,7 @@ import { TestScheduler } from './testScheduler';
 import { Decorator } from './decorator';
 import { pickNode, findLineContaining } from './util';
 
-export class TestExplorer implements vscode.TreeDataProvider<TreeNode>, vscode.CodeLensProvider {
+export class TestExplorer implements TestController, vscode.TreeDataProvider<TreeNode>, vscode.CodeLensProvider {
 
 	public readonly iconPaths: IconPaths;
 	public readonly decorator: Decorator;

@@ -2,10 +2,13 @@ import * as vscode from 'vscode';
 import { TestExplorerExtension } from 'vscode-test-adapter-api';
 import { TestExplorer } from './testExplorer';
 import { runTestsInFile, runTestAtCursor } from './util';
+import { Hub } from './hub/hub';
 
 export function activate(context: vscode.ExtensionContext): TestExplorerExtension {
 
+	const hub = new Hub();
 	const testExplorer = new TestExplorer(context);
+	hub.registerController(testExplorer);
 
 	const registerCommand = (command: string, callback: (...args: any[]) => any) => {
 		context.subscriptions.push(vscode.commands.registerCommand(command, callback));
@@ -47,7 +50,9 @@ export function activate(context: vscode.ExtensionContext): TestExplorerExtensio
 	context.subscriptions.push(vscode.languages.registerCodeLensProvider(documentSelector, testExplorer));
 
 	return {
-		registerAdapter: adapter => testExplorer.registerAdapter(adapter),
-		unregisterAdapter: adapter => testExplorer.unregisterAdapter(adapter)
+		registerAdapter: adapter => hub.registerAdapter(adapter),
+		unregisterAdapter: adapter => hub.unregisterAdapter(adapter),
+		registerController: controller => hub.registerController(controller),
+		unregisterController: controller => hub.registerController(controller)
 	}
 }
