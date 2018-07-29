@@ -53,6 +53,6 @@ export function activate(context: vscode.ExtensionContext): TestExplorerExtensio
 		registerAdapter: adapter => hub.registerAdapter(adapter),
 		unregisterAdapter: adapter => hub.unregisterAdapter(adapter),
 		registerController: controller => hub.registerController(controller),
-		unregisterController: controller => hub.registerController(controller)
+		unregisterController: controller => hub.unregisterController(controller)
 	}
 }
