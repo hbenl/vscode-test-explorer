@@ -1,16 +1,17 @@
 import * as vscode from 'vscode';
 import { TestSuiteNode } from './testSuiteNode';
-import { TestAdapter, TestSuiteInfo, TestEvent, TestSuiteEvent } from 'vscode-test-adapter-api';
+import { TestEvent, TestSuiteEvent, TestAdapterDelegate, TestRunStartedEvent, TestRunFinishedEvent, TestLoadStartedEvent, TestLoadFinishedEvent } from 'vscode-test-adapter-api';
 import { TestNode } from './testNode';
 import { TestExplorer } from '../testExplorer';
 import { TreeNode } from './treeNode';
-import { createRunCodeLens, createDebugCodeLens } from '../util';
+import { allTests, createRunCodeLens, createDebugCodeLens } from '../util';
 
 export class TestCollection {
 
 	private disposables: vscode.Disposable[] = [];
 
 	private rootSuite: TestSuiteNode | undefined;
+	private allRunningTests: TreeNode | undefined;
 	private runningSuite: TestSuiteNode | undefined;
 	private _autorunNode: TreeNode | undefined;
 	private readonly nodesById = new Map<string, TreeNode>();
@@ -22,11 +23,11 @@ export class TestCollection {
 	get autorunNode() { return this._autorunNode; }
 
 	constructor(
-		public readonly adapter: TestAdapter,
+		public readonly delegate: TestAdapterDelegate,
 		public readonly explorer: TestExplorer
 	) {
 
-		const workspaceUri = adapter.workspaceFolder ? adapter.workspaceFolder.uri : undefined;
+		const workspaceUri = delegate.workspaceFolder ? delegate.workspaceFolder.uri : undefined;
 
 		this.disposables.push(vscode.workspace.onDidChangeConfiguration(configChange => {
 
@@ -40,82 +41,104 @@ export class TestCollection {
 			}
 		}));
 
-		this.disposables.push(adapter.testStates(testRunEvent => this.onTestRunEvent(testRunEvent)));
+		this.disposables.push(delegate.tests(testLoadEvent => this.onTestLoadEvent(testLoadEvent)));
+		this.disposables.push(delegate.testStates(testRunEvent => this.onTestRunEvent(testRunEvent)));
 
-		if (adapter.reload) {
-			this.disposables.push(adapter.reload(() => this.explorer.scheduler.scheduleReload(this, true)));
-		}
-
-		if (adapter.autorun) {
-			this.disposables.push(adapter.autorun(() => {
+		if (delegate.autorun) {
+			this.disposables.push(delegate.autorun(() => {
 				if (this._autorunNode) {
 					this.explorer.run([this._autorunNode]);
 				}
 			}));
 		}
-
-		this.explorer.scheduler.scheduleReload(this, false);
 	}
 
-	async loadTests(): Promise<void> {
+	private onTestLoadEvent(testLoadEvent: TestLoadStartedEvent | TestLoadFinishedEvent): void {
 
-		let testSuiteInfo: TestSuiteInfo | undefined;
-		try {
-			testSuiteInfo = await this.adapter.load();
-		} catch(e) {
-			vscode.window.showErrorMessage(`Error while loading tests: ${e}`);
-			return;
-		}
+		if (testLoadEvent.type === 'started') {
 
-		if (testSuiteInfo) {
+			vscode.commands.executeCommand('setContext', 'testsLoading', true);
 
-			this.rootSuite = new TestSuiteNode(this, testSuiteInfo, undefined, this.nodesById);
+		} else if (testLoadEvent.type === 'finished') {
 
-			if (this.shouldRetireStateOnReload()) {
-				this.rootSuite.retireState();
-			} else if (this.shouldResetStateOnReload()) {
-				this.rootSuite.resetState();
+			vscode.commands.executeCommand('setContext', 'testsLoading', false);
+
+			if (testLoadEvent.suite) {
+
+				this.rootSuite = new TestSuiteNode(this, testLoadEvent.suite, undefined, this.nodesById);
+
+				if (this.shouldRetireStateOnReload()) {
+					this.rootSuite.retireState();
+				} else if (this.shouldResetStateOnReload()) {
+					this.rootSuite.resetState();
+				}
+	
+			} else {
+	
+				this.rootSuite = undefined;
+	
 			}
 
-		} else {
-
-			this.rootSuite = undefined;
-
-		}
-
-		this.nodesById.clear();
-		if (this.rootSuite) {
-			this.collectNodesById(this.rootSuite);
-		}
-
-		if (this._autorunNode) {
-			const newAutorunNode = this.nodesById.get(this._autorunNode.info.id);
-			this.setAutorun(newAutorunNode);
-		}
-
-		this.runningSuite = undefined;
-
-		this.computeCodeLenses();
-		this.explorer.decorator.updateDecorationsNow();
-
-		this.explorer.treeEvents.sendTreeChangedEvent();
-	}
-
-	testRunStarting(): void {
-		this.collectionChangedWhileRunning = false;
-	}
-
-	testRunFinished(): void {
-		if (this.collectionChangedWhileRunning) {
-			this.collectionChangedWhileRunning = false;
+			this.nodesById.clear();
+			if (this.rootSuite) {
+				this.collectNodesById(this.rootSuite);
+			}
+	
+			if (this._autorunNode) {
+				const newAutorunNode = this.nodesById.get(this._autorunNode.info.id);
+				this.setAutorun(newAutorunNode);
+			}
+	
+			this.runningSuite = undefined;
+	
 			this.computeCodeLenses();
+			this.explorer.decorator.updateDecorationsNow();
+	
+			this.explorer.treeEvents.sendTreeChangedEvent();
 		}
 	}
 
-	private onTestRunEvent(testRunEvent: TestSuiteEvent | TestEvent): void {
+	private onTestRunEvent(testRunEvent: TestRunStartedEvent | TestRunFinishedEvent | TestSuiteEvent | TestEvent): void {
 		if (this.rootSuite === undefined) return;
 
-		if (testRunEvent.type === 'suite') {
+		if (testRunEvent.type === 'started') {
+
+			if (this.shouldRetireStateOnStart()) {
+				this.retireState();
+			} else if (this.shouldResetStateOnStart()) {
+				this.resetState();
+			}
+
+			this.allRunningTests = this.nodesById.get(testRunEvent.tests.id);
+			if (this.allRunningTests) {
+				for (const testNode of allTests(this.allRunningTests)) {
+					testNode.setCurrentState('scheduled');
+				}
+			}
+	
+			vscode.commands.executeCommand('setContext', 'testsRunning', true);
+
+			this.collectionChangedWhileRunning = false;
+
+		} else if (testRunEvent.type === 'finished') {
+
+			if (this.allRunningTests) {
+				for (const testNode of allTests(this.allRunningTests)) {
+					if ((testNode.state.current === 'scheduled') || (testNode.state.current === 'running')) {
+						testNode.setCurrentState('pending');
+					}
+				}
+				this.allRunningTests = undefined;
+			}
+
+			vscode.commands.executeCommand('setContext', 'testsRunning', false);
+
+			if (this.collectionChangedWhileRunning) {
+				this.collectionChangedWhileRunning = false;
+				this.computeCodeLenses();
+			}
+
+		} else if (testRunEvent.type === 'suite') {
 
 			const suiteId = (typeof testRunEvent.suite === 'string') ? testRunEvent.suite : testRunEvent.suite.id;
 			const node = this.nodesById.get(suiteId);
@@ -316,7 +339,7 @@ export class TestCollection {
 	}
 
 	private getConfiguration(): vscode.WorkspaceConfiguration {
-		const workspaceFolder = this.adapter.workspaceFolder;
+		const workspaceFolder = this.delegate.workspaceFolder;
 		var workspaceUri = workspaceFolder ? workspaceFolder.uri : undefined;
 		return vscode.workspace.getConfiguration('testExplorer', workspaceUri);
 	}

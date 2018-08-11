@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TestSuiteInfo } from "vscode-test-adapter-api";
+import { TestSuiteInfo } from 'vscode-test-adapter-api';
 import { TreeNode, TreeNodeUpdates } from "./treeNode";
 import { NodeState, stateIcon, parentNodeState, parentCurrentNodeState, parentPreviousNodeState, parentAutorunFlag } from "./state";
 import { TestCollection } from './testCollection';
@@ -106,9 +106,9 @@ export class TestSuiteNode implements TreeNode {
 		this.neededUpdates = 'none';
 
 		let label = this.info.label;
-		if ((this.parent === undefined) && this.collection.adapter.workspaceFolder &&
+		if ((this.parent === undefined) && this.collection.delegate.workspaceFolder &&
 			vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 1)) {
-			label = `${this.collection.adapter.workspaceFolder.name} - ${label}`;
+			label = `${this.collection.delegate.workspaceFolder.name} - ${label}`;
 		}
 
 		const treeItem = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.Collapsed);

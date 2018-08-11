@@ -1,10 +1,9 @@
 import * as vscode from 'vscode';
-import { TestAdapter, TestController } from 'vscode-test-adapter-api';
+import { TestController, TestAdapterDelegate } from 'vscode-test-adapter-api';
 import { TestCollection } from './tree/testCollection';
 import { TreeNode } from './tree/treeNode';
 import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './treeEventDebouncer';
-import { TestScheduler } from './testScheduler';
 import { Decorator } from './decorator';
 import { pickNode, findLineContaining } from './util';
 
@@ -24,8 +23,6 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 	public readonly collections: TestCollection[] = [];
 
-	public readonly scheduler = new TestScheduler();
-
 	constructor(
 		context: vscode.ExtensionContext
 	) {
@@ -40,12 +37,12 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		this.onDidChangeCodeLenses = this.codeLensesChanged.event;
 	}
 
-	registerAdapter(adapter: TestAdapter): void {
-		this.collections.push(new TestCollection(adapter, this));
+	registerAdapterDelegate(delegate: TestAdapterDelegate): void {
+		this.collections.push(new TestCollection(delegate, this));
 	}
 
-	unregisterAdapter(adapter: TestAdapter): void {
-		var index = this.collections.findIndex((collection) => (collection.adapter === adapter));
+	unregisterAdapterDelegate(delegate: TestAdapterDelegate): void {
+		var index = this.collections.findIndex((collection) => (collection.delegate === delegate));
 		if (index >= 0) {
 			this.collections[index].dispose();
 			this.collections.splice(index, 1);
@@ -79,10 +76,10 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 	reload(node?: TreeNode): void {
 		if (node) {
-			this.scheduler.scheduleReload(node.collection, false);
+			node.collection.delegate.load();
 		} else {
 			for (const collection of this.collections) {
-				this.scheduler.scheduleReload(collection, false);
+				collection.delegate.load();
 			}
 		}
 	}
@@ -93,14 +90,14 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 			const node = await pickNode(nodes);
 			if (node) {
-				this.scheduler.scheduleTestRun(node);
+				node.collection.delegate.run(node.info);
 			}
 
 		} else {
 
 			for (const collection of this.collections) {
 				if (collection.suite) {
-					this.scheduler.scheduleTestRun(collection.suite);
+					collection.delegate.run(collection.suite.info);
 				}
 			}
 		}
@@ -108,12 +105,12 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 	async debug(nodes: TreeNode[]): Promise<void> {
 
-		await this.scheduler.cancel();
-
 		const node = await pickNode(nodes);
 		if (node) {
 			try {
-				await node.collection.adapter.debug(node.info);
+
+				await node.collection.delegate.debug(node.info);
+
 			} catch(e) {
 				vscode.window.showErrorMessage(`Error while debugging test: ${e}`);
 				return;
@@ -122,7 +119,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	}
 
 	cancel(): void {
-		this.scheduler.cancel();
+		this.collections.forEach(collection => collection.delegate.cancel());
 	}
 
 	selected(node: TreeNode | undefined): void {

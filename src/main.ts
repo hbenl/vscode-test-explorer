@@ -2,11 +2,11 @@ import * as vscode from 'vscode';
 import { TestExplorerExtension } from 'vscode-test-adapter-api';
 import { TestExplorer } from './testExplorer';
 import { runTestsInFile, runTestAtCursor } from './util';
-import { Hub } from './hub/hub';
+import { TestHub } from './hub/testHub';
 
 export function activate(context: vscode.ExtensionContext): TestExplorerExtension {
 
-	const hub = new Hub();
+	const hub = new TestHub();
 	const testExplorer = new TestExplorer(context);
 	hub.registerController(testExplorer);
 
