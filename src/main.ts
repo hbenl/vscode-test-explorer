@@ -46,7 +46,7 @@ export function activate(context: vscode.ExtensionContext): TestExplorerExtensio
 
 	context.subscriptions.push(vscode.window.registerTreeDataProvider('test-explorer', testExplorer));
 
-	const documentSelector = { scheme: 'file' };
+	const documentSelector = { pattern: '**/*' };
 	context.subscriptions.push(vscode.languages.registerCodeLensProvider(documentSelector, testExplorer));
 
 	return {

@@ -3,7 +3,7 @@ import { TestExplorer } from './testExplorer';
 import { stateIcon, parentNodeState, StateIconType } from './tree/state';
 import { StateDecorationTypes } from './stateDecorationTypes';
 import { TestCollection } from './tree/testCollection';
-import { allTests } from './util';
+import { allTests, uriToFile } from './util';
 
 export class Decorator {
 
@@ -37,7 +37,7 @@ export class Decorator {
 	updateDecorationsFor(file: string): void {
 
 		if (!this.timeout && this.activeTextEditor &&
-			(this.activeTextEditor.document.fileName === file)) {
+			(uriToFile(this.activeTextEditor.document.uri) === file)) {
 
 			this.timeout = setTimeout(() => this.updateDecorationsNow(), 200);
 		}
@@ -47,7 +47,7 @@ export class Decorator {
 		this.timeout = undefined;
 		if (!this.activeTextEditor) return;
 
-		const file = this.activeTextEditor.document.fileName;
+		const file = uriToFile(this.activeTextEditor.document.uri);
 
 		const decorations = new Map<vscode.TextEditorDecorationType, vscode.DecorationOptions[]>();
 		for (const decorationType of this.stateDecorationTypes.all) {

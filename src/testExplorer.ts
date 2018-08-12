@@ -5,7 +5,7 @@ import { TreeNode } from './tree/treeNode';
 import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './treeEventDebouncer';
 import { Decorator } from './decorator';
-import { pickNode, findLineContaining } from './util';
+import { pickNode, findLineContaining, fileToUri, uriToFile } from './util';
 
 export class TestExplorer implements TestController, vscode.TreeDataProvider<TreeNode>, vscode.CodeLensProvider {
 
@@ -143,7 +143,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		const file = node.info.file;
 		if (file) {
 
-			const document = await vscode.workspace.openTextDocument(file);
+			const document = await vscode.workspace.openTextDocument(fileToUri(file));
 
 			let line = node.info.line;
 			if (line === undefined) {
@@ -198,7 +198,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 	provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] {
 
-		const file = document.uri.fsPath;
+		const file = uriToFile(document.uri);
 		const codeLenses = this.collections.map(collection => collection.getCodeLenses(file));
 
 		return (<vscode.CodeLens[]>[]).concat(...codeLenses);

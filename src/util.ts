@@ -21,7 +21,7 @@ export function* allTests(treeNode: TreeNode): IterableIterator<TestNode> {
 export function runTestsInFile(file: string | undefined, testExplorer: TestExplorer): void {
 
 	if (!file && vscode.window.activeTextEditor) {
-		file = vscode.window.activeTextEditor.document.fileName;
+		file = uriToFile(vscode.window.activeTextEditor.document.uri);
 	}
 
 	if (file) {
@@ -66,7 +66,7 @@ export function runTestAtCursor(testExplorer: TestExplorer): void {
 	if (editor) {
 
 		const nodes = findNodesLocatedAboveCursor(
-			editor.document.fileName,
+			uriToFile(editor.document.uri),
 			editor.selection.active.line,
 			testExplorer
 		);
@@ -155,4 +155,21 @@ export function createDebugCodeLens(line: number, nodes: TreeNode[]): vscode.Cod
 		command: 'test-explorer.debug',
 		arguments: nodes
 	});
+}
+
+const schemeMatcher = /^[a-z][a-z0-9+-.]*:/;
+export function fileToUri(file: string): vscode.Uri {
+	if (schemeMatcher.test(file)) {
+		return vscode.Uri.parse(file);
+	} else {
+		return vscode.Uri.file(file);
+	}
+}
+
+export function uriToFile(uri: vscode.Uri): string {
+	if (uri.scheme === 'file') {
+		return uri.path;
+	} else {
+		return uri.toString();
+	}
 }
