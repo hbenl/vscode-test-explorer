@@ -52,6 +52,8 @@ export function activate(context: vscode.ExtensionContext): TestExplorerExtensio
 	return {
 		registerAdapter: adapter => hub.registerAdapter(adapter),
 		unregisterAdapter: adapter => hub.unregisterAdapter(adapter),
+		registerAdapterDelegate: delegate => hub.registerAdapterDelegate(delegate),
+		unregisterAdapterDelegate: delegate => hub.unregisterAdapterDelegate(delegate),
 		registerController: controller => hub.registerController(controller),
 		unregisterController: controller => hub.unregisterController(controller)
 	}
