@@ -1,34 +1,47 @@
 import { TestAdapter, TestController, TestExplorerExtension, TestSuiteInfo, TestAdapterDelegate } from 'vscode-test-adapter-api';
-import { TestAdapterDelegateImpl } from './testAdapterDelegate';
+import { TestAdapterDelegateImpl, TestAdapterDelegateImpl2 } from './testAdapterDelegate';
 import { IDisposable } from '../util';
 
 export class TestHub implements TestExplorerExtension {
 
 	private controllers = new Set<TestController>();
-	private adapters = new Set<TestAdapter>();
-	private adapterSubscriptions = new Map<TestAdapter, IDisposable>();
+
+	private localAdapters = new Set<TestAdapter>();
+	private localAdapterSubscriptions = new Map<TestAdapter, IDisposable>();
 	private localDelegates = new Set<TestAdapterDelegateImpl>();
-	private remoteDelegates = new Set<TestAdapterDelegate>();
-	private tests = new Map<TestAdapter, TestSuiteInfo | undefined>();
+	private localTests = new Map<TestAdapter, TestSuiteInfo | undefined>();
+
+	private remoteAdapters = new Set<TestAdapterDelegate>();
+	private remoteAdapterSubscriptions = new Map<TestAdapterDelegate, IDisposable>();
+	private remoteDelegates = new Set<TestAdapterDelegateImpl2>();
+	private remoteTests = new Map<TestAdapterDelegate, TestSuiteInfo | undefined>();
 
 	registerController(controller: TestController): void {
 
 		this.controllers.add(controller);
 
-		for (const adapter of this.adapters) {
+		for (const adapter of this.localAdapters) {
 
 			const delegate = new TestAdapterDelegateImpl(adapter, controller);
 			this.localDelegates.add(delegate);
 			controller.registerAdapterDelegate(delegate);
 
 			delegate.testsEmitter.fire({ type: 'started' });
-			if (this.tests.has(adapter)) {
-				delegate.testsEmitter.fire({ type: 'finished', suite: this.tests.get(adapter) });
+			if (this.localTests.has(adapter)) {
+				delegate.testsEmitter.fire({ type: 'finished', suite: this.localTests.get(adapter) });
 			}
 		}
 
-		for (const delegate of this.remoteDelegates) {
+		for (const adapter of this.remoteAdapters) {
+
+			const delegate = new TestAdapterDelegateImpl2(adapter, controller);
+			this.remoteDelegates.add(delegate);
 			controller.registerAdapterDelegate(delegate);
+
+			delegate.testsEmitter.fire({ type: 'started' });
+			if (this.remoteTests.has(adapter)) {
+				delegate.testsEmitter.fire({ type: 'finished', suite: this.remoteTests.get(adapter) });
+			}
 		}
 	}
 
@@ -45,13 +58,17 @@ export class TestHub implements TestExplorerExtension {
 		}
 
 		for (const delegate of this.remoteDelegates) {
-			controller.unregisterAdapterDelegate(delegate);
+			if (delegate.controller === controller) {
+				controller.unregisterAdapterDelegate(delegate);
+				delegate.dispose();
+				this.remoteDelegates.delete(delegate);
+			}
 		}
 	}
 
 	registerAdapter(adapter: TestAdapter): void {
 
-		this.adapters.add(adapter);
+		this.localAdapters.add(adapter);
 
 		for (const controller of this.controllers) {
 			const proxy = new TestAdapterDelegateImpl(adapter, controller);
@@ -62,16 +79,16 @@ export class TestHub implements TestExplorerExtension {
 		this.loadTests(adapter);
 
 		if (adapter.reload) {
-			this.adapterSubscriptions.set(adapter, adapter.reload(() => this.loadTests(adapter)));
+			this.localAdapterSubscriptions.set(adapter, adapter.reload(() => this.loadTests(adapter)));
 		}
 	}
 
 	unregisterAdapter(adapter: TestAdapter): void {
 
-		this.adapters.delete(adapter);
+		this.localAdapters.delete(adapter);
 
-		if (this.adapterSubscriptions.has(adapter)) {
-			this.adapterSubscriptions.get(adapter)!.dispose();
+		if (this.localAdapterSubscriptions.has(adapter)) {
+			this.localAdapterSubscriptions.get(adapter)!.dispose();
 		}
 
 		for (const delegate of this.localDelegates) {
@@ -83,27 +100,45 @@ export class TestHub implements TestExplorerExtension {
 		}
 	}
 
-	registerAdapterDelegate(delegate: TestAdapterDelegate): void {
+	registerAdapterDelegate(adapter: TestAdapterDelegate): void {
 
-		this.remoteDelegates.add(delegate);
+		this.remoteAdapters.add(adapter);
 
 		for (const controller of this.controllers) {
-			controller.registerAdapterDelegate(delegate);
+			const proxy = new TestAdapterDelegateImpl2(adapter, controller);
+			this.remoteDelegates.add(proxy);
+			controller.registerAdapterDelegate(proxy);
 		}
+
+		this.remoteAdapterSubscriptions.set(adapter, adapter.tests(event => {
+			for (const delegate of this.remoteDelegates) {
+				if (delegate.adapter === adapter) {
+					delegate.testsEmitter.fire(event);
+				}
+			}
+		}));
 	}
 
-	unregisterAdapterDelegate(delegate: TestAdapterDelegate): void {
+	unregisterAdapterDelegate(adapter: TestAdapterDelegate): void {
 
-		this.remoteDelegates.delete(delegate);
+		this.remoteAdapters.delete(adapter);
 
-		for (const controller of this.controllers) {
-			controller.unregisterAdapterDelegate(delegate);
+		if (this.remoteAdapterSubscriptions.has(adapter)) {
+			this.remoteAdapterSubscriptions.get(adapter)!.dispose();
+		}
+
+		for (const delegate of this.remoteDelegates) {
+			if (delegate.adapter === adapter) {
+				delegate.controller.unregisterAdapterDelegate(delegate);
+				delegate.dispose();
+				this.remoteDelegates.delete(delegate);
+			}
 		}
 	}
 
 	async loadTests(adapter: TestAdapter): Promise<void> {
 
-		this.tests.delete(adapter);
+		this.localTests.delete(adapter);
 
 		for (const delegate of this.localDelegates) {
 			if (delegate.adapter === adapter) {
@@ -112,7 +147,7 @@ export class TestHub implements TestExplorerExtension {
 		}
 
 		var suite = await adapter.load();
-		this.tests.set(adapter, suite);
+		this.localTests.set(adapter, suite);
 
 		for (const delegate of this.localDelegates) {
 			if (delegate.adapter === adapter) {
