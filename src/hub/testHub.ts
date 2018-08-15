@@ -136,7 +136,7 @@ export class TestHub implements TestExplorerExtension {
 		}
 	}
 
-	async loadTests(adapter: TestAdapter): Promise<void> {
+	private async loadTests(adapter: TestAdapter): Promise<void> {
 
 		this.localTests.delete(adapter);
 

@@ -7,8 +7,6 @@ export class TestAdapterDelegateImpl implements TestAdapterDelegate {
 	public readonly testsEmitter = new vscode.EventEmitter<TestLoadStartedEvent | TestLoadFinishedEvent>();
 	public readonly testStatesEmitter = new vscode.EventEmitter<TestRunStartedEvent | TestRunFinishedEvent | TestSuiteEvent | TestEvent>();
 
-	private rootSuite: TestSuiteInfo | undefined;
-
 	private disposables: IDisposable[] = [];
 
 	constructor(
@@ -29,8 +27,8 @@ export class TestAdapterDelegateImpl implements TestAdapterDelegate {
 
 	async load(): Promise<void> {
 		this.testsEmitter.fire({ type: 'started' });
-		this.rootSuite = await this.adapter.load();
-		this.testsEmitter.fire({ type: 'finished', suite: this.rootSuite });
+		const rootSuite = await this.adapter.load();
+		this.testsEmitter.fire({ type: 'finished', suite: rootSuite });
 	}
 
 	async run(tests: TestSuiteInfo | TestInfo): Promise<void> {
