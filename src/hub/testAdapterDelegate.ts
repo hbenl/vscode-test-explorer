@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { TestAdapter, TestSuiteInfo, TestInfo, TestSuiteEvent, TestEvent, TestAdapterDelegate, TestRunStartedEvent, TestRunFinishedEvent, TestLoadStartedEvent, TestLoadFinishedEvent, TestController } from 'vscode-test-adapter-api';
 import { IDisposable } from '../util';
+import { TestHub } from './testHub';
 
 export class TestAdapterDelegateImpl implements TestAdapterDelegate {
 
@@ -11,7 +12,8 @@ export class TestAdapterDelegateImpl implements TestAdapterDelegate {
 
 	constructor(
 		readonly adapter: TestAdapter,
-		readonly controller: TestController
+		readonly controller: TestController,
+		private readonly hub: TestHub
 	) {
 		this.disposables.push(this.testsEmitter);
 		this.disposables.push(this.testStatesEmitter);
@@ -26,21 +28,15 @@ export class TestAdapterDelegateImpl implements TestAdapterDelegate {
 	}
 
 	async load(): Promise<void> {
-		this.testsEmitter.fire({ type: 'started' });
-		const rootSuite = await this.adapter.load();
-		this.testsEmitter.fire({ type: 'finished', suite: rootSuite });
+		return this.hub.load(this.adapter);
 	}
 
 	async run(tests: TestSuiteInfo | TestInfo): Promise<void> {
-		this.testStatesEmitter.fire({ type: 'started', tests });
-		await this.adapter.run(tests);
-		this.testStatesEmitter.fire({ type: 'finished' });
+		return this.hub.run(tests, this.adapter);
 	}
 
 	async debug(tests: TestSuiteInfo | TestInfo): Promise<void> {
-		this.testStatesEmitter.fire({ type: 'started', tests });
-		await this.adapter.debug(tests);
-		this.testStatesEmitter.fire({ type: 'finished' });
+		return this.hub.debug(tests, this.adapter);
 	}
 
 	cancel(): void {

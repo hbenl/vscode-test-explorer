@@ -1,4 +1,4 @@
-import { TestAdapter, TestController, TestExplorerExtension, TestSuiteInfo, TestAdapterDelegate } from 'vscode-test-adapter-api';
+import { TestAdapter, TestController, TestExplorerExtension, TestSuiteInfo, TestAdapterDelegate, TestInfo } from 'vscode-test-adapter-api';
 import { TestAdapterDelegateImpl, TestAdapterDelegateImpl2 } from './testAdapterDelegate';
 import { IDisposable } from '../util';
 
@@ -22,7 +22,7 @@ export class TestHub implements TestExplorerExtension {
 
 		for (const adapter of this.localAdapters) {
 
-			const delegate = new TestAdapterDelegateImpl(adapter, controller);
+			const delegate = new TestAdapterDelegateImpl(adapter, controller, this);
 			this.localDelegates.add(delegate);
 			controller.registerAdapterDelegate(delegate);
 
@@ -71,15 +71,15 @@ export class TestHub implements TestExplorerExtension {
 		this.localAdapters.add(adapter);
 
 		for (const controller of this.controllers) {
-			const proxy = new TestAdapterDelegateImpl(adapter, controller);
+			const proxy = new TestAdapterDelegateImpl(adapter, controller, this);
 			this.localDelegates.add(proxy);
 			controller.registerAdapterDelegate(proxy);
 		}
 
-		this.loadTests(adapter);
+		this.load(adapter);
 
 		if (adapter.reload) {
-			this.localAdapterSubscriptions.set(adapter, adapter.reload(() => this.loadTests(adapter)));
+			this.localAdapterSubscriptions.set(adapter, adapter.reload(() => this.load(adapter)));
 		}
 	}
 
@@ -136,7 +136,7 @@ export class TestHub implements TestExplorerExtension {
 		}
 	}
 
-	private async loadTests(adapter: TestAdapter): Promise<void> {
+	async load(adapter: TestAdapter): Promise<void> {
 
 		this.localTests.delete(adapter);
 
@@ -152,6 +152,40 @@ export class TestHub implements TestExplorerExtension {
 		for (const delegate of this.localDelegates) {
 			if (delegate.adapter === adapter) {
 				delegate.testsEmitter.fire({ type: 'finished', suite });
+			}
+		}
+	}
+
+	async run(tests: TestSuiteInfo | TestInfo, adapter: TestAdapter): Promise<void> {
+		
+		for (const delegate of this.localDelegates) {
+			if (delegate.adapter === adapter) {
+				delegate.testStatesEmitter.fire({ type: 'started', tests });
+			}
+		}
+
+		await adapter.run(tests);
+
+		for (const delegate of this.localDelegates) {
+			if (delegate.adapter === adapter) {
+				delegate.testStatesEmitter.fire({ type: 'finished' });
+			}
+		}
+	}
+
+	async debug(tests: TestSuiteInfo | TestInfo, adapter: TestAdapter): Promise<void> {
+		
+		for (const delegate of this.localDelegates) {
+			if (delegate.adapter === adapter) {
+				delegate.testStatesEmitter.fire({ type: 'started', tests });
+			}
+		}
+
+		await adapter.debug(tests);
+
+		for (const delegate of this.localDelegates) {
+			if (delegate.adapter === adapter) {
+				delegate.testStatesEmitter.fire({ type: 'finished' });
 			}
 		}
 	}
