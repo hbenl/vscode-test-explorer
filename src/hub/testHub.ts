@@ -1,15 +1,15 @@
+import * as vscode from 'vscode';
 import { TestAdapter, TestController, TestHub as ITestHub, TestSuiteInfo } from 'vscode-test-adapter-api';
 import { TestAdapter as LegacyTestAdapter } from 'vscode-test-adapter-api/out/legacy';
 import { TestAdapterDelegate } from './testAdapterDelegate';
 import { LegacyTestAdapterWrapper } from './legacyTestAdapterWrapper';
-import { IDisposable } from '../util';
 
 export class TestHub implements ITestHub {
 
 	private readonly controllers = new Set<TestController>();
 
 	private readonly adapters = new Set<TestAdapter>();
-	private readonly adapterSubscriptions = new Map<TestAdapter, IDisposable>();
+	private readonly adapterSubscriptions = new Map<TestAdapter, vscode.Disposable>();
 	private readonly delegates = new Set<TestAdapterDelegate>();
 	private readonly tests = new Map<TestAdapter, TestSuiteInfo | undefined>();
 	private readonly legacyWrappers = new Map<LegacyTestAdapter, LegacyTestAdapterWrapper>();

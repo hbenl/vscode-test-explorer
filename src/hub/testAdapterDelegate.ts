@@ -1,12 +1,11 @@
 import * as vscode from 'vscode';
 import { TestAdapter, TestSuiteInfo, TestInfo, TestSuiteEvent, TestEvent, TestRunStartedEvent, TestRunFinishedEvent, TestLoadStartedEvent, TestLoadFinishedEvent, TestController } from 'vscode-test-adapter-api';
-import { IDisposable } from '../util';
 
 export class TestAdapterDelegate implements TestAdapter {
 
 	public readonly testsEmitter = new vscode.EventEmitter<TestLoadStartedEvent | TestLoadFinishedEvent>();
 
-	private readonly disposables: IDisposable[] = [];
+	private readonly disposables: vscode.Disposable[] = [];
 
 	constructor(
 		readonly adapter: TestAdapter,

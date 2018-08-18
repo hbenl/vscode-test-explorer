@@ -1,14 +1,13 @@
 import * as vscode from 'vscode';
 import { TestAdapter, TestLoadStartedEvent, TestLoadFinishedEvent, TestRunStartedEvent, TestRunFinishedEvent, TestSuiteEvent, TestEvent, TestSuiteInfo, TestInfo } from 'vscode-test-adapter-api';
 import { TestAdapter as LegacyTestAdapter } from 'vscode-test-adapter-api/out/legacy';
-import { IDisposable } from '../util';
 
 export class LegacyTestAdapterWrapper implements TestAdapter {
 
 	private readonly testsEmitter = new vscode.EventEmitter<TestLoadStartedEvent | TestLoadFinishedEvent>();
 	private readonly testStatesEmitter = new vscode.EventEmitter<TestRunStartedEvent | TestRunFinishedEvent | TestSuiteEvent | TestEvent>();
 
-	private readonly disposables: IDisposable[] = [];
+	private readonly disposables: vscode.Disposable[] = [];
 
 	constructor(
 		private readonly legacyAdapter: LegacyTestAdapter
