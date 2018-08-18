@@ -31,20 +31,36 @@ export class LegacyTestAdapterWrapper implements TestAdapter {
 	}
 
 	async load(): Promise<void> {
+
 		this.testsEmitter.fire({ type: 'started' });
-		var suite = await this.legacyAdapter.load();
+
+		let suite: TestSuiteInfo | undefined;
+		try {
+			suite = await this.legacyAdapter.load();
+		} catch (e) {}
+
 		this.testsEmitter.fire({ type: 'finished', suite });
 	}
 
 	async run(tests: TestSuiteInfo | TestInfo): Promise<void> {
+
 		this.testStatesEmitter.fire({ type: 'started', tests });
-		await this.legacyAdapter.run(tests);
+
+		try {
+			await this.legacyAdapter.run(tests);
+		} catch (e) {}
+
 		this.testStatesEmitter.fire({ type: 'finished' });
 	}
 
 	async debug(tests: TestSuiteInfo | TestInfo): Promise<void> {
+
 		this.testStatesEmitter.fire({ type: 'started', tests });
-		await this.legacyAdapter.debug(tests);
+
+		try {
+			await this.legacyAdapter.debug(tests);
+		} catch (e) {}
+
 		this.testStatesEmitter.fire({ type: 'finished' });
 	}
 
