@@ -1,22 +1,23 @@
-import { TestAdapter, TestController, TestExplorerExtension, TestSuiteInfo, TestAdapterDelegate, TestInfo } from 'vscode-test-adapter-api';
+import { TestAdapter, TestController, TestHub as ITestHub, TestSuiteInfo, TestInfo } from 'vscode-test-adapter-api';
+import { TestAdapter as LegacyTestAdapter } from 'vscode-test-adapter-api/out/legacy';
 import { TestAdapterDelegateImpl, TestAdapterDelegateImpl2 } from './testAdapterDelegate';
 import { IDisposable } from '../util';
 
-export class TestHub implements TestExplorerExtension {
+export class TestHub implements ITestHub {
 
 	private controllers = new Set<TestController>();
 
-	private localAdapters = new Set<TestAdapter>();
-	private localAdapterSubscriptions = new Map<TestAdapter, IDisposable>();
+	private localAdapters = new Set<LegacyTestAdapter>();
+	private localAdapterSubscriptions = new Map<LegacyTestAdapter, IDisposable>();
 	private localDelegates = new Set<TestAdapterDelegateImpl>();
-	private localTests = new Map<TestAdapter, TestSuiteInfo | undefined>();
+	private localTests = new Map<LegacyTestAdapter, TestSuiteInfo | undefined>();
 
-	private remoteAdapters = new Set<TestAdapterDelegate>();
-	private remoteAdapterSubscriptions = new Map<TestAdapterDelegate, IDisposable>();
+	private remoteAdapters = new Set<TestAdapter>();
+	private remoteAdapterSubscriptions = new Map<TestAdapter, IDisposable>();
 	private remoteDelegates = new Set<TestAdapterDelegateImpl2>();
-	private remoteTests = new Map<TestAdapterDelegate, TestSuiteInfo | undefined>();
+	private remoteTests = new Map<TestAdapter, TestSuiteInfo | undefined>();
 
-	registerController(controller: TestController): void {
+	registerTestController(controller: TestController): void {
 
 		this.controllers.add(controller);
 
@@ -24,7 +25,7 @@ export class TestHub implements TestExplorerExtension {
 
 			const delegate = new TestAdapterDelegateImpl(adapter, controller, this);
 			this.localDelegates.add(delegate);
-			controller.registerAdapterDelegate(delegate);
+			controller.registerTestAdapter(delegate);
 
 			delegate.testsEmitter.fire({ type: 'started' });
 			if (this.localTests.has(adapter)) {
@@ -36,7 +37,7 @@ export class TestHub implements TestExplorerExtension {
 
 			const delegate = new TestAdapterDelegateImpl2(adapter, controller);
 			this.remoteDelegates.add(delegate);
-			controller.registerAdapterDelegate(delegate);
+			controller.registerTestAdapter(delegate);
 
 			delegate.testsEmitter.fire({ type: 'started' });
 			if (this.remoteTests.has(adapter)) {
@@ -45,13 +46,13 @@ export class TestHub implements TestExplorerExtension {
 		}
 	}
 
-	unregisterController(controller: TestController): void {
+	unregisterTestController(controller: TestController): void {
 
 		this.controllers.delete(controller);
 
 		for (const delegate of this.localDelegates) {
 			if (delegate.controller === controller) {
-				controller.unregisterAdapterDelegate(delegate);
+				controller.unregisterTestAdapter(delegate);
 				delegate.dispose();
 				this.localDelegates.delete(delegate);
 			}
@@ -59,21 +60,21 @@ export class TestHub implements TestExplorerExtension {
 
 		for (const delegate of this.remoteDelegates) {
 			if (delegate.controller === controller) {
-				controller.unregisterAdapterDelegate(delegate);
+				controller.unregisterTestAdapter(delegate);
 				delegate.dispose();
 				this.remoteDelegates.delete(delegate);
 			}
 		}
 	}
 
-	registerAdapter(adapter: TestAdapter): void {
+	registerAdapter(adapter: LegacyTestAdapter): void {
 
 		this.localAdapters.add(adapter);
 
 		for (const controller of this.controllers) {
 			const proxy = new TestAdapterDelegateImpl(adapter, controller, this);
 			this.localDelegates.add(proxy);
-			controller.registerAdapterDelegate(proxy);
+			controller.registerTestAdapter(proxy);
 		}
 
 		this.load(adapter);
@@ -83,7 +84,7 @@ export class TestHub implements TestExplorerExtension {
 		}
 	}
 
-	unregisterAdapter(adapter: TestAdapter): void {
+	unregisterAdapter(adapter: LegacyTestAdapter): void {
 
 		this.localAdapters.delete(adapter);
 
@@ -93,21 +94,21 @@ export class TestHub implements TestExplorerExtension {
 
 		for (const delegate of this.localDelegates) {
 			if (delegate.adapter === adapter) {
-				delegate.controller.unregisterAdapterDelegate(delegate);
+				delegate.controller.unregisterTestAdapter(delegate);
 				delegate.dispose();
 				this.localDelegates.delete(delegate);
 			}
 		}
 	}
 
-	registerAdapterDelegate(adapter: TestAdapterDelegate): void {
+	registerTestAdapter(adapter: TestAdapter): void {
 
 		this.remoteAdapters.add(adapter);
 
 		for (const controller of this.controllers) {
 			const proxy = new TestAdapterDelegateImpl2(adapter, controller);
 			this.remoteDelegates.add(proxy);
-			controller.registerAdapterDelegate(proxy);
+			controller.registerTestAdapter(proxy);
 		}
 
 		this.remoteAdapterSubscriptions.set(adapter, adapter.tests(event => {
@@ -119,7 +120,7 @@ export class TestHub implements TestExplorerExtension {
 		}));
 	}
 
-	unregisterAdapterDelegate(adapter: TestAdapterDelegate): void {
+	unregisterTestAdapter(adapter: TestAdapter): void {
 
 		this.remoteAdapters.delete(adapter);
 
@@ -129,14 +130,14 @@ export class TestHub implements TestExplorerExtension {
 
 		for (const delegate of this.remoteDelegates) {
 			if (delegate.adapter === adapter) {
-				delegate.controller.unregisterAdapterDelegate(delegate);
+				delegate.controller.unregisterTestAdapter(delegate);
 				delegate.dispose();
 				this.remoteDelegates.delete(delegate);
 			}
 		}
 	}
 
-	async load(adapter: TestAdapter): Promise<void> {
+	async load(adapter: LegacyTestAdapter): Promise<void> {
 
 		this.localTests.delete(adapter);
 
@@ -156,7 +157,7 @@ export class TestHub implements TestExplorerExtension {
 		}
 	}
 
-	async run(tests: TestSuiteInfo | TestInfo, adapter: TestAdapter): Promise<void> {
+	async run(tests: TestSuiteInfo | TestInfo, adapter: LegacyTestAdapter): Promise<void> {
 		
 		for (const delegate of this.localDelegates) {
 			if (delegate.adapter === adapter) {
@@ -173,7 +174,7 @@ export class TestHub implements TestExplorerExtension {
 		}
 	}
 
-	async debug(tests: TestSuiteInfo | TestInfo, adapter: TestAdapter): Promise<void> {
+	async debug(tests: TestSuiteInfo | TestInfo, adapter: LegacyTestAdapter): Promise<void> {
 		
 		for (const delegate of this.localDelegates) {
 			if (delegate.adapter === adapter) {

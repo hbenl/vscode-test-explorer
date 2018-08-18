@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
-import { TestAdapter, TestSuiteInfo, TestInfo, TestSuiteEvent, TestEvent, TestAdapterDelegate, TestRunStartedEvent, TestRunFinishedEvent, TestLoadStartedEvent, TestLoadFinishedEvent, TestController } from 'vscode-test-adapter-api';
+import { TestAdapter, TestSuiteInfo, TestInfo, TestSuiteEvent, TestEvent, TestRunStartedEvent, TestRunFinishedEvent, TestLoadStartedEvent, TestLoadFinishedEvent, TestController } from 'vscode-test-adapter-api';
+import { TestAdapter as LegacyTestAdapter } from 'vscode-test-adapter-api/out/legacy';
 import { IDisposable } from '../util';
 import { TestHub } from './testHub';
 
-export class TestAdapterDelegateImpl implements TestAdapterDelegate {
+export class TestAdapterDelegateImpl implements TestAdapter {
 
 	public readonly testsEmitter = new vscode.EventEmitter<TestLoadStartedEvent | TestLoadFinishedEvent>();
 	public readonly testStatesEmitter = new vscode.EventEmitter<TestRunStartedEvent | TestRunFinishedEvent | TestSuiteEvent | TestEvent>();
@@ -11,7 +12,7 @@ export class TestAdapterDelegateImpl implements TestAdapterDelegate {
 	private disposables: IDisposable[] = [];
 
 	constructor(
-		readonly adapter: TestAdapter,
+		readonly adapter: LegacyTestAdapter,
 		readonly controller: TestController,
 		private readonly hub: TestHub
 	) {
@@ -60,14 +61,14 @@ export class TestAdapterDelegateImpl implements TestAdapterDelegate {
 	}
 }
 
-export class TestAdapterDelegateImpl2 implements TestAdapterDelegate {
+export class TestAdapterDelegateImpl2 implements TestAdapter {
 
 	public readonly testsEmitter = new vscode.EventEmitter<TestLoadStartedEvent | TestLoadFinishedEvent>();
 
 	private disposables: IDisposable[] = [];
 
 	constructor(
-		readonly adapter: TestAdapterDelegate,
+		readonly adapter: TestAdapter,
 		readonly controller: TestController
 	) {
 		this.disposables.push(this.testsEmitter);

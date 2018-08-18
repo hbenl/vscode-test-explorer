@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
-import { TestExplorerExtension } from 'vscode-test-adapter-api';
+import { TestHub as ITestHub} from 'vscode-test-adapter-api';
+import { TestHub } from './hub/testHub';
 import { TestExplorer } from './testExplorer';
 import { runTestsInFile, runTestAtCursor } from './util';
-import { TestHub } from './hub/testHub';
 
-export function activate(context: vscode.ExtensionContext): TestExplorerExtension {
+export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	const hub = new TestHub();
 	const testExplorer = new TestExplorer(context);
-	hub.registerController(testExplorer);
+	hub.registerTestController(testExplorer);
 
 	const registerCommand = (command: string, callback: (...args: any[]) => any) => {
 		context.subscriptions.push(vscode.commands.registerCommand(command, callback));
@@ -52,9 +52,9 @@ export function activate(context: vscode.ExtensionContext): TestExplorerExtensio
 	return {
 		registerAdapter: adapter => hub.registerAdapter(adapter),
 		unregisterAdapter: adapter => hub.unregisterAdapter(adapter),
-		registerAdapterDelegate: delegate => hub.registerAdapterDelegate(delegate),
-		unregisterAdapterDelegate: delegate => hub.unregisterAdapterDelegate(delegate),
-		registerController: controller => hub.registerController(controller),
-		unregisterController: controller => hub.unregisterController(controller)
+		registerTestAdapter: adapter => hub.registerTestAdapter(adapter),
+		unregisterTestAdapter: adapter => hub.unregisterTestAdapter(adapter),
+		registerTestController: controller => hub.registerTestController(controller),
+		unregisterTestController: controller => hub.unregisterTestController(controller)
 	}
 }

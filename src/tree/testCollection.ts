@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TestSuiteNode } from './testSuiteNode';
-import { TestEvent, TestSuiteEvent, TestAdapterDelegate, TestRunStartedEvent, TestRunFinishedEvent, TestLoadStartedEvent, TestLoadFinishedEvent } from 'vscode-test-adapter-api';
+import { TestEvent, TestSuiteEvent, TestAdapter, TestRunStartedEvent, TestRunFinishedEvent, TestLoadStartedEvent, TestLoadFinishedEvent } from 'vscode-test-adapter-api';
 import { TestNode } from './testNode';
 import { TestExplorer } from '../testExplorer';
 import { TreeNode } from './treeNode';
@@ -23,11 +23,11 @@ export class TestCollection {
 	get autorunNode() { return this._autorunNode; }
 
 	constructor(
-		public readonly delegate: TestAdapterDelegate,
+		public readonly adapter: TestAdapter,
 		public readonly explorer: TestExplorer
 	) {
 
-		const workspaceUri = delegate.workspaceFolder ? delegate.workspaceFolder.uri : undefined;
+		const workspaceUri = adapter.workspaceFolder ? adapter.workspaceFolder.uri : undefined;
 
 		this.disposables.push(vscode.workspace.onDidChangeConfiguration(configChange => {
 
@@ -41,11 +41,11 @@ export class TestCollection {
 			}
 		}));
 
-		this.disposables.push(delegate.tests(testLoadEvent => this.onTestLoadEvent(testLoadEvent)));
-		this.disposables.push(delegate.testStates(testRunEvent => this.onTestRunEvent(testRunEvent)));
+		this.disposables.push(adapter.tests(testLoadEvent => this.onTestLoadEvent(testLoadEvent)));
+		this.disposables.push(adapter.testStates(testRunEvent => this.onTestRunEvent(testRunEvent)));
 
-		if (delegate.autorun) {
-			this.disposables.push(delegate.autorun(() => {
+		if (adapter.autorun) {
+			this.disposables.push(adapter.autorun(() => {
 				if (this._autorunNode) {
 					this.explorer.run([this._autorunNode]);
 				}
@@ -339,7 +339,7 @@ export class TestCollection {
 	}
 
 	private getConfiguration(): vscode.WorkspaceConfiguration {
-		const workspaceFolder = this.delegate.workspaceFolder;
+		const workspaceFolder = this.adapter.workspaceFolder;
 		var workspaceUri = workspaceFolder ? workspaceFolder.uri : undefined;
 		return vscode.workspace.getConfiguration('testExplorer', workspaceUri);
 	}

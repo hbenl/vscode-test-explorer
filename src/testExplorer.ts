@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TestController, TestAdapterDelegate } from 'vscode-test-adapter-api';
+import { TestController, TestAdapter } from 'vscode-test-adapter-api';
 import { TestCollection } from './tree/testCollection';
 import { TreeNode } from './tree/treeNode';
 import { IconPaths } from './iconPaths';
@@ -37,12 +37,12 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		this.onDidChangeCodeLenses = this.codeLensesChanged.event;
 	}
 
-	registerAdapterDelegate(delegate: TestAdapterDelegate): void {
-		this.collections.push(new TestCollection(delegate, this));
+	registerTestAdapter(adapter: TestAdapter): void {
+		this.collections.push(new TestCollection(adapter, this));
 	}
 
-	unregisterAdapterDelegate(delegate: TestAdapterDelegate): void {
-		var index = this.collections.findIndex((collection) => (collection.delegate === delegate));
+	unregisterTestAdapter(adapter: TestAdapter): void {
+		var index = this.collections.findIndex((collection) => (collection.adapter === adapter));
 		if (index >= 0) {
 			this.collections[index].dispose();
 			this.collections.splice(index, 1);
@@ -76,10 +76,10 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 	reload(node?: TreeNode): void {
 		if (node) {
-			node.collection.delegate.load();
+			node.collection.adapter.load();
 		} else {
 			for (const collection of this.collections) {
-				collection.delegate.load();
+				collection.adapter.load();
 			}
 		}
 	}
@@ -90,14 +90,14 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 			const node = await pickNode(nodes);
 			if (node) {
-				node.collection.delegate.run(node.info);
+				node.collection.adapter.run(node.info);
 			}
 
 		} else {
 
 			for (const collection of this.collections) {
 				if (collection.suite) {
-					collection.delegate.run(collection.suite.info);
+					collection.adapter.run(collection.suite.info);
 				}
 			}
 		}
@@ -109,7 +109,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		if (node) {
 			try {
 
-				await node.collection.delegate.debug(node.info);
+				await node.collection.adapter.debug(node.info);
 
 			} catch(e) {
 				vscode.window.showErrorMessage(`Error while debugging test: ${e}`);
@@ -119,7 +119,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	}
 
 	cancel(): void {
-		this.collections.forEach(collection => collection.delegate.cancel());
+		this.collections.forEach(collection => collection.adapter.cancel());
 	}
 
 	selected(node: TreeNode | undefined): void {
