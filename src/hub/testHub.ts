@@ -77,6 +77,7 @@ export class TestHub implements ITestHub {
 		const subscription = this.adapterSubscriptions.get(adapter);
 		if (subscription) {
 			subscription.dispose();
+			this.adapterSubscriptions.delete(adapter);
 		}
 
 		for (const delegate of this.delegates) {
@@ -86,6 +87,8 @@ export class TestHub implements ITestHub {
 				this.delegates.delete(delegate);
 			}
 		}
+
+		this.tests.delete(adapter);
 	}
 
 	registerAdapter(adapter: LegacyTestAdapter): void {
@@ -102,6 +105,7 @@ export class TestHub implements ITestHub {
 		const wrapper = this.legacyWrappers.get(adapter);
 		if (wrapper) {
 			this.unregisterTestAdapter(wrapper);
+			this.legacyWrappers.delete(adapter);
 		}
 	}
 }
