@@ -93,7 +93,7 @@ export class TestHub implements ITestHub {
 
 	registerAdapter(adapter: LegacyTestAdapter): void {
 
-		const wrapper = new LegacyTestAdapterWrapper(adapter);
+		const wrapper = new LegacyTestAdapterWrapper(adapter, this);
 		this.legacyWrappers.set(adapter, wrapper);
 		this.registerTestAdapter(wrapper);
 
@@ -107,5 +107,9 @@ export class TestHub implements ITestHub {
 			this.unregisterTestAdapter(wrapper);
 			this.legacyWrappers.delete(adapter);
 		}
+	}
+
+	getTests(adapter: TestAdapter): TestSuiteInfo | undefined {
+		return this.tests.get(adapter);
 	}
 }

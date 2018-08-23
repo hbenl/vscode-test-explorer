@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { TestAdapter, TestLoadStartedEvent, TestLoadFinishedEvent, TestRunStartedEvent, TestRunFinishedEvent, TestSuiteEvent, TestEvent, TestSuiteInfo, TestInfo } from 'vscode-test-adapter-api';
 import { TestAdapter as LegacyTestAdapter } from 'vscode-test-adapter-api/out/legacy';
+import { TestHub } from './testHub';
 
 export class LegacyTestAdapterWrapper implements TestAdapter {
 
@@ -10,7 +11,8 @@ export class LegacyTestAdapterWrapper implements TestAdapter {
 	private readonly disposables: vscode.Disposable[] = [];
 
 	constructor(
-		private readonly legacyAdapter: LegacyTestAdapter
+		private readonly legacyAdapter: LegacyTestAdapter,
+		private readonly hub: TestHub
 	) {
 		this.disposables.push(this.testsEmitter);
 		this.disposables.push(this.testStatesEmitter);
@@ -42,7 +44,13 @@ export class LegacyTestAdapterWrapper implements TestAdapter {
 		this.testsEmitter.fire({ type: 'finished', suite });
 	}
 
-	async run(tests: TestSuiteInfo | TestInfo): Promise<void> {
+	async run(testIDs: string[]): Promise<void> {
+
+		const allTests = this.hub.getTests(this);
+		if (!allTests) return;
+
+		const tests = (testIDs.length > 0) ? this.find(testIDs[0], allTests) : allTests;
+		if (!tests) return;
 
 		this.testStatesEmitter.fire({ type: 'started', tests });
 
@@ -53,7 +61,13 @@ export class LegacyTestAdapterWrapper implements TestAdapter {
 		this.testStatesEmitter.fire({ type: 'finished' });
 	}
 
-	async debug(tests: TestSuiteInfo | TestInfo): Promise<void> {
+	async debug(testIDs: string[]): Promise<void> {
+
+		const allTests = this.hub.getTests(this);
+		if (!allTests) return;
+
+		const tests = (testIDs.length > 0) ? this.find(testIDs[0], allTests) : allTests;
+		if (!tests) return;
 
 		this.testStatesEmitter.fire({ type: 'started', tests });
 
@@ -78,6 +92,25 @@ export class LegacyTestAdapterWrapper implements TestAdapter {
 
 	get autorun(): vscode.Event<void> | undefined {
 		return this.legacyAdapter.autorun;
+	}
+
+	private find(id: string, info: TestSuiteInfo | TestInfo): TestSuiteInfo | TestInfo | undefined {
+
+		if (info.id === id) {
+
+			return info;
+
+		} else if (info.type === 'suite') {
+
+			for (const child of info.children) {
+				const found = this.find(id, child);
+				if (found) {
+					return found;
+				}
+			}
+		}
+
+		return undefined;
 	}
 
 	dispose(): void {

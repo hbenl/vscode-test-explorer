@@ -90,14 +90,14 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 			const node = await pickNode(nodes);
 			if (node) {
-				node.collection.adapter.run(node.info);
+				node.collection.adapter.run([ node.info.id ]);
 			}
 
 		} else {
 
 			for (const collection of this.collections) {
 				if (collection.suite) {
-					collection.adapter.run(collection.suite.info);
+					collection.adapter.run([ collection.suite.info.id ]);
 				}
 			}
 		}
@@ -109,7 +109,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		if (node) {
 			try {
 
-				await node.collection.adapter.debug(node.info);
+				await node.collection.adapter.debug([ node.info.id ]);
 
 			} catch(e) {
 				vscode.window.showErrorMessage(`Error while debugging test: ${e}`);

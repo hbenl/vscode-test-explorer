@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { TestAdapter, TestSuiteInfo, TestInfo, TestSuiteEvent, TestEvent, TestRunStartedEvent, TestRunFinishedEvent, TestLoadStartedEvent, TestLoadFinishedEvent, TestController } from 'vscode-test-adapter-api';
+import { TestAdapter, TestSuiteEvent, TestEvent, TestRunStartedEvent, TestRunFinishedEvent, TestLoadStartedEvent, TestLoadFinishedEvent, TestController } from 'vscode-test-adapter-api';
 
 export class TestAdapterDelegate implements TestAdapter {
 
@@ -26,11 +26,11 @@ export class TestAdapterDelegate implements TestAdapter {
 		return this.adapter.load();
 	}
 
-	run(tests: TestSuiteInfo | TestInfo): Promise<void> {
+	run(tests: string[]): Promise<void> {
 		return this.adapter.run(tests);
 	}
 
-	debug(tests: TestSuiteInfo | TestInfo): Promise<void> {
+	debug(tests: string[]): Promise<void> {
 		return this.adapter.debug(tests);
 	}
 
