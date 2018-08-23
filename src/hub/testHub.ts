@@ -68,6 +68,8 @@ export class TestHub implements ITestHub {
 				}
 			}
 		}));
+
+		adapter.load();
 	}
 
 	unregisterTestAdapter(adapter: TestAdapter): void {
@@ -96,8 +98,6 @@ export class TestHub implements ITestHub {
 		const wrapper = new LegacyTestAdapterWrapper(adapter, this);
 		this.legacyWrappers.set(adapter, wrapper);
 		this.registerTestAdapter(wrapper);
-
-		wrapper.load();
 	}
 
 	unregisterAdapter(adapter: LegacyTestAdapter): void {
