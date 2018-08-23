@@ -57,11 +57,11 @@ export class TestCollection {
 
 		if (testLoadEvent.type === 'started') {
 
-			vscode.commands.executeCommand('setContext', 'testsLoading', true);
+			this.explorer.testLoadStarted();
 
 		} else if (testLoadEvent.type === 'finished') {
 
-			vscode.commands.executeCommand('setContext', 'testsLoading', false);
+			this.explorer.testLoadFinished();
 
 			if (testLoadEvent.suite) {
 

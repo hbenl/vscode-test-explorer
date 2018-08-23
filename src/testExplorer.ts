@@ -22,6 +22,8 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	public readonly onDidChangeCodeLenses: vscode.Event<void>;
 
 	public readonly collections: TestCollection[] = [];
+	// the number of adapters that are in the process of loading their test definitions
+	private loadingCount = 0;
 
 	constructor(
 		context: vscode.ExtensionContext
@@ -202,5 +204,17 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		const codeLenses = this.collections.map(collection => collection.getCodeLenses(file));
 
 		return (<vscode.CodeLens[]>[]).concat(...codeLenses);
+	}
+
+	testLoadStarted(): void {
+		this.loadingCount++;
+		vscode.commands.executeCommand('setContext', 'testsLoading', true);
+	}
+
+	testLoadFinished(): void {
+		this.loadingCount--;
+		if (this.loadingCount === 0) {
+			vscode.commands.executeCommand('setContext', 'testsLoading', false);
+		}
 	}
 }
