@@ -87,6 +87,7 @@ export class TestCollection {
 			if (this._autorunNode) {
 				const newAutorunNode = this.nodesById.get(this._autorunNode.info.id);
 				this.setAutorun(newAutorunNode);
+				this.explorer.run([this._autorunNode]);
 			}
 	
 			this.runningSuite = undefined;
