@@ -11,7 +11,7 @@ export class TestCollection {
 	private disposables: vscode.Disposable[] = [];
 
 	private rootSuite: TestSuiteNode | undefined;
-	private allRunningTests: TreeNode | undefined;
+	private allRunningTests: TestNode[] | undefined;
 	private runningSuite: TestSuiteNode | undefined;
 	private _autorunNode: TreeNode | undefined;
 	private readonly nodesById = new Map<string, TreeNode>();
@@ -110,11 +110,15 @@ export class TestCollection {
 				this.resetState();
 			}
 
-			this.allRunningTests = this.nodesById.get(testRunEvent.tests.id);
-			if (this.allRunningTests) {
-				for (const testNode of allTests(this.allRunningTests)) {
-					testNode.setCurrentState('scheduled');
+			this.allRunningTests = [];
+			for (const nodeId of testRunEvent.tests) {
+				const node = this.nodesById.get(nodeId);
+				if (node) {
+					this.allRunningTests.push(...allTests(node));
 				}
+			}
+			for (const testNode of this.allRunningTests) {
+				testNode.setCurrentState('scheduled');
 			}
 	
 			vscode.commands.executeCommand('setContext', 'testsRunning', true);
@@ -124,7 +128,7 @@ export class TestCollection {
 		} else if (testRunEvent.type === 'finished') {
 
 			if (this.allRunningTests) {
-				for (const testNode of allTests(this.allRunningTests)) {
+				for (const testNode of this.allRunningTests) {
 					if ((testNode.state.current === 'scheduled') || (testNode.state.current === 'running')) {
 						testNode.setCurrentState('pending');
 					}

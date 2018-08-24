@@ -44,15 +44,15 @@ export class LegacyTestAdapterWrapper implements TestAdapter {
 		this.testsEmitter.fire({ type: 'finished', suite });
 	}
 
-	async run(testIDs: string[]): Promise<void> {
+	async run(nodeIds: string[]): Promise<void> {
 
 		const allTests = this.hub.getTests(this);
 		if (!allTests) return;
 
-		const tests = (testIDs.length > 0) ? this.find(testIDs[0], allTests) : allTests;
+		const tests = (nodeIds.length > 0) ? this.find(nodeIds[0], allTests) : allTests;
 		if (!tests) return;
 
-		this.testStatesEmitter.fire({ type: 'started', tests });
+		this.testStatesEmitter.fire({ type: 'started', tests: nodeIds });
 
 		try {
 			await this.legacyAdapter.run(tests);
@@ -61,15 +61,15 @@ export class LegacyTestAdapterWrapper implements TestAdapter {
 		this.testStatesEmitter.fire({ type: 'finished' });
 	}
 
-	async debug(testIDs: string[]): Promise<void> {
+	async debug(nodeIds: string[]): Promise<void> {
 
 		const allTests = this.hub.getTests(this);
 		if (!allTests) return;
 
-		const tests = (testIDs.length > 0) ? this.find(testIDs[0], allTests) : allTests;
+		const tests = (nodeIds.length > 0) ? this.find(nodeIds[0], allTests) : allTests;
 		if (!tests) return;
 
-		this.testStatesEmitter.fire({ type: 'started', tests });
+		this.testStatesEmitter.fire({ type: 'started', tests: nodeIds });
 
 		try {
 			await this.legacyAdapter.debug(tests);

@@ -37,7 +37,7 @@
     "escape-string-regexp": "^1.0.5",
     "fs-extra": "^7.0.0",
     "tslib": "^1.9.3",
-    "vscode-test-adapter-api": "^1.0.0"
+    "vscode-test-adapter-api": "^1.0.1"
   },
   "devDependencies": {
     "@types/escape-string-regexp": "1.0.0",
