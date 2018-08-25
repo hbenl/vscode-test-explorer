@@ -1,3 +1,12 @@
+### Version 2.0.2
+* UI bugfix: when multiple adapters are installed, the "Run all tests" button did not change when tests were running
+
+### Version 2.0.1
+* API bugfix
+
+### Version 2.0.0
+* changed API to allow support for VS Live Share and more extensibility
+
 ### Version 1.1.0
 * add commands for running all tests in the current file or the test at the current cursor position
 * remove error decorations when resetting the test states

@@ -24,6 +24,8 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	public readonly collections: TestCollection[] = [];
 	// the number of adapters that are in the process of loading their test definitions
 	private loadingCount = 0;
+	// the number of adapters that are running tests
+	private runningCount = 0;
 
 	constructor(
 		context: vscode.ExtensionContext
@@ -215,6 +217,18 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		this.loadingCount--;
 		if (this.loadingCount === 0) {
 			vscode.commands.executeCommand('setContext', 'testsLoading', false);
+		}
+	}
+
+	testRunStarted(): void {
+		this.runningCount++;
+		vscode.commands.executeCommand('setContext', 'testsRunning', true);
+	}
+
+	testRunFinished(): void {
+		this.runningCount--;
+		if (this.runningCount === 0) {
+			vscode.commands.executeCommand('setContext', 'testsRunning', false);
 		}
 	}
 }

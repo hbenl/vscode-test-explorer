@@ -120,8 +120,8 @@ export class TestCollection {
 			for (const testNode of this.allRunningTests) {
 				testNode.setCurrentState('scheduled');
 			}
-	
-			vscode.commands.executeCommand('setContext', 'testsRunning', true);
+
+			this.explorer.testRunStarted();
 
 			this.collectionChangedWhileRunning = false;
 
@@ -136,7 +136,7 @@ export class TestCollection {
 				this.allRunningTests = undefined;
 			}
 
-			vscode.commands.executeCommand('setContext', 'testsRunning', false);
+			this.explorer.testRunFinished();
 
 			if (this.collectionChangedWhileRunning) {
 				this.collectionChangedWhileRunning = false;
