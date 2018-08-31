@@ -1,6 +1,7 @@
 src/**
 **/*.map
 out/test/**
+docs/**
 package-lock.json
 tsconfig.json
 .vscode/**

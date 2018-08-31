@@ -1,15 +1,45 @@
-# Test Explorer UI for Visual Studio Code
+# Test Explorer for Visual Studio Code
 
-This extension provides a user interface for running automated tests.
-It needs Test Adapter extensions to provide the integration with different testing frameworks.
-Currently the following Test Adapters are under development:
+This extension provides an extensible user interface for running your tests in VS Code.
+It can be used with any testing framework if there is a corresponding [Test Adapter extension](#test-adapters).
 
-* [Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter)
-* [Jasmine Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-jasmine-test-adapter)
-* [Google Test Explorer](https://marketplace.visualstudio.com/items?itemName=OpenNingia.vscode-google-test-adapter)
+Other extensions can get full access to the Test Adapters by acting as [Test Controllers](#test-controllers).
+
+The Test Explorer can also be used in [VS Live Share](https://aka.ms/vsls) sessions by installing the [Test Explorer Live Share](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer-liveshare) extension.
 
 This extension will be automatically installed when you install one of the Test Adapters,
 so there is usually no need to install this extension manually.
+
+## Test Adapters
+
+Currently the following Test Adapters are available:
+
+### Javascript
+
+* [Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter)
+* [Jasmine Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-jasmine-test-adapter)
+
+### C++
+
+* [Google Test Explorer](https://marketplace.visualstudio.com/items?itemName=OpenNingia.vscode-google-test-adapter)
+* [Catch2 Test Explorer](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)
+
+### Live Share
+
+* The [Test Explorer Live Share](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer-liveshare) extension creates Test Adapters in
+Live Share guests that act as proxies for the Test Adapters in the Live Share host.
+
+If there is no Test Adapter for your favorite testing framework yet, you can easily [create your own](https://github.com/hbenl/vscode-test-explorer/blob/master/docs/TestAdapter.md).
+
+## Test Controllers
+
+Currently the following Test Controllers are available:
+
+* The Test Explorer UI (which is the main part of this extension) is itself implemented as a Test Controller
+* The [Test Explorer Live Share](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer-liveshare) extension creates Test Controllers in
+the Live Share host that act as proxies for the Test Explorers in the Live Share guests.
+
+Do you have a new idea for interacting with the Test Adapters? You can easily get full access to all Test Adapters in your own extension by [implementing your own controller](https://github.com/hbenl/vscode-test-explorer/blob/master/docs/TestController.md).
 
 ## Configuration
 
@@ -36,14 +66,3 @@ ID                                 | Command
 `test-explorer.run-file`           | Run tests in current file
 `test-explorer.run-test-at-cursor` | Run the test at the current cursor position
 `test-explorer.cancel`             | Cancel running tests
-
-## Writing your own Test Adapter
-
-The [`vscode-test-adapter-api`](https://github.com/hbenl/vscode-test-adapter-api) npm package
-provides the API that is used by this extension and the Test Adapters to talk to each other.
-You need to implement the 
-[TestAdapter](https://github.com/hbenl/vscode-test-adapter-api/blob/5b2300ac79dee47dffe5f9fdfe5399316e31d278/src/index.ts#L10)
-interface and
-[register](https://github.com/hbenl/vscode-test-adapter-api/blob/5b2300ac79dee47dffe5f9fdfe5399316e31d278/src/index.ts#L6)
-your implementation with this extension.
-Have a look at the existing adapters for examples.
