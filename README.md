@@ -29,7 +29,7 @@ Currently the following Test Adapters are available:
 * The [Test Explorer Live Share](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer-liveshare) extension creates Test Adapters in
 Live Share guests that act as proxies for the Test Adapters in the Live Share host.
 
-If there is no Test Adapter for your favorite testing framework yet, you can easily [create your own](https://github.com/hbenl/vscode-test-explorer/blob/master/docs/TestAdapter.md).
+If there is no Test Adapter for your favorite testing framework yet, you can easily [create your own](https://github.com/hbenl/vscode-example-test-adapter).
 
 ## Test Controllers
 
