@@ -1,3 +1,6 @@
+### Version 2.0.3
+* updated documentation
+
 ### Version 2.0.2
 * UI bugfix: when multiple adapters are installed, the "Run all tests" button did not change when tests were running
 
