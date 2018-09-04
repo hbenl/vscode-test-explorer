@@ -153,7 +153,7 @@ export function createDebugCodeLens(line: number, nodes: TreeNode[]): vscode.Cod
 	});
 }
 
-const schemeMatcher = /^[a-z][a-z0-9+-.]*:/;
+const schemeMatcher = /^[a-z][a-z0-9+-.]+:/;
 export function fileToUri(file: string): vscode.Uri {
 	if (schemeMatcher.test(file)) {
 		return vscode.Uri.parse(file);
