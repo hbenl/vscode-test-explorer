@@ -1,3 +1,6 @@
+### Version 2.0.4
+* Fix the "Show source" button on Windows
+
 ### Version 2.0.3
 * updated documentation
 
