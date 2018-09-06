@@ -1,5 +1,8 @@
+### Version 2.0.5
+* show the "Show source" button only for tests and suites that specify a source file
+
 ### Version 2.0.4
-* Fix the "Show source" button on Windows
+* fix the "Show source" button on Windows
 
 ### Version 2.0.3
 * updated documentation
