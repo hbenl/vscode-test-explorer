@@ -136,7 +136,7 @@ export class TestNode implements TreeNode {
 		const treeItem = new vscode.TreeItem(this.info.label, vscode.TreeItemCollapsibleState.None);
 		treeItem.id = this.info.id;
 		treeItem.iconPath = this.collection.explorer.iconPaths[stateIcon(this.state)];
-		treeItem.contextValue = 'test';
+		treeItem.contextValue = this.info.file ? 'testWithSource' : 'test';
 		treeItem.command = {
 			title: '',
 			command: 'test-explorer.selected',

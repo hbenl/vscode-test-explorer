@@ -250,12 +250,22 @@
         {
           "command": "test-explorer.debug",
           "group": "inline@1",
+          "when": "view == test-explorer && viewItem == testWithSource"
+        },
+        {
+          "command": "test-explorer.debug",
+          "group": "inline@1",
           "when": "view == test-explorer && viewItem == test"
         },
         {
           "command": "test-explorer.show-source",
           "group": "inline@3",
-          "when": "view == test-explorer"
+          "when": "view == test-explorer && viewItem == suiteWithSource"
+        },
+        {
+          "command": "test-explorer.show-source",
+          "group": "inline@3",
+          "when": "view == test-explorer && viewItem == testWithSource"
         },
         {
           "command": "test-explorer.reload-collection",
