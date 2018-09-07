@@ -73,6 +73,23 @@ export function runTestAtCursor(testExplorer: TestExplorer): void {
 	}
 }
 
+export function debugTestAtCursor(testExplorer: TestExplorer): void {
+
+	const editor = vscode.window.activeTextEditor;
+	if (editor) {
+
+		const nodes = findNodesLocatedAboveCursor(
+			uriToFile(editor.document.uri),
+			editor.selection.active.line,
+			testExplorer
+		);
+
+		if (nodes.length > 0) {
+			testExplorer.debug(nodes);
+		}
+	}
+}
+
 function findNodesLocatedAboveCursor(file: string, cursorLine: number, testExplorer: TestExplorer): TreeNode[] {
 
 	let currentLine = -1;

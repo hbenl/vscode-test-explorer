@@ -63,10 +63,11 @@ Further configuration options are provided by the Test Adapters.
 
 The following commands are available in VS Code's command palette, use the ID to add them to your keyboard shortcuts:
 
-ID                                 | Command
------------------------------------|--------------------------------------------
-`test-explorer.reload`             | Reload tests
-`test-explorer.run-all`            | Run all tests
-`test-explorer.run-file`           | Run tests in current file
-`test-explorer.run-test-at-cursor` | Run the test at the current cursor position
-`test-explorer.cancel`             | Cancel running tests
+ID                                   | Command
+-------------------------------------|--------------------------------------------
+`test-explorer.reload`               | Reload tests
+`test-explorer.run-all`              | Run all tests
+`test-explorer.run-file`             | Run tests in current file
+`test-explorer.run-test-at-cursor`   | Run the test at the current cursor position
+`test-explorer.debug-test-at-cursor` | Debug the test at the current cursor position
+`test-explorer.cancel`               | Cancel running tests

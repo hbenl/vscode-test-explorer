@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { TestHub as ITestHub} from 'vscode-test-adapter-api';
 import { TestHub } from './hub/testHub';
 import { TestExplorer } from './testExplorer';
-import { runTestsInFile, runTestAtCursor } from './util';
+import { runTestsInFile, runTestAtCursor, debugTestAtCursor } from './util';
 
 export function activate(context: vscode.ExtensionContext): ITestHub {
 
@@ -27,6 +27,8 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	registerCommand('test-explorer.run-file', (file?: string) => runTestsInFile(file, testExplorer));
 
 	registerCommand('test-explorer.run-test-at-cursor', () => runTestAtCursor(testExplorer));
+
+	registerCommand('test-explorer.debug-test-at-cursor', () => debugTestAtCursor(testExplorer));
 
 	registerCommand('test-explorer.cancel', () => testExplorer.cancel());
 

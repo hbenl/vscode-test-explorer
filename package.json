@@ -157,6 +157,10 @@
         "title": "Test Explorer: Run the test at the current cursor position"
       },
       {
+        "command": "test-explorer.debug-test-at-cursor",
+        "title": "Test Explorer: Debug the test at the current cursor position"
+      },
+      {
         "command": "test-explorer.debug",
         "title": "Debug this test",
         "icon": {
