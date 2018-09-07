@@ -1,3 +1,6 @@
+### Version 2.0.6
+* add command for debugging the test at the current cursor position
+
 ### Version 2.0.5
 * show the "Show source" button only for tests and suites that specify a source file
 
