@@ -43,7 +43,7 @@ Currently the following Test Controllers are available:
 * The [Test Explorer Live Share](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer-liveshare) extension creates Test Controllers in
 the Live Share host that act as proxies for the Test Explorers in the Live Share guests.
 
-Do you have a new idea for interacting with the Test Adapters? You can easily get full access to all Test Adapters in your own extension by [implementing your own controller](https://github.com/hbenl/vscode-test-explorer/blob/master/docs/TestController.md).
+Do you have a new idea for interacting with the Test Adapters? You can easily get full access to all Test Adapters in your own extension by [implementing your own controller](https://github.com/hbenl/vscode-example-test-controller).
 
 ## Configuration
 
