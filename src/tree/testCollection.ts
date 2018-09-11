@@ -345,7 +345,7 @@ export class TestCollection {
 
 	private getConfiguration(): vscode.WorkspaceConfiguration {
 		const workspaceFolder = this.adapter.workspaceFolder;
-		var workspaceUri = workspaceFolder ? workspaceFolder.uri : undefined;
+		var workspaceUri = workspaceFolder ? workspaceFolder.uri : null;
 		return vscode.workspace.getConfiguration('testExplorer', workspaceUri);
 	}
 
