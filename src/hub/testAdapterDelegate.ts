@@ -12,10 +12,6 @@ export class TestAdapterDelegate implements TestAdapter {
 		readonly controller: TestController
 	) {
 		this.disposables.push(this.testsEmitter);
-
-		this.disposables.push(
-			this.adapter.tests(event => this.testsEmitter.fire(event))
-		);
 	}
 
 	get workspaceFolder(): vscode.WorkspaceFolder | undefined {
