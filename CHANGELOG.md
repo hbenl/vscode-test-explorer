@@ -1,3 +1,6 @@
+### Version 2.0.7
+* bugfix for TestLoadEvents being sent to the controllers twice
+
 ### Version 2.0.6
 * add command for debugging the test at the current cursor position
 
