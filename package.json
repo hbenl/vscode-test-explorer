@@ -174,8 +174,8 @@
         "icon": "./icons/stop.svg"
       },
       {
-        "command": "test-explorer.selected",
-        "title": "Test tree item selected"
+        "command": "test-explorer.show-error",
+        "title": "Show error message"
       },
       {
         "command": "test-explorer.show-source",
@@ -249,7 +249,7 @@
         {
           "command": "test-explorer.run",
           "group": "inline@2",
-          "when": "view == test-explorer"
+          "when": "view == test-explorer && viewItem != error"
         },
         {
           "command": "test-explorer.debug",
@@ -277,24 +277,29 @@
           "when": "view == test-explorer && viewItem == collection"
         },
         {
+          "command": "test-explorer.reload-collection",
+          "group": "1_reload",
+          "when": "view == test-explorer && viewItem == error"
+        },
+        {
           "command": "test-explorer.enable-autorun",
           "group": "4_autorun@4",
-          "when": "view == test-explorer"
+          "when": "view == test-explorer && viewItem != error"
         },
         {
           "command": "test-explorer.disable-autorun",
           "group": "4_autorun@5",
-          "when": "view == test-explorer"
+          "when": "view == test-explorer && viewItem != error"
         },
         {
           "command": "test-explorer.retire",
           "group": "5_state@6",
-          "when": "view == test-explorer"
+          "when": "view == test-explorer && viewItem != error"
         },
         {
           "command": "test-explorer.reset",
           "group": "5_state@7",
-          "when": "view == test-explorer"
+          "when": "view == test-explorer && viewItem != error"
         }
       ],
       "commandPalette": [
@@ -315,7 +320,7 @@
           "when": "false"
         },
         {
-          "command": "test-explorer.selected",
+          "command": "test-explorer.show-error",
           "when": "false"
         },
         {

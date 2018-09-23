@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	registerCommand('test-explorer.debug', (...nodes) => testExplorer.debug(nodes));
 
-	registerCommand('test-explorer.selected', (node) => testExplorer.selected(node));
+	registerCommand('test-explorer.show-error', (message) => testExplorer.showError(message));
 
 	registerCommand('test-explorer.show-source', (node) => testExplorer.showSource(node));
 

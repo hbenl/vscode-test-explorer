@@ -2,12 +2,13 @@ import * as vscode from 'vscode';
 import { TestController, TestAdapter } from 'vscode-test-adapter-api';
 import { TestCollection } from './tree/testCollection';
 import { TreeNode } from './tree/treeNode';
+import { ErrorNode } from './tree/errorNode';
 import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './treeEventDebouncer';
 import { Decorator } from './decorator';
 import { pickNode, findLineContaining, fileToUri, uriToFile } from './util';
 
-export class TestExplorer implements TestController, vscode.TreeDataProvider<TreeNode>, vscode.CodeLensProvider {
+export class TestExplorer implements TestController, vscode.TreeDataProvider<TreeNode | ErrorNode>, vscode.CodeLensProvider {
 
 	public readonly iconPaths: IconPaths;
 	public readonly decorator: Decorator;
@@ -53,11 +54,11 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		}
 	}
 
-	getTreeItem(node: TreeNode): vscode.TreeItem {
+	getTreeItem(node: TreeNode | ErrorNode): vscode.TreeItem {
 		return node.getTreeItem();
 	}
 
-	getChildren(node?: TreeNode): vscode.ProviderResult<TreeNode[]> {
+	getChildren(node?: TreeNode | ErrorNode): vscode.ProviderResult<(TreeNode | ErrorNode)[]> {
 
 		if (node) {
 
@@ -66,19 +67,30 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		} else {
 
 			const nonEmptyCollections = this.collections.filter(
-				(collection) => (collection.suite !== undefined));
+				(collection) => ((collection.suite !== undefined) || (collection.error !== undefined)));
 
 			if (nonEmptyCollections.length === 0) {
+
 				return [];
+
 			} else if (nonEmptyCollections.length === 1) {
-				return nonEmptyCollections[0].suite!.children;
+
+				const collection = nonEmptyCollections[0];
+				if (collection.suite) {
+					return collection.suite.children;
+				} else { // collection.error !== undefined
+					return [ collection.error! ];
+				}
+
 			} else {
-				return nonEmptyCollections.map(collection => collection.suite!);
+
+				return nonEmptyCollections.map(collection => (collection.suite || collection.error)!);
+
 			}
 		}
 	}
 
-	reload(node?: TreeNode): void {
+	reload(node?: TreeNode | ErrorNode): void {
 		if (node) {
 			node.collection.adapter.load();
 		} else {
@@ -126,13 +138,12 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		this.collections.forEach(collection => collection.adapter.cancel());
 	}
 
-	selected(node: TreeNode | undefined): void {
-		if (!node) return;
+	showError(message: string | undefined): void {
 
-		if (node.log) {
+		if (message) {
 
 			this.outputChannel.clear();
-			this.outputChannel.append(node.log);
+			this.outputChannel.append(message);
 			this.outputChannel.show(true);
 
 		} else {

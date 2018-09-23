@@ -4,6 +4,7 @@ import { TestEvent, TestSuiteEvent, TestAdapter, TestRunStartedEvent, TestRunFin
 import { TestNode } from './testNode';
 import { TestExplorer } from '../testExplorer';
 import { TreeNode } from './treeNode';
+import { ErrorNode } from './errorNode';
 import { allTests, createRunCodeLens, createDebugCodeLens } from '../util';
 
 export class TestCollection {
@@ -11,6 +12,7 @@ export class TestCollection {
 	private disposables: vscode.Disposable[] = [];
 
 	private rootSuite: TestSuiteNode | undefined;
+	private errorNode: ErrorNode | undefined;
 	private allRunningTests: TestNode[] | undefined;
 	private runningSuite: TestSuiteNode | undefined;
 	private _autorunNode: TreeNode | undefined;
@@ -20,6 +22,7 @@ export class TestCollection {
 	private collectionChangedWhileRunning = false;
 
 	get suite() { return this.rootSuite; }
+	get error() { return this.errorNode; }
 	get autorunNode() { return this._autorunNode; }
 
 	constructor(
@@ -66,35 +69,40 @@ export class TestCollection {
 			if (testLoadEvent.suite) {
 
 				this.rootSuite = new TestSuiteNode(this, testLoadEvent.suite, undefined, this.nodesById);
+				this.errorNode = undefined;
 
 				if (this.shouldRetireStateOnReload()) {
 					this.rootSuite.retireState();
 				} else if (this.shouldResetStateOnReload()) {
 					this.rootSuite.resetState();
 				}
-	
+
 			} else {
-	
+
 				this.rootSuite = undefined;
-	
+				if (testLoadEvent.errorMessage) {
+					this.errorNode = new ErrorNode(this, testLoadEvent.errorMessage);
+				} else {
+					this.errorNode = undefined;
+				}
 			}
 
 			this.nodesById.clear();
 			if (this.rootSuite) {
 				this.collectNodesById(this.rootSuite);
 			}
-	
+
 			if (this._autorunNode) {
 				const newAutorunNode = this.nodesById.get(this._autorunNode.info.id);
 				this.setAutorun(newAutorunNode);
 				this.explorer.run([this._autorunNode]);
 			}
-	
+
 			this.runningSuite = undefined;
-	
+
 			this.computeCodeLenses();
 			this.explorer.decorator.updateDecorationsNow();
-	
+
 			this.explorer.treeEvents.sendTreeChangedEvent();
 		}
 	}

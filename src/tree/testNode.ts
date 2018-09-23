@@ -139,8 +139,8 @@ export class TestNode implements TreeNode {
 		treeItem.contextValue = this.info.file ? 'testWithSource' : 'test';
 		treeItem.command = {
 			title: '',
-			command: 'test-explorer.selected',
-			arguments: [ this ]
+			command: 'test-explorer.show-error',
+			arguments: [ this.log ]
 		};
 
 		return treeItem;
