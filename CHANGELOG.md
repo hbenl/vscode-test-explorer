@@ -1,3 +1,6 @@
+### Version 2.0.8
+* show error message when loading the tests fails
+
 ### Version 2.0.7
 * bugfix for TestLoadEvents being sent to the controllers twice
 
