@@ -1,3 +1,6 @@
+### Version 2.0.9
+* fix decorations and CodeLenses on Windows
+
 ### Version 2.0.8
 * show error message when loading the tests fails
 
