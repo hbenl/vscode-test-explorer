@@ -181,7 +181,7 @@ export function fileToUri(file: string): vscode.Uri {
 
 export function uriToFile(uri: vscode.Uri): string {
 	if (uri.scheme === 'file') {
-		return uri.path;
+		return uri.fsPath;
 	} else {
 		return uri.toString();
 	}
