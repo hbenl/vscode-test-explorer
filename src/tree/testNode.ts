@@ -30,8 +30,6 @@ export class TestNode implements TreeNode {
 			let currentState = oldNode.state.current;
 			if (info.skipped) {
 				currentState = 'skipped';
-			} else if (currentState === 'skipped') {
-				currentState = 'pending';
 			}
 
 			this._state = {
