@@ -1,8 +1,8 @@
 import { TreeNode } from './treeNode';
 
-export type CurrentNodeState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed' | 'running-failed' | 'skipped';
+export type CurrentNodeState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed' | 'running-failed' | 'skipped' | 'always-skipped';
 
-export type PreviousNodeState = 'pending' | 'passed' | 'failed' | 'skipped';
+export type PreviousNodeState = 'pending' | 'passed' | 'failed' | 'skipped' | 'always-skipped';
 
 export interface NodeState {
 	current: CurrentNodeState,
@@ -12,8 +12,8 @@ export interface NodeState {
 
 export function defaultState(skipped?: boolean): NodeState {
 	return {
-		current: skipped ? 'skipped' : 'pending',
-		previous: skipped ? 'skipped' : 'pending',
+		current: skipped ? 'always-skipped' : 'pending',
+		previous: skipped ? 'always-skipped' : 'pending',
 		autorun: false
 	};
 }
@@ -32,9 +32,17 @@ export function parentCurrentNodeState(children: TreeNode[]): CurrentNodeState {
 
 		return 'pending';
 
-	} else if (children.every((child) => (child.state.current === 'skipped'))) {
+	} else if (children.every((child) => (child.state.current.endsWith('skipped')))) {
 
-		return 'skipped';
+		if (children.some((child) => (child.state.current === 'skipped'))) {
+
+			return 'skipped';
+
+		} else {
+
+			return 'always-skipped';
+
+		}
 
 	} else if (children.some((child) => (child.state.current === 'running'))) {
 
@@ -89,9 +97,17 @@ export function parentPreviousNodeState(children: TreeNode[]): PreviousNodeState
 
 		return 'pending';
 
-	} else if (children.every((child) => (child.state.previous === 'skipped'))) {
+	} else if (children.every((child) => (child.state.previous.endsWith('skipped')))) {
 
-		return 'skipped';
+		if (children.some((child) => (child.state.previous === 'skipped'))) {
+
+			return 'skipped';
+
+		} else {
+
+			return 'always-skipped';
+
+		}
 
 	} else if (children.some((child) => (child.state.previous === 'failed'))) {
 
@@ -141,6 +157,7 @@ export function stateIcon(state: NodeState): StateIconType {
 			return state.autorun ? 'failedAutorun' : 'failed';
 
 		case 'skipped':
+		case 'always-skipped':
 
 			return 'skipped';
 
@@ -156,6 +173,11 @@ export function stateIcon(state: NodeState): StateIconType {
 
 					return state.autorun ? 'failedFaintAutorun' : 'failedFaint';
 
+				case 'skipped':
+				case 'always-skipped':
+		
+					return 'skipped';
+			
 				default:
 
 					return state.autorun ? 'pendingAutorun' : 'pending';

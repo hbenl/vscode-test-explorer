@@ -29,14 +29,21 @@ export class TestNode implements TreeNode {
 
 			let currentState = oldNode.state.current;
 			if (info.skipped) {
-				currentState = 'skipped';
-			} else if (currentState === 'skipped') {
+				currentState = 'always-skipped';
+			} else if (currentState === 'always-skipped') {
 				currentState = 'pending';
+			}
+
+			let previousState = oldNode.state.previous;
+			if (info.skipped) {
+				previousState = 'always-skipped';
+			} else if (previousState === 'always-skipped') {
+				previousState = 'pending';
 			}
 
 			this._state = {
 				current: currentState,
-				previous: oldNode.state.previous,
+				previous: previousState,
 				autorun: oldNode.state.autorun
 			}
 			this._log = oldNode.log || "";
@@ -57,7 +64,8 @@ export class TestNode implements TreeNode {
 
 		this.state.current = currentState;
 
-		if ((currentState === 'passed') || (currentState === 'failed')) {
+		if ((currentState === 'passed') || (currentState === 'failed') ||
+			((currentState === 'skipped') && (this.state.previous !== 'always-skipped'))) {
 			this.state.previous = currentState;
 		}
 
@@ -87,7 +95,8 @@ export class TestNode implements TreeNode {
 	}
 
 	retireState(): void {
-		if ((this.state.current === 'passed') || (this.state.current === 'failed')) {
+
+		if ((this.state.current === 'passed') || (this.state.current === 'failed') || (this.state.current === 'skipped')) {
 
 			this._state.current = 'pending';
 			this.neededUpdates = 'send';
@@ -102,19 +111,17 @@ export class TestNode implements TreeNode {
 
 		this._log = "";
 
-		if (((this.state.current !== 'pending') && (this.state.current !== 'skipped')) ||
-			((this.state.previous !== 'pending') && (this.state.previous !== 'skipped'))) {
-
+		if ((this.state.current !== 'pending') && (this.state.current !== 'always-skipped')) {
 			this._state.current = 'pending';
+			this.neededUpdates = 'send';
+		}
+
+		if ((this.state.previous !== 'pending') && (this.state.previous !== 'always-skipped')) {
 			this._state.previous = 'pending';
 			this.neededUpdates = 'send';
-			this._decorations = [];
+		}
 
-			if (this.info.file) {
-				this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
-			}
-
-		} else if (this._decorations.length > 0) {
+		if (this._decorations.length > 0) {
 
 			this._decorations = [];
 
