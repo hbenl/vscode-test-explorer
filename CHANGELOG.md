@@ -1,3 +1,6 @@
+### Version 2.1.0
+* remember if a test was skipped dynamically (while running the test) and don't reset its state when reloading the tests
+
 ### Version 2.0.9
 * fix decorations and CodeLenses on Windows
 
