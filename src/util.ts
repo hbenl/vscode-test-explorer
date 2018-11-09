@@ -170,6 +170,34 @@ export function createDebugCodeLens(line: number, nodes: TreeNode[]): vscode.Cod
 	});
 }
 
+export function createLogCodeLens(line: number, nodes: TreeNode[]): vscode.CodeLens {
+
+	const range = new vscode.Range(line, 0, line, 0);
+	let log = '';
+	for (const node of nodes) {
+		if (node.log) {
+			log += node.log;
+		}
+	}
+
+	return new vscode.CodeLens(range, {
+		title: 'Show Log',
+		command: 'test-explorer.show-error',
+		arguments: [ log ]
+	});
+}
+
+export function createRevealCodeLens(line: number, nodes: TreeNode[]): vscode.CodeLens {
+
+	const range = new vscode.Range(line, 0, line, 0);
+
+	return new vscode.CodeLens(range, {
+		title: 'Show in Test Explorer',
+		command: 'test-explorer.reveal',
+		arguments: nodes
+	});
+}
+
 const schemeMatcher = /^[a-z][a-z0-9+-.]+:/;
 export function fileToUri(file: string): vscode.Uri {
 	if (schemeMatcher.test(file)) {

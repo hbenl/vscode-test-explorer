@@ -10,6 +10,12 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	const testExplorer = new TestExplorer(context);
 	hub.registerTestController(testExplorer);
 
+	const treeView = vscode.window.createTreeView('test-explorer', { treeDataProvider: testExplorer });
+	context.subscriptions.push(treeView);
+
+	const documentSelector = { pattern: '**/*' };
+	context.subscriptions.push(vscode.languages.registerCodeLensProvider(documentSelector, testExplorer));
+
 	const registerCommand = (command: string, callback: (...args: any[]) => any) => {
 		context.subscriptions.push(vscode.commands.registerCommand(command, callback));
 	};
@@ -46,10 +52,7 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	registerCommand('test-explorer.reset', (node) => testExplorer.resetState(node));
 
-	context.subscriptions.push(vscode.window.registerTreeDataProvider('test-explorer', testExplorer));
-
-	const documentSelector = { pattern: '**/*' };
-	context.subscriptions.push(vscode.languages.registerCodeLensProvider(documentSelector, testExplorer));
+	registerCommand('test-explorer.reveal', (node) => treeView.reveal(node));
 
 	return {
 		registerAdapter: adapter => hub.registerAdapter(adapter),

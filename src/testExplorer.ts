@@ -90,6 +90,10 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		}
 	}
 
+	getParent(node: TreeNode | ErrorNode): TreeNode | undefined {
+		return (<any>node).parent;
+	}
+
 	reload(node?: TreeNode | ErrorNode): void {
 		if (node) {
 			node.collection.adapter.load();

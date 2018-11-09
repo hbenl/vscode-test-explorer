@@ -5,7 +5,7 @@ import { TestNode } from './testNode';
 import { TestExplorer } from '../testExplorer';
 import { TreeNode } from './treeNode';
 import { ErrorNode } from './errorNode';
-import { allTests, createRunCodeLens, createDebugCodeLens } from '../util';
+import { allTests, createRunCodeLens, createDebugCodeLens, createRevealCodeLens, createLogCodeLens } from '../util';
 
 export class TestCollection {
 
@@ -19,7 +19,6 @@ export class TestCollection {
 	private readonly nodesById = new Map<string, TreeNode>();
 	private readonly locatedNodes = new Map<string, Map<number, TreeNode[]>>();
 	private readonly codeLenses = new Map<string, vscode.CodeLens[]>();
-	private collectionChangedWhileRunning = false;
 
 	get suite() { return this.rootSuite; }
 	get error() { return this.errorNode; }
@@ -131,8 +130,6 @@ export class TestCollection {
 
 			this.explorer.testRunStarted();
 
-			this.collectionChangedWhileRunning = false;
-
 		} else if (testRunEvent.type === 'finished') {
 
 			if (this.allRunningTests) {
@@ -146,10 +143,7 @@ export class TestCollection {
 
 			this.explorer.testRunFinished();
 
-			if (this.collectionChangedWhileRunning) {
-				this.collectionChangedWhileRunning = false;
-				this.computeCodeLenses();
-			}
+			this.computeCodeLenses();
 
 		} else if (testRunEvent.type === 'suite') {
 
@@ -166,7 +160,6 @@ export class TestCollection {
 					this.runningSuite.children.push(testSuiteNode);
 					this.runningSuite.neededUpdates = 'recalc';
 					this.nodesById.set(suiteId, testSuiteNode);
-					this.collectionChangedWhileRunning = true;
 
 				}
 
@@ -195,7 +188,6 @@ export class TestCollection {
 				this.runningSuite.children.push(testNode);
 				this.runningSuite.neededUpdates = 'recalc';
 				this.nodesById.set(testId, testNode);
-				this.collectionChangedWhileRunning = true;
 
 			}
 
@@ -253,6 +245,7 @@ export class TestCollection {
 		}
 
 		this.sendNodeChangedEvents();
+		this.computeCodeLenses();
 	}
 
 	setAutorun(node: TreeNode | undefined): void {
@@ -326,6 +319,10 @@ export class TestCollection {
 					for (const [ line, lineLocatedNodes ] of fileLocatedNodes) {
 						fileCodeLenses.push(createRunCodeLens(line, lineLocatedNodes));
 						fileCodeLenses.push(createDebugCodeLens(line, lineLocatedNodes));
+						if (lineLocatedNodes.some(node => (node.log !== undefined) && (node.log.length > 0))) {
+							fileCodeLenses.push(createLogCodeLens(line, lineLocatedNodes));
+						}
+						fileCodeLenses.push(createRevealCodeLens(line, lineLocatedNodes));
 					}
 
 					this.codeLenses.set(file, fileCodeLenses);
