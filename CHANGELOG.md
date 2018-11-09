@@ -1,3 +1,6 @@
+### Version 2.2.0
+* add CodeLenses for showing a test's log and revealing the test in the explorer
+
 ### Version 2.1.0
 * remember if a test was skipped dynamically (while running the test) and don't reset its state when reloading the tests
 
