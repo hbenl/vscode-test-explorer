@@ -28,6 +28,8 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	// the number of adapters that are running tests
 	private runningCount = 0;
 
+	private lastTestRun?: [ TestCollection, string[] ];
+
 	constructor(
 		context: vscode.ExtensionContext
 	) {
@@ -106,10 +108,13 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 	async run(nodes?: TreeNode[]): Promise<void> {
 
+		this.lastTestRun = undefined;
+
 		if (nodes) {
 
 			const node = await pickNode(nodes);
 			if (node) {
+				this.lastTestRun = [ node.collection, [ node.info.id ] ];
 				node.collection.adapter.run([ node.info.id ]);
 			}
 
@@ -123,12 +128,26 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		}
 	}
 
+	rerun(): Promise<void> {
+
+		if (this.lastTestRun) {
+			const collection = this.lastTestRun[0];
+			const testIds = this.lastTestRun[1];
+			return collection.adapter.run(testIds);
+		}
+
+		return Promise.resolve();
+	}
+
 	async debug(nodes: TreeNode[]): Promise<void> {
+
+		this.lastTestRun = undefined;
 
 		const node = await pickNode(nodes);
 		if (node) {
 			try {
 
+				this.lastTestRun = [ node.collection, [ node.info.id ] ];
 				await node.collection.adapter.debug([ node.info.id ]);
 
 			} catch(e) {
@@ -136,6 +155,17 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 				return;
 			}
 		}
+	}
+
+	redebug(): Promise<void> {
+
+		if (this.lastTestRun) {
+			const collection = this.lastTestRun[0];
+			const testIds = this.lastTestRun[1];
+			return collection.adapter.debug(testIds);
+		}
+
+		return Promise.resolve();
 	}
 
 	cancel(): void {

@@ -149,6 +149,10 @@
         }
       },
       {
+        "command": "test-explorer.rerun",
+        "title": "Test Explorer: Repeat the last test run"
+      },
+      {
         "command": "test-explorer.run-file",
         "title": "Test Explorer: Run tests in current file"
       },
@@ -157,16 +161,20 @@
         "title": "Test Explorer: Run the test at the current cursor position"
       },
       {
-        "command": "test-explorer.debug-test-at-cursor",
-        "title": "Test Explorer: Debug the test at the current cursor position"
-      },
-      {
         "command": "test-explorer.debug",
         "title": "Debug this test",
         "icon": {
           "dark": "./icons/debug-dark.svg",
           "light": "./icons/debug-light.svg"
         }
+      },
+      {
+        "command": "test-explorer.redebug",
+        "title": "Test Explorer: Repeat the last test run in the debugger"
+      },
+      {
+        "command": "test-explorer.debug-test-at-cursor",
+        "title": "Test Explorer: Debug the test at the current cursor position"
       },
       {
         "command": "test-explorer.cancel",

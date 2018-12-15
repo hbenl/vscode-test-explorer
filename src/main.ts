@@ -30,15 +30,19 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	registerCommand('test-explorer.run', (...nodes) => testExplorer.run(nodes));
 
+	registerCommand('test-explorer.rerun', () => testExplorer.rerun());
+
 	registerCommand('test-explorer.run-file', (file?: string) => runTestsInFile(file, testExplorer));
 
 	registerCommand('test-explorer.run-test-at-cursor', () => runTestAtCursor(testExplorer));
 
-	registerCommand('test-explorer.debug-test-at-cursor', () => debugTestAtCursor(testExplorer));
-
 	registerCommand('test-explorer.cancel', () => testExplorer.cancel());
 
 	registerCommand('test-explorer.debug', (...nodes) => testExplorer.debug(nodes));
+
+	registerCommand('test-explorer.redebug', () => testExplorer.redebug());
+
+	registerCommand('test-explorer.debug-test-at-cursor', () => debugTestAtCursor(testExplorer));
 
 	registerCommand('test-explorer.show-error', (message) => testExplorer.showError(message));
 
