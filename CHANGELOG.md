@@ -1,3 +1,6 @@
+### Version 2.3.0
+* add commands for repeating the last test run
+
 ### Version 2.2.0
 * add CodeLenses for showing a test's log and revealing the test in the explorer
 
