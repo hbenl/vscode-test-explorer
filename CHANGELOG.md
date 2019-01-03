@@ -1,3 +1,6 @@
+### Version 2.3.1
+* update list of test adapters in README.md
+
 ### Version 2.3.0
 * add commands for repeating the last test run
 
