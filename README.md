@@ -29,6 +29,7 @@ Currently the following Test Adapters are available:
 
 * [Google Test Explorer](https://marketplace.visualstudio.com/items?itemName=OpenNingia.vscode-google-test-adapter)
 * [Catch2 and Google Test Explorer](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)
+* [CppUnitTestFramework Explorer](https://marketplace.visualstudio.com/items?itemName=drleq.vscode-cpputf-test-adapter)
 
 ### Python
 
@@ -37,6 +38,10 @@ Currently the following Test Adapters are available:
 ### Rust
 
 * [Rust Test Explorer](https://marketplace.visualstudio.com/items?itemName=swellaby.vscode-rust-test-adapter)
+
+### .NET Framework
+
+* [NXunit Test Explorer](https://marketplace.visualstudio.com/items?itemName=wghats.vscode-nxunit-test-adapter)
 
 ### Live Share
 
