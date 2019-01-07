@@ -169,6 +169,16 @@ export class TestCollection {
 
 			} else { // testStateMessage.state === 'completed'
 
+				const suiteId = (typeof testRunEvent.suite === 'object') ? testRunEvent.suite.id : testRunEvent.suite;
+				const suiteNode = this.nodesById.get(suiteId);
+				if (suiteNode) {
+					for (const testNode of allTests(suiteNode)) {
+						if ((testNode.state.current === 'scheduled') || (testNode.state.current === 'running')) {
+							testNode.setCurrentState('pending');
+						}
+					}
+				}
+
 				if (this.runningSuite) {
 					this.runningSuite = this.runningSuite.parent;
 				}
