@@ -1,3 +1,6 @@
+### Version 2.3.2
+* clean up states of tests that were not run after receiving the completed event for the suite containing them
+
 ### Version 2.3.1
 * update list of test adapters in README.md
 
