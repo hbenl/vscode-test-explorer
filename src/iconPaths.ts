@@ -18,6 +18,9 @@ export class IconPaths {
 	passedFaintAutorun: IconPath;
 	failedFaintAutorun: IconPath;
 	skipped: IconPath;
+	duplicate: IconPath;
+	errored: IconPath;
+	erroredFaint: IconPath;
 
 	constructor(context: ExtensionContext) {
 		this.pending = context.asAbsolutePath('icons/pending.svg');
@@ -49,5 +52,8 @@ export class IconPaths {
 			light: context.asAbsolutePath('icons/failed-faint-autorun-light.svg')
 		};
 		this.skipped = context.asAbsolutePath('icons/skipped.svg');
+		this.duplicate = context.asAbsolutePath('icons/duplicate.svg');
+		this.errored = context.asAbsolutePath('icons/errored.svg');
+		this.erroredFaint = context.asAbsolutePath('icons/errored-faint.svg');
 	}
 }

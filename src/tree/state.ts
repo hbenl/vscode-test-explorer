@@ -1,8 +1,9 @@
 import { TreeNode } from './treeNode';
 
-export type CurrentNodeState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed' | 'running-failed' | 'skipped' | 'always-skipped';
+export type CurrentNodeState = 'pending' | 'scheduled' | 'running' | 'passed' | 'failed' | 'running-failed' |
+	'skipped' | 'always-skipped' | 'duplicate' | 'errored';
 
-export type PreviousNodeState = 'pending' | 'passed' | 'failed' | 'skipped' | 'always-skipped';
+export type PreviousNodeState = 'pending' | 'passed' | 'failed' | 'skipped' | 'always-skipped' | 'duplicate' | 'errored';
 
 export interface NodeState {
 	current: CurrentNodeState,
@@ -46,7 +47,7 @@ export function parentCurrentNodeState(children: TreeNode[]): CurrentNodeState {
 
 	} else if (children.some((child) => (child.state.current === 'running'))) {
 
-		if (children.some((child) => child.state.current.endsWith('failed'))) {
+		if (children.some((child) => child.state.current.endsWith('failed') || (child.state.current === 'errored'))) {
 
 			return 'running-failed';
 
@@ -58,7 +59,7 @@ export function parentCurrentNodeState(children: TreeNode[]): CurrentNodeState {
 
 	} else if (children.some((child) => (child.state.current === 'scheduled'))) {
 
-		if (children.some((child) => child.state.current.endsWith('failed'))) {
+		if (children.some((child) => child.state.current.endsWith('failed') || (child.state.current === 'errored'))) {
 
 			return 'running-failed';
 
@@ -76,17 +77,21 @@ export function parentCurrentNodeState(children: TreeNode[]): CurrentNodeState {
 
 		return 'running-failed';
 
+	} else if (children.some((child) => (child.state.current === 'errored'))) {
+
+		return 'errored';
+
 	} else if (children.some((child) => (child.state.current === 'failed'))) {
 
 		return 'failed';
 
-	} else if (children.some((child) => (child.state.current === 'pending'))) {
+	} else if (children.some((child) => (child.state.current === 'passed'))) {
 
-		return 'pending';
+		return 'passed';
 
 	} else {
 
-		return 'passed';
+		return 'pending';
 
 	}
 }
@@ -109,17 +114,21 @@ export function parentPreviousNodeState(children: TreeNode[]): PreviousNodeState
 
 		}
 
+	} else if (children.some((child) => (child.state.previous === 'errored'))) {
+
+		return 'errored';
+
 	} else if (children.some((child) => (child.state.previous === 'failed'))) {
 
 		return 'failed';
 
-	} else if (children.some((child) => (child.state.previous === 'pending'))) {
+	} else if (children.some((child) => (child.state.previous === 'passed'))) {
 
-		return 'pending';
+		return 'passed';
 
 	} else {
 
-		return 'passed';
+		return 'pending';
 
 	}
 }
@@ -130,7 +139,8 @@ export function parentAutorunFlag(children: TreeNode[]): boolean {
 
 export type StateIconType = 'pending' | 'pendingAutorun' | 'scheduled' | 'running' |
 	'runningFailed' | 'passed' | 'passedAutorun' | 'failed' | 'failedAutorun' | 'skipped' |
-	'passedFaint' | 'passedFaintAutorun' | 'failedFaint' | 'failedFaintAutorun';
+	'passedFaint' | 'passedFaintAutorun' | 'failedFaint' | 'failedFaintAutorun'  |
+	'duplicate' | 'errored' | 'erroredFaint';
 
 export function stateIcon(state: NodeState): StateIconType {
 
@@ -161,6 +171,14 @@ export function stateIcon(state: NodeState): StateIconType {
 
 			return 'skipped';
 
+		case 'duplicate':
+
+			return 'duplicate';
+
+		case 'errored':
+
+			return 'errored';
+
 		default:
 
 			switch (state.previous) {
@@ -175,9 +193,17 @@ export function stateIcon(state: NodeState): StateIconType {
 
 				case 'skipped':
 				case 'always-skipped':
-		
+
 					return 'skipped';
-			
+
+				case 'duplicate':
+
+					return 'duplicate';
+
+				case 'errored':
+
+					return 'erroredFaint';
+
 				default:
 
 					return state.autorun ? 'pendingAutorun' : 'pending';
