@@ -1,3 +1,7 @@
+### Version 2.4.0
+* handle multiple tests with the same ID
+* new test state for tests that the adapter failed to run
+
 ### Version 2.3.2
 * clean up states of tests that were not run after receiving the completed event for the suite containing them
 
