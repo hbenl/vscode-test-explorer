@@ -37,14 +37,14 @@
     "escape-string-regexp": "^1.0.5",
     "fs-extra": "^7.0.1",
     "tslib": "^1.9.3",
-    "vscode-test-adapter-api": "^1.1.0"
+    "vscode-test-adapter-api": "^1.2.0"
   },
   "devDependencies": {
     "@types/escape-string-regexp": "1.0.0",
     "@types/fs-extra": "^5.0.4",
-    "typescript": "^3.2.2",
-    "vsce": "^1.53.2",
-    "vscode": "^1.1.26"
+    "typescript": "^3.2.4",
+    "vsce": "^1.54.0",
+    "vscode": "^1.1.28"
   },
   "engines": {
     "vscode": "^1.23.0"
