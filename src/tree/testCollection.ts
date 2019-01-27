@@ -17,6 +17,7 @@ export class TestCollection {
 	private runningSuite: TestSuiteNode | undefined;
 	private _autorunNode: TreeNode | undefined;
 	private readonly nodesById = new Map<string, TreeNode>();
+	private readonly idCount = new Map<string, number>();
 	private readonly locatedNodes = new Map<string, Map<number, TreeNode[]>>();
 	private readonly codeLenses = new Map<string, vscode.CodeLens[]>();
 
@@ -86,10 +87,7 @@ export class TestCollection {
 				}
 			}
 
-			this.nodesById.clear();
-			if (this.rootSuite) {
-				this.collectNodesById(this.rootSuite);
-			}
+			this.collectNodesById();
 
 			if (this._autorunNode) {
 				const newAutorunNode = this.nodesById.get(this._autorunNode.info.id);
@@ -364,12 +362,47 @@ export class TestCollection {
 		return vscode.workspace.getConfiguration('testExplorer', workspaceUri);
 	}
 
-	private collectNodesById(node: TreeNode): void {
+	private collectNodesById(): void {
 
-		this.nodesById.set(node.info.id, node);
+		this.nodesById.clear();
+		this.idCount.clear();
+
+		if (this.rootSuite !== undefined) {
+			this.collectNodesByIdRec(this.rootSuite);
+		}
+	}
+
+	private collectNodesByIdRec(node: TreeNode): void {
+
+		if (!this.idCount.get(node.info.id)) {
+
+			node.uniqueId = `${node.info.id}_1`;
+			this.nodesById.set(node.info.id, node);
+			this.idCount.set(node.info.id, 1);
+
+		} else {
+
+			const count = this.idCount.get(node.info.id)! + 1;
+			node.uniqueId = `${node.info.id}_${count}`;
+			this.idCount.set(node.info.id, count);
+
+			const errorMessage = 'There are multiple tests with the same ID, Test Explorer will not be able to show test results for these tests.';
+
+			if (node instanceof TestNode) {
+				node.setCurrentState('duplicate', errorMessage);
+			}
+
+			const otherNode = this.nodesById.get(node.info.id);
+			if (otherNode) {
+				this.nodesById.delete(node.info.id);
+				if (otherNode instanceof TestNode) {
+					otherNode.setCurrentState('duplicate', errorMessage);
+				}
+			}
+		}
 
 		for (const child of node.children) {
-			this.collectNodesById(child);
+			this.collectNodesByIdRec(child);
 		}
 	}
 

@@ -8,6 +8,7 @@ export type TreeNodeUpdates = 'none' | 'send' | 'recalc';
 
 export interface TreeNode {
 	readonly info: TestSuiteInfo | TestInfo;
+	uniqueId: string;
 	readonly state: NodeState;
 	neededUpdates: TreeNodeUpdates;
 	readonly log: string | undefined;

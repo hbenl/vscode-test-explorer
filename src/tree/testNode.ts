@@ -11,6 +11,7 @@ export class TestNode implements TreeNode {
 	private _log: string = "";
 	private _decorations: TestDecoration[] = [];
 
+	uniqueId: string;
 	get state(): NodeState { return this._state; }
 	neededUpdates: 'none' | 'send' = 'none';
 	get log(): string { return this._log; }
@@ -30,14 +31,14 @@ export class TestNode implements TreeNode {
 			let currentState = oldNode.state.current;
 			if (info.skipped) {
 				currentState = 'always-skipped';
-			} else if (currentState === 'always-skipped') {
+			} else if ((currentState === 'always-skipped') || (currentState === 'duplicate')) {
 				currentState = 'pending';
 			}
 
 			let previousState = oldNode.state.previous;
 			if (info.skipped) {
 				previousState = 'always-skipped';
-			} else if (previousState === 'always-skipped') {
+			} else if ((previousState === 'always-skipped') || (previousState === 'duplicate')) {
 				previousState = 'pending';
 			}
 
@@ -65,6 +66,7 @@ export class TestNode implements TreeNode {
 		this.state.current = currentState;
 
 		if ((currentState === 'passed') || (currentState === 'failed') ||
+			(currentState === 'duplicate') || (currentState === 'errored') ||
 			((currentState === 'skipped') && (this.state.previous !== 'always-skipped'))) {
 			this.state.previous = currentState;
 		}
@@ -96,7 +98,8 @@ export class TestNode implements TreeNode {
 
 	retireState(): void {
 
-		if ((this.state.current === 'passed') || (this.state.current === 'failed') || (this.state.current === 'skipped')) {
+		if ((this.state.current === 'passed') || (this.state.current === 'failed') ||
+			(this.state.current === 'skipped') || (this.state.current === 'errored')) {
 
 			this._state.current = 'pending';
 			this.neededUpdates = 'send';
@@ -111,12 +114,12 @@ export class TestNode implements TreeNode {
 
 		this._log = "";
 
-		if ((this.state.current !== 'pending') && (this.state.current !== 'always-skipped')) {
+		if ((this.state.current !== 'pending') && (this.state.current !== 'always-skipped') && (this.state.current !== 'duplicate')) {
 			this._state.current = 'pending';
 			this.neededUpdates = 'send';
 		}
 
-		if ((this.state.previous !== 'pending') && (this.state.previous !== 'always-skipped')) {
+		if ((this.state.previous !== 'pending') && (this.state.previous !== 'always-skipped') && (this.state.previous !== 'duplicate')) {
 			this._state.previous = 'pending';
 			this.neededUpdates = 'send';
 		}
@@ -141,7 +144,7 @@ export class TestNode implements TreeNode {
 		this.neededUpdates = 'none';
 
 		const treeItem = new vscode.TreeItem(this.info.label, vscode.TreeItemCollapsibleState.None);
-		treeItem.id = this.info.id;
+		treeItem.id = this.uniqueId;
 		treeItem.iconPath = this.collection.explorer.iconPaths[stateIcon(this.state)];
 		treeItem.contextValue = this.info.file ? 'testWithSource' : 'test';
 		treeItem.command = {

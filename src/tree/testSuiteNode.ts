@@ -10,6 +10,7 @@ export class TestSuiteNode implements TreeNode {
 	private _state: NodeState;
 	private _children: TreeNode[];
 
+	uniqueId: string;
 	get state(): NodeState { return this._state; }
 	neededUpdates: TreeNodeUpdates = 'none';
 	readonly log = undefined;
@@ -112,7 +113,7 @@ export class TestSuiteNode implements TreeNode {
 		}
 
 		const treeItem = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.Collapsed);
-		treeItem.id = this.info.id;
+		treeItem.id = this.uniqueId;
 		treeItem.iconPath = this.collection.explorer.iconPaths[stateIcon(this.state)];
 		treeItem.contextValue = this.parent ? (this.info.file ? 'suiteWithSource' : 'suite') : 'collection';
 
