@@ -31,6 +31,10 @@ Currently the following Test Adapters are available:
 * [Catch2 and Google Test Explorer](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)
 * [CppUnitTestFramework Explorer](https://marketplace.visualstudio.com/items?itemName=drleq.vscode-cpputf-test-adapter)
 
+### Haxe
+
+* [Haxe Test Explorer](https://marketplace.visualstudio.com/items?itemName=vshaxe.haxe-test-adapter)
+
 ### Python
 
 * [Python Test Explorer](https://marketplace.visualstudio.com/items?itemName=LittleFoxTeam.vscode-python-test-adapter)
