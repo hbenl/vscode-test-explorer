@@ -1,3 +1,7 @@
+### Version 2.4.1
+* ensure that the IDs of nodes from different adapters never clash
+* ensure that the filenames from the adapters match the file URIs we get from VS Code
+
 ### Version 2.4.0
 * handle multiple tests with the same ID
 * new test state for tests that the adapter failed to run
