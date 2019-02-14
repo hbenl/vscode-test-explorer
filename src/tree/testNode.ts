@@ -4,6 +4,7 @@ import { TreeNode } from "./treeNode";
 import { NodeState, stateIcon, CurrentNodeState, defaultState } from "./state";
 import { TestSuiteNode } from './testSuiteNode';
 import { TestCollection } from './testCollection';
+import { normalizeFilename } from '../util';
 
 export class TestNode implements TreeNode {
 
@@ -11,6 +12,7 @@ export class TestNode implements TreeNode {
 	private _log: string = "";
 	private _decorations: TestDecoration[] = [];
 
+	readonly fileUri: string | undefined;
 	uniqueId: string;
 	get state(): NodeState { return this._state; }
 	neededUpdates: 'none' | 'send' = 'none';
@@ -24,6 +26,8 @@ export class TestNode implements TreeNode {
 		public readonly parent: TestSuiteNode,
 		oldNodesById?: Map<string, TreeNode>
 	) {
+
+		this.fileUri = normalizeFilename(info.file);
 
 		const oldNode = oldNodesById ? oldNodesById.get(info.id) : undefined;
 		if (oldNode && (oldNode.info.type === 'test')) {
@@ -91,8 +95,8 @@ export class TestNode implements TreeNode {
 
 		this.collection.sendNodeChangedEvents();
 
-		if (this.info.file) {
-			this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
+		if (this.fileUri) {
+			this.collection.explorer.decorator.updateDecorationsFor(this.fileUri);
 		}
 	}
 
@@ -104,8 +108,8 @@ export class TestNode implements TreeNode {
 			this._state.current = 'pending';
 			this.neededUpdates = 'send';
 
-			if (this.info.file) {
-				this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
+			if (this.fileUri) {
+				this.collection.explorer.decorator.updateDecorationsFor(this.fileUri);
 			}
 		}
 	}
@@ -128,8 +132,8 @@ export class TestNode implements TreeNode {
 
 			this._decorations = [];
 
-			if (this.info.file) {
-				this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
+			if (this.fileUri) {
+				this.collection.explorer.decorator.updateDecorationsFor(this.fileUri);
 			}
 		}
 	}
@@ -146,7 +150,7 @@ export class TestNode implements TreeNode {
 		const treeItem = new vscode.TreeItem(this.info.label, vscode.TreeItemCollapsibleState.None);
 		treeItem.id = this.uniqueId;
 		treeItem.iconPath = this.collection.explorer.iconPaths[stateIcon(this.state)];
-		treeItem.contextValue = this.info.file ? 'testWithSource' : 'test';
+		treeItem.contextValue = this.fileUri ? 'testWithSource' : 'test';
 		treeItem.command = {
 			title: '',
 			command: 'test-explorer.show-error',

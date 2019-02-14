@@ -346,12 +346,12 @@ export class TestCollection {
 		this.explorer.codeLensesChanged.fire();
 	}
 
-	getCodeLenses(file: string): vscode.CodeLens[] {
-		return this.codeLenses.get(file) || [];
+	getCodeLenses(fileUri: string): vscode.CodeLens[] {
+		return this.codeLenses.get(fileUri) || [];
 	}
 
-	getLocatedNodes(file: string): Map<number, TreeNode[]> | undefined {
-		return this.locatedNodes.get(file);
+	getLocatedNodes(fileUri: string): Map<number, TreeNode[]> | undefined {
+		return this.locatedNodes.get(fileUri);
 	}
 
 	dispose(): void {
@@ -426,12 +426,12 @@ export class TestCollection {
 
 	private addLocatedNode(node: TreeNode): void {
 
-		if ((node.info.file === undefined) || (node.info.line === undefined)) return;
+		if ((node.fileUri === undefined) || (node.info.line === undefined)) return;
 
-		let fileLocatedNodes = this.locatedNodes.get(node.info.file);
+		let fileLocatedNodes = this.locatedNodes.get(node.fileUri);
 		if (!fileLocatedNodes) {
 			fileLocatedNodes = new Map<number, TreeNode[]>()
-			this.locatedNodes.set(node.info.file, fileLocatedNodes);
+			this.locatedNodes.set(node.fileUri, fileLocatedNodes);
 		}
 
 		let lineLocatedNodes = fileLocatedNodes.get(node.info.line);

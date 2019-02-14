@@ -4,12 +4,14 @@ import { TreeNode, TreeNodeUpdates } from "./treeNode";
 import { NodeState, stateIcon, parentNodeState, parentCurrentNodeState, parentPreviousNodeState, parentAutorunFlag } from "./state";
 import { TestCollection } from './testCollection';
 import { TestNode } from './testNode';
+import { normalizeFilename } from '../util';
 
 export class TestSuiteNode implements TreeNode {
 
 	private _state: NodeState;
 	private _children: TreeNode[];
 
+	readonly fileUri: string | undefined;
 	uniqueId: string;
 	get state(): NodeState { return this._state; }
 	neededUpdates: TreeNodeUpdates = 'none';
@@ -22,6 +24,8 @@ export class TestSuiteNode implements TreeNode {
 		public readonly parent: TestSuiteNode | undefined,
 		oldNodesById?: Map<string, TreeNode>
 	) {
+
+		this.fileUri = normalizeFilename(info.file);
 
 		this._children = info.children.map(childInfo => {
 			if (childInfo.type === 'test') {
@@ -60,8 +64,8 @@ export class TestSuiteNode implements TreeNode {
 				if (this.parent) {
 					this.parent.neededUpdates = 'recalc';
 				}
-				if (this.info.file) {
-					this.collection.explorer.decorator.updateDecorationsFor(this.info.file);
+				if (this.fileUri) {
+					this.collection.explorer.decorator.updateDecorationsFor(this.fileUri);
 				}
 		
 			} else {
@@ -115,7 +119,7 @@ export class TestSuiteNode implements TreeNode {
 		const treeItem = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.Collapsed);
 		treeItem.id = this.uniqueId;
 		treeItem.iconPath = this.collection.explorer.iconPaths[stateIcon(this.state)];
-		treeItem.contextValue = this.parent ? (this.info.file ? 'suiteWithSource' : 'suite') : 'collection';
+		treeItem.contextValue = this.parent ? (this.fileUri ? 'suiteWithSource' : 'suite') : 'collection';
 
 		return treeItem;
 	}

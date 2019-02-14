@@ -14,16 +14,16 @@ export function* allTests(treeNode: TreeNode): IterableIterator<TestNode> {
 	}
 }
 
-export function runTestsInFile(file: string | undefined, testExplorer: TestExplorer): void {
+export function runTestsInFile(fileUri: string | undefined, testExplorer: TestExplorer): void {
 
-	if (!file && vscode.window.activeTextEditor) {
-		file = uriToFile(vscode.window.activeTextEditor.document.uri);
+	if (!fileUri && vscode.window.activeTextEditor) {
+		fileUri = vscode.window.activeTextEditor.document.uri.toString();
 	}
 
-	if (file) {
+	if (fileUri) {
 		for (const collection of testExplorer.collections) {
 			if (collection.suite) {
-				const found = findFileNode(file, collection.suite);
+				const found = findFileNode(fileUri, collection.suite);
 				if (found) {
 					testExplorer.run([ found ]);
 					return;
@@ -33,11 +33,11 @@ export function runTestsInFile(file: string | undefined, testExplorer: TestExplo
 	}
 }
 
-function findFileNode(file: string, searchNode: TreeNode): TreeNode | undefined {
+function findFileNode(fileUri: string, searchNode: TreeNode): TreeNode | undefined {
 
-	if (searchNode.info.file) {
+	if (searchNode.fileUri) {
 
-		if (searchNode.info.file === file) {
+		if (searchNode.fileUri === fileUri) {
 			return searchNode;
 		} else {
 			return undefined;
@@ -46,7 +46,7 @@ function findFileNode(file: string, searchNode: TreeNode): TreeNode | undefined 
 	} else {
 
 		for (const childNode of searchNode.children) {
-			const found = findFileNode(file, childNode);
+			const found = findFileNode(fileUri, childNode);
 			if (found) {
 				return found;
 			}
@@ -62,7 +62,7 @@ export function runTestAtCursor(testExplorer: TestExplorer): void {
 	if (editor) {
 
 		const nodes = findNodesLocatedAboveCursor(
-			uriToFile(editor.document.uri),
+			editor.document.uri.toString(),
 			editor.selection.active.line,
 			testExplorer
 		);
@@ -79,7 +79,7 @@ export function debugTestAtCursor(testExplorer: TestExplorer): void {
 	if (editor) {
 
 		const nodes = findNodesLocatedAboveCursor(
-			uriToFile(editor.document.uri),
+			editor.document.uri.toString(),
 			editor.selection.active.line,
 			testExplorer
 		);
@@ -90,14 +90,14 @@ export function debugTestAtCursor(testExplorer: TestExplorer): void {
 	}
 }
 
-function findNodesLocatedAboveCursor(file: string, cursorLine: number, testExplorer: TestExplorer): TreeNode[] {
+function findNodesLocatedAboveCursor(fileUri: string, cursorLine: number, testExplorer: TestExplorer): TreeNode[] {
 
 	let currentLine = -1;
 	let currentNodes: TreeNode[] = [];
 
 	for (const collection of testExplorer.collections) {
 
-		const locatedNodes = collection.getLocatedNodes(file);
+		const locatedNodes = collection.getLocatedNodes(fileUri);
 		if (locatedNodes) {
 			
 			for (const line of locatedNodes.keys()) {
@@ -199,18 +199,12 @@ export function createRevealCodeLens(line: number, nodes: TreeNode[]): vscode.Co
 }
 
 const schemeMatcher = /^[a-z][a-z0-9+-.]+:/;
-export function fileToUri(file: string): vscode.Uri {
-	if (schemeMatcher.test(file)) {
-		return vscode.Uri.parse(file);
-	} else {
-		return vscode.Uri.file(file);
-	}
-}
+export function normalizeFilename(file: string | undefined): string | undefined {
+	if (file === undefined) return undefined;
 
-export function uriToFile(uri: vscode.Uri): string {
-	if (uri.scheme === 'file') {
-		return uri.fsPath;
+	if (schemeMatcher.test(file)) {
+		return vscode.Uri.parse(file).toString();
 	} else {
-		return uri.toString();
+		return vscode.Uri.file(file).toString();
 	}
 }

@@ -3,7 +3,7 @@ import { TestExplorer } from './testExplorer';
 import { stateIcon, parentNodeState, StateIconType } from './tree/state';
 import { StateDecorationTypes } from './stateDecorationTypes';
 import { TestCollection } from './tree/testCollection';
-import { allTests, uriToFile } from './util';
+import { allTests } from './util';
 
 export class Decorator {
 
@@ -34,10 +34,10 @@ export class Decorator {
 		this.activeTextEditor = vscode.window.activeTextEditor;
 	}
 
-	updateDecorationsFor(file: string): void {
+	updateDecorationsFor(fileUri: string): void {
 
 		if (!this.timeout && this.activeTextEditor &&
-			(uriToFile(this.activeTextEditor.document.uri) === file)) {
+			(this.activeTextEditor.document.uri.toString() === fileUri)) {
 
 			this.timeout = setTimeout(() => this.updateDecorationsNow(), 200);
 		}
@@ -47,7 +47,7 @@ export class Decorator {
 		this.timeout = undefined;
 		if (!this.activeTextEditor) return;
 
-		const file = uriToFile(this.activeTextEditor.document.uri);
+		const fileUri = this.activeTextEditor.document.uri.toString();
 
 		const decorations = new Map<vscode.TextEditorDecorationType, vscode.DecorationOptions[]>();
 		for (const decorationType of this.stateDecorationTypes.all) {
@@ -56,8 +56,8 @@ export class Decorator {
 		decorations.set(this.errorDecorationType, []);
 
 		for (const collection of this.testExplorer.collections) {
-			this.addStateDecorations(collection, file, decorations);
-			this.addErrorDecorations(collection, file, decorations);
+			this.addStateDecorations(collection, fileUri, decorations);
+			this.addErrorDecorations(collection, fileUri, decorations);
 		}
 
 		for (const [ decorationType, decorationOptions ] of decorations) {
@@ -67,12 +67,12 @@ export class Decorator {
 
 	private addStateDecorations(
 		collection: TestCollection,
-		file: string,
+		fileUri: string,
 		decorations: Map<vscode.TextEditorDecorationType, vscode.DecorationOptions[]>
 	): void {
 
 		if (collection.shouldShowGutterDecoration()) {
-			const locatedNodes = collection.getLocatedNodes(file);
+			const locatedNodes = collection.getLocatedNodes(fileUri);
 			if (locatedNodes) {
 				for (const [ line, treeNodes ] of locatedNodes) {
 
@@ -94,13 +94,13 @@ export class Decorator {
 
 	private addErrorDecorations(
 		collection: TestCollection,
-		file: string,
+		fileUri: string,
 		decorations: Map<vscode.TextEditorDecorationType, vscode.DecorationOptions[]>
 	): void {
 
 		if (collection.shouldShowErrorDecoration() && collection.suite) {
 			for (const testNode of allTests(collection.suite)) {
-				if (testNode.info.file === file) {
+				if (testNode.fileUri === fileUri) {
 					for (const decoration of testNode.decorations) {
 						decorations.get(this.errorDecorationType)!.push({
 							range: new vscode.Range(decoration.line, 0, decoration.line, 0),
