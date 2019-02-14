@@ -9,8 +9,11 @@ import { allTests, createRunCodeLens, createDebugCodeLens, createRevealCodeLens,
 
 export class TestCollection {
 
+	private static nextCollectionId = 1;
+
 	private disposables: vscode.Disposable[] = [];
 
+	private id: number;
 	private rootSuite: TestSuiteNode | undefined;
 	private errorNode: ErrorNode | undefined;
 	private allRunningTests: TestNode[] | undefined;
@@ -29,6 +32,8 @@ export class TestCollection {
 		public readonly adapter: TestAdapter,
 		public readonly explorer: TestExplorer
 	) {
+
+		this.id = TestCollection.nextCollectionId++;
 
 		const workspaceUri = adapter.workspaceFolder ? adapter.workspaceFolder.uri : undefined;
 
@@ -376,14 +381,14 @@ export class TestCollection {
 
 		if (!this.idCount.get(node.info.id)) {
 
-			node.uniqueId = `${node.info.id}_1`;
+			node.uniqueId = `${this.id}:${node.info.id}_1`;
 			this.nodesById.set(node.info.id, node);
 			this.idCount.set(node.info.id, 1);
 
 		} else {
 
 			const count = this.idCount.get(node.info.id)! + 1;
-			node.uniqueId = `${node.info.id}_${count}`;
+			node.uniqueId = `${this.id}:${node.info.id}_${count}`;
 			this.idCount.set(node.info.id, count);
 
 			const errorMessage = 'There are multiple tests with the same ID, Test Explorer will not be able to show test results for these tests.';
