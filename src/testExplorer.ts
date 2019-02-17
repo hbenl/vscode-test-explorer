@@ -144,7 +144,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		this.lastTestRun = undefined;
 
 		const node = await pickNode(nodes);
-		if (node) {
+		if (node && node.collection.adapter.debug) {
 			try {
 
 				this.lastTestRun = [ node.collection, [ node.info.id ] ];
@@ -162,7 +162,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		if (this.lastTestRun) {
 			const collection = this.lastTestRun[0];
 			const testIds = this.lastTestRun[1];
-			return collection.adapter.debug(testIds);
+			return collection.adapter.debug!(testIds);
 		}
 
 		return Promise.resolve();

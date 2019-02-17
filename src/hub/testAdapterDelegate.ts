@@ -12,6 +12,10 @@ export class TestAdapterDelegate implements TestAdapter {
 		readonly controller: TestController
 	) {
 		this.disposables.push(this.testsEmitter);
+
+		if (adapter.debug) {
+			this.debug = tests => adapter.debug!(tests);
+		}
 	}
 
 	get workspaceFolder(): vscode.WorkspaceFolder | undefined {
@@ -26,9 +30,7 @@ export class TestAdapterDelegate implements TestAdapter {
 		return this.adapter.run(tests);
 	}
 
-	debug(tests: string[]): Promise<void> {
-		return this.adapter.debug(tests);
-	}
+	debug?: (tests: string[]) => Promise<void>;
 
 	cancel(): void {
 		this.adapter.cancel();
