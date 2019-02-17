@@ -1,3 +1,6 @@
+### Version 2.5.0
+* make TestAdapter#debug optional and don't show menu items and code lenses for debugging if TestAdapter#debug isn't defined
+
 ### Version 2.4.1
 * ensure that the IDs of nodes from different adapters never clash
 * ensure that the filenames from the adapters match the file URIs we get from VS Code
