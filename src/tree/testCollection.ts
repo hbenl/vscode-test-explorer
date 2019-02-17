@@ -330,11 +330,17 @@ export class TestCollection {
 					const fileCodeLenses: vscode.CodeLens[] = [];
 
 					for (const [ line, lineLocatedNodes ] of fileLocatedNodes) {
+
 						fileCodeLenses.push(createRunCodeLens(line, lineLocatedNodes));
-						fileCodeLenses.push(createDebugCodeLens(line, lineLocatedNodes));
+
+						if (this.adapter.debug) {
+							fileCodeLenses.push(createDebugCodeLens(line, lineLocatedNodes));
+						}
+
 						if (lineLocatedNodes.some(node => (node.log !== undefined) && (node.log.length > 0))) {
 							fileCodeLenses.push(createLogCodeLens(line, lineLocatedNodes));
 						}
+
 						fileCodeLenses.push(createRevealCodeLens(line, lineLocatedNodes));
 					}
 

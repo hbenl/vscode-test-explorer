@@ -150,7 +150,9 @@ export class TestNode implements TreeNode {
 		const treeItem = new vscode.TreeItem(this.info.label, vscode.TreeItemCollapsibleState.None);
 		treeItem.id = this.uniqueId;
 		treeItem.iconPath = this.collection.explorer.iconPaths[stateIcon(this.state)];
-		treeItem.contextValue = this.fileUri ? 'testWithSource' : 'test';
+		treeItem.contextValue = this.collection.adapter.debug ? 
+			(this.fileUri ? 'debuggableTestWithSource' : 'debuggableTest') :
+			(this.fileUri ? 'testWithSource' : 'test');
 		treeItem.command = {
 			title: '',
 			command: 'test-explorer.show-error',
