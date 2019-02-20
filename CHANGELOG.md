@@ -1,3 +1,6 @@
+### Version 2.6.0
+* add `testExplorer.orderingStrategy` with `orderByAlphabet` and `orderByLocation`
+
 ### Version 2.5.0
 * make TestAdapter#debug optional and don't show menu items and code lenses for debugging if TestAdapter#debug isn't defined
 

@@ -5,7 +5,7 @@
   "icon": "icon.png",
   "author": "Holger Benl <hbenl@evandor.de>",
   "publisher": "hbenl",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "license": "MIT",
   "homepage": "https://github.com/hbenl/vscode-test-explorer",
   "repository": {
@@ -99,6 +99,22 @@
           "description": "Show error messages from test failures as decorations in the editor",
           "type": "boolean",
           "default": true,
+          "scope": "resource"
+        },
+        "testExplorer.orderingStrategy": {
+          "description": "Set the suite and test ordering strategy",
+          "type": "string",
+          "default": "orderByAdapter",
+          "enum": [
+            "orderByAdapter",
+            "orderByAlphabet",
+            "orderByLocation"
+          ],
+          "enumDescriptions": [
+            "This is the default for compatibilty reasons. Orders as it gets from the adapter.",
+            "Suites and tests are ordered by their labels regardless of their type.",
+            "This is a special ordering strategy:\n 1. suites before tests;\n 2. suites ordered by label;\n 3. tests with file and line come before tests without file or line;\n 4. tests with file ordered by file and sub-ordered by line;"
+          ],
           "scope": "resource"
         }
       }

@@ -47,6 +47,10 @@ export class TestCollection {
 				configChange.affectsConfiguration('testExplorer.errorDecoration', workspaceUri)) {
 				this.explorer.decorator.updateDecorationsNow();
 			}
+
+			if (configChange.affectsConfiguration('testExplorer.orderingStrategy')) {
+				this.explorer.reload();
+			}
 		}));
 
 		this.disposables.push(adapter.tests(testLoadEvent => this.onTestLoadEvent(testLoadEvent)));
@@ -73,7 +77,7 @@ export class TestCollection {
 
 			if (testLoadEvent.suite) {
 
-				this.rootSuite = new TestSuiteNode(this, testLoadEvent.suite, undefined, this.nodesById);
+				this.rootSuite = new TestSuiteNode(this, testLoadEvent.suite, undefined, this.getOrderingStrategy(), this.nodesById);
 				this.errorNode = undefined;
 
 				if (this.shouldRetireStateOnReload()) {
@@ -159,7 +163,7 @@ export class TestCollection {
 				if (!testSuiteNode && this.runningSuite && (typeof testRunEvent.suite === 'object')) {
 
 					this.runningSuite.info.children.push(testRunEvent.suite);
-					testSuiteNode = new TestSuiteNode(this, testRunEvent.suite, this.runningSuite);
+					testSuiteNode = new TestSuiteNode(this, testRunEvent.suite, this.runningSuite, this.getOrderingStrategy());
 					this.runningSuite.children.push(testSuiteNode);
 					this.runningSuite.neededUpdates = 'recalc';
 					this.nodesById.set(suiteId, testSuiteNode);
@@ -312,6 +316,10 @@ export class TestCollection {
 
 	shouldShowErrorDecoration(): boolean {
 		return (this.getConfiguration().get('errorDecoration') !== false);
+	}
+
+	getOrderingStrategy(): 'orderByAdapter' | 'orderByAlphabet' | 'orderByLocation' {
+		return this.getConfiguration().get('orderingStrategy', 'orderByAdapter');
 	}
 
 	computeCodeLenses(): void {
