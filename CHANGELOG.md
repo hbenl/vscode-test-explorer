@@ -1,3 +1,7 @@
+### Version 2.6.0
+* add configuration option for sorting the tests and suites
+* add the ability for adapters to set tooltips for tests and suites
+
 ### Version 2.5.0
 * make TestAdapter#debug optional and don't show menu items and code lenses for debugging if TestAdapter#debug isn't defined
 
