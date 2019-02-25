@@ -27,7 +27,6 @@ Currently the following Test Adapters are available:
 
 ### C++
 
-* [Google Test Explorer](https://marketplace.visualstudio.com/items?itemName=OpenNingia.vscode-google-test-adapter)
 * [Catch2 and Google Test Explorer](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)
 * [CppUnitTestFramework Explorer](https://marketplace.visualstudio.com/items?itemName=drleq.vscode-cpputf-test-adapter)
 
