@@ -75,6 +75,7 @@ Property                        | Description
 `testExplorer.codeLens`         | Show a CodeLens above each test or suite for running or debugging the tests
 `testExplorer.gutterDecoration` | Show the state of each test in the editor using Gutter Decorations
 `testExplorer.errorDecoration`  | Show error messages from test failures as decorations in the editor
+`testExplorer.sort`             | Sort the tests and suites by label or location. If this is not set (or set to null), they will be shown in the order that they were received from the adapter
 
 Further configuration options are provided by the Test Adapters.
 

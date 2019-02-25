@@ -100,6 +100,29 @@
           "type": "boolean",
           "default": true,
           "scope": "resource"
+        },
+        "testExplorer.sort": {
+          "description": "Sort the tests and suites by label or location. If this is not set (or set to null), they will be shown in the order that they were received from the adapter",
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "byLabel",
+            "byLocation",
+            "byLabelWithSuitesFirst",
+            "byLocationWithSuitesFirst",
+            null
+          ],
+          "enumDescriptions": [
+            "sort by label",
+            "sort by location (filename and line), if multiple tests or suites appear at the same location, they are sorted by label",
+            "sort by label, but always put the suites on top",
+            "sort by location, but always put the suites on top",
+            "don't sort, the tests and suites will be shown in the order that they were received from the adapter"
+          ],
+          "default": null,
+          "scope": "resource"
         }
       }
     },

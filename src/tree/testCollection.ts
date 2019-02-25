@@ -6,6 +6,7 @@ import { TestExplorer } from '../testExplorer';
 import { TreeNode } from './treeNode';
 import { ErrorNode } from './errorNode';
 import { allTests, createRunCodeLens, createDebugCodeLens, createRevealCodeLens, createLogCodeLens } from '../util';
+import { SortSetting, getCompareFn } from './sort';
 
 export class TestCollection {
 
@@ -47,6 +48,28 @@ export class TestCollection {
 				configChange.affectsConfiguration('testExplorer.errorDecoration', workspaceUri)) {
 				this.explorer.decorator.updateDecorationsNow();
 			}
+
+			if (configChange.affectsConfiguration('testExplorer.sort', workspaceUri)) {
+				if (this.rootSuite) {
+
+					let compareFn = getCompareFn(this.getSortSetting());
+
+					if (!compareFn) {
+						// this will restore the "original" (as delivered by the adapter) sort order of the tests and suites
+						compareFn = (a: TreeNode, b: TreeNode) => {
+							if (a.parent) {
+								const siblings = a.parent.info.children;
+								return siblings.indexOf(a.info) - siblings.indexOf(b.info);
+							} else {
+								return 0;
+							}
+						}
+					}
+
+					this.sortRec(this.rootSuite, compareFn);
+					this.explorer.treeEvents.sendTreeChangedEvent();
+				}
+			}
 		}));
 
 		this.disposables.push(adapter.tests(testLoadEvent => this.onTestLoadEvent(testLoadEvent)));
@@ -82,6 +105,11 @@ export class TestCollection {
 					this.rootSuite.resetState();
 				}
 
+				const sortCompareFn = getCompareFn(this.getSortSetting());
+				if (sortCompareFn) {
+					this.sortRec(this.rootSuite, sortCompareFn);
+				}
+	
 			} else {
 
 				this.rootSuite = undefined;
@@ -314,6 +342,10 @@ export class TestCollection {
 		return (this.getConfiguration().get('errorDecoration') !== false);
 	}
 
+	getSortSetting(): SortSetting | undefined {
+		return this.getConfiguration().get('sort');
+	}
+
 	computeCodeLenses(): void {
 
 		this.codeLenses.clear();
@@ -371,6 +403,17 @@ export class TestCollection {
 		const workspaceFolder = this.adapter.workspaceFolder;
 		var workspaceUri = workspaceFolder ? workspaceFolder.uri : null;
 		return vscode.workspace.getConfiguration('testExplorer', workspaceUri);
+	}
+
+	private sortRec(suite: TestSuiteNode, compareFn: (a: TreeNode, b: TreeNode) => number): void {
+
+		suite.children.sort(compareFn);
+
+		for (const child of suite.children) {
+			if (child instanceof TestSuiteNode) {
+				this.sortRec(child, compareFn);
+			}
+		}
 	}
 
 	private collectNodesById(): void {
