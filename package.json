@@ -68,6 +68,12 @@
             "reset",
             null
           ],
+          "enumDescriptions": [
+            "Retire all test states whenever a test run is started",
+            "Reset all test states whenever a test run is started",
+            "Don't change the test states when a test run is started"
+          ],
+          "default": null,
           "scope": "resource"
         },
         "testExplorer.onReload": {
@@ -81,6 +87,12 @@
             "reset",
             null
           ],
+          "enumDescriptions": [
+            "Retire all test states whenever the test tree is reloaded",
+            "Reset all test states whenever the test tree is reloaded",
+            "Don't change the test states when the test tree is reloaded"
+          ],
+          "default": null,
           "scope": "resource"
         },
         "testExplorer.codeLens": {
