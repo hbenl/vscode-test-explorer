@@ -158,6 +158,7 @@ export class TestNode implements TreeNode {
 			command: 'test-explorer.show-error',
 			arguments: [ this.log ]
 		};
+		treeItem.tooltip = this.info.tooltip;
 
 		return treeItem;
 	}

@@ -120,6 +120,7 @@ export class TestSuiteNode implements TreeNode {
 		treeItem.id = this.uniqueId;
 		treeItem.iconPath = this.collection.explorer.iconPaths[stateIcon(this.state)];
 		treeItem.contextValue = this.parent ? (this.fileUri ? 'suiteWithSource' : 'suite') : 'collection';
+		treeItem.tooltip = this.info.tooltip;
 
 		return treeItem;
 	}
