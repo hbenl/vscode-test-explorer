@@ -13,7 +13,7 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	const treeView = vscode.window.createTreeView('test-explorer', { treeDataProvider: testExplorer });
 	context.subscriptions.push(treeView);
 
-	const documentSelector = { pattern: '**/*' };
+	const documentSelector = { scheme: '*', pattern: '**/*' };
 	context.subscriptions.push(vscode.languages.registerCodeLensProvider(documentSelector, testExplorer));
 	context.subscriptions.push(vscode.languages.registerHoverProvider(documentSelector, testExplorer));
 
