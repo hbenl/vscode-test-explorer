@@ -15,6 +15,7 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	const documentSelector = { pattern: '**/*' };
 	context.subscriptions.push(vscode.languages.registerCodeLensProvider(documentSelector, testExplorer));
+	context.subscriptions.push(vscode.languages.registerHoverProvider(documentSelector, testExplorer));
 
 	const registerCommand = (command: string, callback: (...args: any[]) => any) => {
 		context.subscriptions.push(vscode.commands.registerCommand(command, callback));

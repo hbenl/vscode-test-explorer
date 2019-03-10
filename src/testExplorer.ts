@@ -8,7 +8,7 @@ import { TreeEventDebouncer } from './treeEventDebouncer';
 import { Decorator } from './decorator';
 import { pickNode, findLineContaining } from './util';
 
-export class TestExplorer implements TestController, vscode.TreeDataProvider<TreeNode | ErrorNode>, vscode.CodeLensProvider {
+export class TestExplorer implements TestController, vscode.TreeDataProvider<TreeNode | ErrorNode>, vscode.CodeLensProvider, vscode.HoverProvider {
 
 	public readonly iconPaths: IconPaths;
 	public readonly decorator: Decorator;
@@ -251,6 +251,18 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		const codeLenses = this.collections.map(collection => collection.getCodeLenses(fileUri));
 
 		return (<vscode.CodeLens[]>[]).concat(...codeLenses);
+	}
+
+	provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.Hover | undefined {
+
+		for (const collection of this.collections) {
+			var hover = collection.getHover(document, position);
+			if (hover) {
+				return hover;
+			}
+		}
+
+		return undefined;
 	}
 
 	testLoadStarted(): void {

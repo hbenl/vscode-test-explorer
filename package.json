@@ -111,6 +111,12 @@
           "default": true,
           "scope": "resource"
         },
+        "testExplorer.errorDecorationHover": {
+          "description": "Provide hover messages for the error decorations in the editor",
+          "type": "boolean",
+          "default": true,
+          "scope": "resource"
+        },
         "testExplorer.sort": {
           "description": "Sort the tests and suites by label or location. If this is not set (or set to null), they will be shown in the order that they were received from the adapter",
           "type": [

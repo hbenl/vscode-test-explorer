@@ -342,6 +342,10 @@ export class TestCollection {
 		return (this.getConfiguration().get('errorDecoration') !== false);
 	}
 
+	shouldShowErrorDecorationHover(): boolean {
+		return (this.getConfiguration().get('errorDecorationHover') !== false);
+	}
+
 	getSortSetting(): SortSetting | undefined {
 		return this.getConfiguration().get('sort');
 	}
@@ -390,6 +394,33 @@ export class TestCollection {
 
 	getLocatedNodes(fileUri: string): Map<number, TreeNode[]> | undefined {
 		return this.locatedNodes.get(fileUri);
+	}
+
+	getHover(document: vscode.TextDocument, position: vscode.Position): vscode.Hover | undefined {
+		if (!this.shouldShowErrorDecorationHover()) return undefined;
+
+		const nodes = this.getLocatedNodes(document.uri.toString());
+		if (!nodes) return undefined;
+
+		for (const lineNodes of nodes.values()) {
+			for (const node of lineNodes) {
+				if (node instanceof TestNode) {
+					for (const decoration of node.decorations) {
+						if ((position.line === decoration.line) &&
+							(position.character === document.lineAt(decoration.line).range.end.character)) {
+
+							const hoverText = decoration.hover || node.log;
+							if (!hoverText) continue;
+
+							const hoverMarkdown = '    ' + hoverText.replace(/\n/g, '\n    ');
+							return new vscode.Hover(new vscode.MarkdownString(hoverMarkdown));
+						}
+					}
+				}
+			}
+		}
+
+		return undefined;
 	}
 
 	dispose(): void {
