@@ -148,6 +148,10 @@ export class TestCollection {
 				this.resetState();
 			}
 
+			if (this.shouldShowExplorerOnRun()) {
+				vscode.commands.executeCommand('workbench.view.extension.test');
+			}
+
 			this.allRunningTests = [];
 			for (const nodeId of testRunEvent.tests) {
 				const node = this.nodesById.get(nodeId);
@@ -344,6 +348,10 @@ export class TestCollection {
 
 	shouldShowErrorDecorationHover(): boolean {
 		return (this.getConfiguration().get('errorDecorationHover') !== false);
+	}
+
+	shouldShowExplorerOnRun(): boolean {
+		return (this.getConfiguration().get('showOnRun') === true);
 	}
 
 	getSortSetting(): SortSetting | undefined {
