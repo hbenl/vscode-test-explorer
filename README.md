@@ -67,14 +67,18 @@ Do you have a new idea for interacting with the Test Adapters? You can easily ge
 
 The following configuration properties are available:
 
-Property                        | Description
---------------------------------|---------------------------------------------------------------
-`testExplorer.onStart`          | Retire or reset all test states whenever a test run is started
-`testExplorer.onReload`         | Retire or reset all test states whenever the test tree is reloaded
-`testExplorer.codeLens`         | Show a CodeLens above each test or suite for running or debugging the tests
-`testExplorer.gutterDecoration` | Show the state of each test in the editor using Gutter Decorations
-`testExplorer.errorDecoration`  | Show error messages from test failures as decorations in the editor
-`testExplorer.sort`             | Sort the tests and suites by label or location. If this is not set (or set to null), they will be shown in the order that they were received from the adapter
+Property                            | Description
+------------------------------------|---------------------------------------------------------------
+`testExplorer.onStart`              | Retire or reset all test states whenever a test run is started
+`testExplorer.onReload`             | Retire or reset all test states whenever the test tree is reloaded
+`testExplorer.codeLens`             | Show a CodeLens above each test or suite for running or debugging the tests
+`testExplorer.gutterDecoration`     | Show the state of each test in the editor using Gutter Decorations
+`testExplorer.errorDecoration`      | Show error messages from test failures as decorations in the editor
+`testExplorer.errorDecorationHover` | Provide hover messages for the error decorations in the editor
+`testExplorer.sort`                 | Sort the tests and suites by label or location. If this is not set (or set to null), they will be shown in the order that they were received from the adapter
+`testExplorer.showCollapseButton`   | Show a button for collapsing the nodes of the test tree
+`testExplorer.showExpandButton`     | Show a button for expanding the top nodes of the test tree, recursively for the given number of levels
+`testExplorer.showOnRun`            | Switch to the Test Explorer view whenever a test run is started
 
 Further configuration options are provided by the Test Adapters.
 

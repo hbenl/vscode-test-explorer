@@ -1,3 +1,7 @@
+### Version 2.7.0
+* add configuration options to show buttons for collapsing or expanding the test tree nodes
+* add configuration option for switching to the Test Explorer view whenever a test run is started
+
 ### Version 2.6.0
 * add configuration option for sorting the tests and suites
 * add the ability for adapters to set tooltips for tests and suites
