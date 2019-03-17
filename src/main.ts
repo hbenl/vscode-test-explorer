@@ -15,6 +15,13 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	const expandLevels = configuration.get<number>('showExpandButton') || 0;
 	const showCollapseAll = configuration.get<boolean>('showCollapseButton');
 
+	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(configChange => {
+		if (configChange.affectsConfiguration('testExplorer.showExpandButton') ||
+			configChange.affectsConfiguration('testExplorer.showCollapseButton')) {
+			vscode.window.showInformationMessage('The change will take effect when you restart Visual Studio Code');
+		}
+	}));
+
 	vscode.commands.executeCommand('setContext', 'showTestExplorerExpandButton', (expandLevels > 0));
 
 	const treeView = vscode.window.createTreeView('test-explorer', { treeDataProvider: testExplorer, showCollapseAll });
