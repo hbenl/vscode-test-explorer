@@ -261,6 +261,10 @@
         "title": "Reset test states"
       },
       {
+        "command": "test-explorer.reveal",
+        "title": "Reveal the given node"
+      },
+      {
         "command": "test-explorer.expand",
         "title": "Expand the top nodes of the test tree",
         "icon": {
@@ -418,6 +422,10 @@
         },
         {
           "command": "test-explorer.reset",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.reveal",
           "when": "false"
         },
         {
