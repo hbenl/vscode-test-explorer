@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { TestHub as ITestHub} from 'vscode-test-adapter-api';
 import { TestHub } from './hub/testHub';
 import { TestExplorer } from './testExplorer';
-import { runTestsInFile, runTestAtCursor, debugTestAtCursor } from './util';
+import { runTestsInFile, runTestAtCursor, debugTestAtCursor, expand } from './util';
 
 export function activate(context: vscode.ExtensionContext): ITestHub {
 
@@ -10,7 +10,14 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	const testExplorer = new TestExplorer(context);
 	hub.registerTestController(testExplorer);
 
-	const treeView = vscode.window.createTreeView('test-explorer', { treeDataProvider: testExplorer });
+	const workspaceUri = (vscode.workspace.workspaceFolders !== undefined) ? vscode.workspace.workspaceFolders[0].uri : undefined;
+	const configuration = vscode.workspace.getConfiguration('testExplorer', workspaceUri);
+	const expandLevels = configuration.get<number>('showExpandButton') || 0;
+	const showCollapseAll = configuration.get<boolean>('showCollapseButton');
+
+	vscode.commands.executeCommand('setContext', 'showTestExplorerExpandButton', (expandLevels > 0));
+
+	const treeView = vscode.window.createTreeView('test-explorer', { treeDataProvider: testExplorer, showCollapseAll });
 	context.subscriptions.push(treeView);
 
 	const documentSelector = { scheme: '*', pattern: '**/*' };
@@ -58,6 +65,8 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	registerCommand('test-explorer.reset', (node) => testExplorer.resetState(node));
 
 	registerCommand('test-explorer.reveal', (node) => treeView.reveal(node));
+
+	registerCommand('test-explorer.expand', () => expand(testExplorer, treeView, expandLevels));
 
 	return {
 		registerAdapter: adapter => hub.registerAdapter(adapter),

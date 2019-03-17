@@ -60,7 +60,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		return node.getTreeItem();
 	}
 
-	getChildren(node?: TreeNode | ErrorNode): vscode.ProviderResult<(TreeNode | ErrorNode)[]> {
+	getChildren(node?: TreeNode | ErrorNode): (TreeNode | ErrorNode)[] {
 
 		if (node) {
 

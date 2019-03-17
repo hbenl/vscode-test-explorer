@@ -139,6 +139,18 @@
           ],
           "default": null,
           "scope": "resource"
+        },
+        "testExplorer.showExpandButton": {
+          "description": "Show a button for expanding the top nodes of the test tree, recursively for the given number of levels",
+          "type": "number",
+          "default": 0,
+          "scope": "resource"
+        },
+        "testExplorer.showCollapseButton": {
+          "description": "Show a button for collapsing the nodes of the test tree",
+          "type": "boolean",
+          "default": false,
+          "scope": "resource"
         }
       }
     },
@@ -247,6 +259,14 @@
       {
         "command": "test-explorer.reset",
         "title": "Reset test states"
+      },
+      {
+        "command": "test-explorer.expand",
+        "title": "Expand the top nodes of the test tree",
+        "icon": {
+          "dark": "./icons/expand-all-dark.svg",
+          "light": "./icons/expand-all-light.svg"
+        }
       }
     ],
     "menus": {
@@ -270,6 +290,11 @@
           "command": "test-explorer.reloading",
           "group": "navigation@4",
           "when": "view == test-explorer && testsLoading"
+        },
+        {
+          "command": "test-explorer.expand",
+          "group": "navigation@5",
+          "when": "view == test-explorer && showTestExplorerExpandButton"
         },
         {
           "command": "test-explorer.enable-autorun",
@@ -394,6 +419,10 @@
         {
           "command": "test-explorer.reset",
           "when": "false"
+        },
+        {
+          "command": "test-explorer.expand",
+          "when": "showTestExplorerExpandButton"
         }
       ]
     }

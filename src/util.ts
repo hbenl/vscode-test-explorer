@@ -3,6 +3,7 @@ import * as RegExpEscape from 'escape-string-regexp';
 import { TestExplorer } from './testExplorer';
 import { TreeNode } from './tree/treeNode';
 import { TestNode } from './tree/testNode';
+import { ErrorNode } from './tree/errorNode';
 
 export function* allTests(treeNode: TreeNode): IterableIterator<TestNode> {
 	if (treeNode.info.type === 'suite') {
@@ -206,5 +207,11 @@ export function normalizeFilename(file: string | undefined): string | undefined 
 		return vscode.Uri.parse(file).toString();
 	} else {
 		return vscode.Uri.file(file).toString();
+	}
+}
+
+export function expand(testExplorer: TestExplorer, treeView: vscode.TreeView<TreeNode | ErrorNode>, levels: number): void {
+	for (const node of testExplorer.getChildren()) {
+		treeView.reveal(node, { expand: levels });
 	}
 }
