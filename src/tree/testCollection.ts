@@ -199,14 +199,18 @@ export class TestCollection {
 				}
 
 				if (testSuiteNode) {
+					testSuiteNode.update(testRunEvent.description, testRunEvent.tooltip);
 					this.runningSuite = testSuiteNode;
 				}
 
 			} else { // testStateMessage.state === 'completed'
 
 				const suiteId = (typeof testRunEvent.suite === 'object') ? testRunEvent.suite.id : testRunEvent.suite;
-				const suiteNode = this.nodesById.get(suiteId);
+				const node = this.nodesById.get(suiteId);
+				const suiteNode = (node && (node.info.type === 'suite')) ? <TestSuiteNode>node : undefined;
+
 				if (suiteNode) {
+					suiteNode.update(testRunEvent.description, testRunEvent.tooltip);
 					for (const testNode of allTests(suiteNode)) {
 						if ((testNode.state.current === 'scheduled') || (testNode.state.current === 'running')) {
 							testNode.setCurrentState('pending');
@@ -240,7 +244,9 @@ export class TestCollection {
 				testNode.setCurrentState(
 					testRunEvent.state,
 					testRunEvent.message,
-					testRunEvent.decorations
+					testRunEvent.decorations,
+					testRunEvent.description,
+					testRunEvent.tooltip
 				);
 			}
 		}

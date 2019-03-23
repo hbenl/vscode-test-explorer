@@ -11,6 +11,8 @@ export class TestNode implements TreeNode {
 	private _state: NodeState;
 	private _log: string = "";
 	private _decorations: TestDecoration[] = [];
+	private description?: string;
+	private tooltip?: string;
 
 	readonly fileUri: string | undefined;
 	uniqueId: string;
@@ -28,6 +30,9 @@ export class TestNode implements TreeNode {
 	) {
 
 		this.fileUri = normalizeFilename(info.file);
+
+		this.description = info.description;
+		this.tooltip = info.tooltip;
 
 		const oldNode = oldNodesById ? oldNodesById.get(info.id) : undefined;
 		if (oldNode && (oldNode.info.type === 'test')) {
@@ -64,7 +69,9 @@ export class TestNode implements TreeNode {
 	setCurrentState(
 		currentState: CurrentNodeState,
 		logMessage?: string,
-		decorations?: TestDecoration[]
+		decorations?: TestDecoration[],
+		description?: string,
+		tooltip?: string
 	): void {
 
 		this.state.current = currentState;
@@ -86,6 +93,13 @@ export class TestNode implements TreeNode {
 
 		if (decorations) {
 			this._decorations = this._decorations.concat(decorations);
+		}
+
+		if (description !== undefined) {
+			this.description = description;
+		}
+		if (tooltip !== undefined) {
+			this.tooltip = tooltip;
 		}
 
 		this.neededUpdates = 'send';
@@ -128,6 +142,12 @@ export class TestNode implements TreeNode {
 			this.neededUpdates = 'send';
 		}
 
+		if ((this.description !== this.info.description) || (this.tooltip !== this.info.tooltip)) {
+			this.description = this.info.description;
+			this.tooltip = this.info.tooltip;
+			this.neededUpdates = 'send';
+		}
+
 		if (this._decorations.length > 0) {
 
 			this._decorations = [];
@@ -158,7 +178,8 @@ export class TestNode implements TreeNode {
 			command: 'test-explorer.show-error',
 			arguments: [ this.log ]
 		};
-		treeItem.tooltip = this.info.tooltip;
+		treeItem.description = this.description;
+		treeItem.tooltip = this.tooltip;
 
 		return treeItem;
 	}

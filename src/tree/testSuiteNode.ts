@@ -10,6 +10,8 @@ export class TestSuiteNode implements TreeNode {
 
 	private _state: NodeState;
 	private _children: TreeNode[];
+	private description?: string;
+	private tooltip?: string;
 
 	readonly fileUri: string | undefined;
 	uniqueId: string;
@@ -27,6 +29,9 @@ export class TestSuiteNode implements TreeNode {
 
 		this.fileUri = normalizeFilename(info.file);
 
+		this.description = info.description;
+		this.tooltip = info.tooltip;
+
 		this._children = info.children.map(childInfo => {
 			if (childInfo.type === 'test') {
 				return new TestNode(collection, childInfo, this, oldNodesById);
@@ -36,6 +41,18 @@ export class TestSuiteNode implements TreeNode {
 		});
 
 		this._state = parentNodeState(this._children);
+	}
+
+	update(description?: string, tooltip?: string) {
+		if (description !== undefined) {
+			this.description = description;
+		}
+		if (tooltip !== undefined) {
+			this.tooltip = tooltip;
+		}
+		if ((this.neededUpdates === 'none') && ((description !== undefined) || (tooltip !== undefined))) {
+			this.neededUpdates = 'send';
+		}
 	}
 
 	recalcState(): void {
@@ -87,6 +104,9 @@ export class TestSuiteNode implements TreeNode {
 
 	resetState(): void {
 
+		this.description = this.info.description;
+		this.tooltip = this.info.tooltip;
+
 		for (const child of this._children) {
 			child.resetState();
 		}
@@ -120,7 +140,8 @@ export class TestSuiteNode implements TreeNode {
 		treeItem.id = this.uniqueId;
 		treeItem.iconPath = this.collection.explorer.iconPaths[stateIcon(this.state)];
 		treeItem.contextValue = this.parent ? (this.fileUri ? 'suiteWithSource' : 'suite') : 'collection';
-		treeItem.tooltip = this.info.tooltip;
+		treeItem.description = this.description;
+		treeItem.tooltip = this.tooltip;
 
 		return treeItem;
 	}
