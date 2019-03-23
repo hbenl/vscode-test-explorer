@@ -101,7 +101,9 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 			node.collection.adapter.load();
 		} else {
 			for (const collection of this.collections) {
-				collection.adapter.load();
+				try {
+					collection.adapter.load();
+				} catch (err) {}
 			}
 		}
 	}
@@ -122,7 +124,9 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 			for (const collection of this.collections) {
 				if (collection.suite) {
-					collection.adapter.run([ collection.suite.info.id ]);
+					try {
+						collection.adapter.run([ collection.suite.info.id ]);
+					} catch (err) {}
 				}
 			}
 		}
@@ -169,7 +173,11 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	}
 
 	cancel(): void {
-		this.collections.forEach(collection => collection.adapter.cancel());
+		this.collections.forEach(collection => {
+			try {
+				collection.adapter.cancel();
+			} catch (err) {}
+		});
 	}
 
 	showError(message: string | undefined): void {
