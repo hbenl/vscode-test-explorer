@@ -1,3 +1,7 @@
+### Version 2.8.0
+* add the ability for adapters to set descriptions for tests and suites
+* add the ability for adapters to change the descriptions and tooltips for tests and suites when they are run
+
 ### Version 2.7.0
 * add configuration options to show buttons for collapsing or expanding the test tree nodes
 * add configuration option for switching to the Test Explorer view whenever a test run is started
