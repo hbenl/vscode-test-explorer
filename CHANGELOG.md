@@ -1,3 +1,6 @@
+### Version 2.8.1
+* update list of test adapters in README.md
+
 ### Version 2.8.0
 * add the ability for adapters to set descriptions for tests and suites
 * add the ability for adapters to change the descriptions and tooltips for tests and suites when they are run
