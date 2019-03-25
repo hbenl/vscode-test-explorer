@@ -69,10 +69,10 @@ export class TestSuiteNode implements TreeNode {
 			const newPreviousNodeState = parentPreviousNodeState(this.children);
 			const newAutorunFlag = parentAutorunFlag(this.children);
 
-			if ((this.state.current !== newCurrentNodeState) ||
-				(this.state.previous !== newPreviousNodeState) ||
-				(this.state.autorun !== newAutorunFlag)
-			) {
+			// if ((this.state.current !== newCurrentNodeState) ||
+			// 	(this.state.previous !== newPreviousNodeState) ||
+			// 	(this.state.autorun !== newAutorunFlag)
+			// ) {
 	
 				this.state.current = newCurrentNodeState;
 				this.state.previous = newPreviousNodeState;
@@ -85,11 +85,11 @@ export class TestSuiteNode implements TreeNode {
 					this.collection.explorer.decorator.updateDecorationsFor(this.fileUri);
 				}
 		
-			} else {
+			// } else {
 
-				this.neededUpdates = 'none';
+			// 	this.neededUpdates = 'none';
 
-			}
+			// }
 		}
 	}
 
