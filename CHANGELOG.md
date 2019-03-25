@@ -1,3 +1,6 @@
+### Version 2.8.2
+* temporary workaround for suite description updates not being sent to VS Code
+
 ### Version 2.8.1
 * update list of test adapters in README.md
 
