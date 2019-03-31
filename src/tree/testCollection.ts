@@ -5,7 +5,7 @@ import { TestNode } from './testNode';
 import { TestExplorer } from '../testExplorer';
 import { TreeNode } from './treeNode';
 import { ErrorNode } from './errorNode';
-import { allTests, createRunCodeLens, createDebugCodeLens, createRevealCodeLens, createLogCodeLens } from '../util';
+import { allTests, createRunCodeLens, createDebugCodeLens, createRevealCodeLens, createLogCodeLens, intersect } from '../util';
 import { SortSetting, getCompareFn } from './sort';
 
 export class TestCollection {
@@ -75,10 +75,28 @@ export class TestCollection {
 		this.disposables.push(adapter.tests(testLoadEvent => this.onTestLoadEvent(testLoadEvent)));
 		this.disposables.push(adapter.testStates(testRunEvent => this.onTestRunEvent(testRunEvent)));
 
-		if (adapter.autorun) {
-			this.disposables.push(adapter.autorun(() => {
-				if (this._autorunNode) {
-					this.explorer.run([this._autorunNode]);
+		if (adapter.retire) {
+			this.disposables.push(adapter.retire(retireEvent => {
+
+				if (!this.rootSuite) return;
+
+				let nodes: TreeNode[];
+				if (retireEvent && retireEvent.tests) {
+					nodes = retireEvent.tests.map(nodeId => this.nodesById.get(nodeId)).filter(node => node) as TreeNode[];
+				} else {
+					nodes = [ this.rootSuite ];
+				}
+
+				for (const node of nodes) {
+					this.retireState(node);
+				}
+
+				if (!this._autorunNode) return;
+
+				if (this._autorunNode === this.rootSuite) {
+					this.explorer.run(nodes);
+				} else {
+					this.explorer.run(intersect(this._autorunNode, nodes));
 				}
 			}));
 		}
@@ -109,7 +127,7 @@ export class TestCollection {
 				if (sortCompareFn) {
 					this.sortRec(this.rootSuite, sortCompareFn);
 				}
-	
+
 			} else {
 
 				this.rootSuite = undefined;
@@ -125,7 +143,6 @@ export class TestCollection {
 			if (this._autorunNode) {
 				const newAutorunNode = this.nodesById.get(this._autorunNode.info.id);
 				this.setAutorun(newAutorunNode);
-				this.explorer.run([this._autorunNode]);
 			}
 
 			this.runningSuite = undefined;

@@ -15,6 +15,21 @@ export function* allTests(treeNode: TreeNode): IterableIterator<TestNode> {
 	}
 }
 
+export function isAncestor(node: TreeNode, otherNode: TreeNode | undefined): boolean {
+	return !!otherNode && ((node === otherNode) || isAncestor(node, otherNode.parent));
+}
+
+export function intersect(mainNode: TreeNode, nodes: TreeNode[]): TreeNode[] {
+	
+	for (const node of nodes) {
+		if (isAncestor(node, mainNode)) {
+			return [ mainNode ];
+		}
+	}
+
+	return nodes.filter(node => isAncestor(mainNode, node));
+}
+
 export function runTestsInFile(fileUri: string | undefined, testExplorer: TestExplorer): void {
 
 	if (!fileUri && vscode.window.activeTextEditor) {
