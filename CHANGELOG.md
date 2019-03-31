@@ -1,3 +1,6 @@
+### Version 2.9.0
+* add support for the retire event
+
 ### Version 2.8.2
 * temporary workaround for suite description updates not being sent to VS Code
 
