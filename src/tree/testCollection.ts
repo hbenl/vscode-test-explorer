@@ -94,9 +94,9 @@ export class TestCollection {
 				if (!this._autorunNode) return;
 
 				if (this._autorunNode === this.rootSuite) {
-					this.explorer.run(nodes);
+					this.adapter.run(nodes.map(node => node.info.id));
 				} else {
-					this.explorer.run(intersect(this._autorunNode, nodes));
+					this.adapter.run(intersect(this._autorunNode, nodes).map(node => node.info.id));
 				}
 			}));
 		}
