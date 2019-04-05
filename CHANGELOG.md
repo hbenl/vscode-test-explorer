@@ -1,3 +1,6 @@
+### Version 2.9.2
+* performance fix for large trees
+
 ### Version 2.9.1
 * bugfix: sending a retire event with multiple nodes opened the test picker
 
