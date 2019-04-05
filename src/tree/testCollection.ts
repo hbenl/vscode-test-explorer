@@ -210,7 +210,7 @@ export class TestCollection {
 					this.runningSuite.info.children.push(testRunEvent.suite);
 					testSuiteNode = new TestSuiteNode(this, testRunEvent.suite, this.runningSuite);
 					this.runningSuite.children.push(testSuiteNode);
-					this.runningSuite.neededUpdates = 'recalc';
+					this.runningSuite.recalcStateNeeded = true;
 					this.nodesById.set(suiteId, testSuiteNode);
 
 				}
@@ -252,7 +252,7 @@ export class TestCollection {
 				this.runningSuite.info.children.push(testRunEvent.test);
 				testNode = new TestNode(this, testRunEvent.test, this.runningSuite);
 				this.runningSuite.children.push(testNode);
-				this.runningSuite.neededUpdates = 'recalc';
+				this.runningSuite.recalcStateNeeded = true;
 				this.nodesById.set(testId, testNode);
 
 			}
@@ -284,7 +284,7 @@ export class TestCollection {
 			node.retireState();
 
 			if (node.parent) {
-				node.parent.neededUpdates = 'recalc';
+				node.parent.recalcStateNeeded = true;
 			}
 
 		} else if (this.rootSuite) {
@@ -303,7 +303,7 @@ export class TestCollection {
 			node.resetState();
 
 			if (node.parent) {
-				node.parent.neededUpdates = 'recalc';
+				node.parent.recalcStateNeeded = true;
 			}
 
 		} else if (this.rootSuite) {
@@ -321,7 +321,7 @@ export class TestCollection {
 		if (this._autorunNode) {
 			this._autorunNode.setAutorun(false);
 			if (this._autorunNode.parent) {
-				this._autorunNode.parent.neededUpdates = 'recalc';
+				this._autorunNode.parent.recalcStateNeeded = true;
 			}
 			this._autorunNode = undefined;
 		}
@@ -329,7 +329,7 @@ export class TestCollection {
 		if (this.rootSuite && node) {
 			node.setAutorun(true);
 			if (node.parent) {
-				node.parent.neededUpdates = 'recalc';
+				node.parent.recalcStateNeeded = true;
 			}
 			this._autorunNode = node;
 		}

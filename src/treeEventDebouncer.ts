@@ -63,7 +63,7 @@ export class TreeEventDebouncer {
 
 	private collectChangedNodes(node: TreeNode): TreeNode[] {
 
-		if (node.neededUpdates === 'send') {
+		if (node.sendStateNeeded) {
 
 			this.resetNeededUpdates(node);
 			return [ node ];
@@ -82,7 +82,7 @@ export class TreeEventDebouncer {
 
 	private resetNeededUpdates(node: TreeNode): void {
 
-		node.neededUpdates = 'none';
+		node.sendStateNeeded = false;
 
 		for (const child of node.children) {
 			this.resetNeededUpdates(child);

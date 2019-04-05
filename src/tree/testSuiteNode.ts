@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TestSuiteInfo } from 'vscode-test-adapter-api';
-import { TreeNode, TreeNodeUpdates } from "./treeNode";
+import { TreeNode } from "./treeNode";
 import { NodeState, stateIcon, parentNodeState, parentCurrentNodeState, parentPreviousNodeState, parentAutorunFlag } from "./state";
 import { TestCollection } from './testCollection';
 import { TestNode } from './testNode';
@@ -16,9 +16,16 @@ export class TestSuiteNode implements TreeNode {
 	readonly fileUri: string | undefined;
 	uniqueId: string;
 	get state(): NodeState { return this._state; }
-	neededUpdates: TreeNodeUpdates = 'none';
 	readonly log = undefined;
 	get children(): TreeNode[] { return this._children; }
+
+	/** set to true if one of the children's state may have changed and hence
+	 *  the state of this node needs to be recalculated */
+	recalcStateNeeded: boolean;
+
+	/** set to true if the state, description or tooltip of this node has changed
+	 *  and needs to be sent to VS Code so that the UI is updated */
+	sendStateNeeded: boolean;
 
 	constructor(
 		public readonly collection: TestCollection,
@@ -44,14 +51,13 @@ export class TestSuiteNode implements TreeNode {
 	}
 
 	update(description?: string, tooltip?: string) {
-		if (description !== undefined) {
+		if ((description !== undefined) && (description !== this.description)) {
 			this.description = description;
+			this.sendStateNeeded = true;
 		}
-		if (tooltip !== undefined) {
+		if ((tooltip !== undefined) && (tooltip !== this.tooltip)) {
 			this.tooltip = tooltip;
-		}
-		if ((this.neededUpdates === 'none') && ((description !== undefined) || (tooltip !== undefined))) {
-			this.neededUpdates = 'send';
+			this.sendStateNeeded = true;
 		}
 	}
 
@@ -63,33 +69,33 @@ export class TestSuiteNode implements TreeNode {
 			}
 		}
 
-		if (this.neededUpdates === 'recalc') {
+		if (this.recalcStateNeeded) {
 
 			const newCurrentNodeState = parentCurrentNodeState(this.children);
 			const newPreviousNodeState = parentPreviousNodeState(this.children);
 			const newAutorunFlag = parentAutorunFlag(this.children);
 
-			// if ((this.state.current !== newCurrentNodeState) ||
-			// 	(this.state.previous !== newPreviousNodeState) ||
-			// 	(this.state.autorun !== newAutorunFlag)
-			// ) {
-	
+			if ((this.state.current !== newCurrentNodeState) ||
+				(this.state.previous !== newPreviousNodeState) ||
+				(this.state.autorun !== newAutorunFlag)
+			) {
+
 				this.state.current = newCurrentNodeState;
 				this.state.previous = newPreviousNodeState;
 				this.state.autorun = newAutorunFlag;
-				this.neededUpdates = 'send';
+
+				this.sendStateNeeded = true;
 				if (this.parent) {
-					this.parent.neededUpdates = 'recalc';
+					this.parent.recalcStateNeeded = true;
 				}
+
 				if (this.fileUri) {
 					this.collection.explorer.decorator.updateDecorationsFor(this.fileUri);
 				}
-		
-			// } else {
 
-			// 	this.neededUpdates = 'none';
+			}
 
-			// }
+			this.recalcStateNeeded = false;
 		}
 	}
 
@@ -99,19 +105,22 @@ export class TestSuiteNode implements TreeNode {
 			child.retireState();
 		}
 
-		this.neededUpdates = 'recalc';
+		this.recalcStateNeeded = true;
 	}
 
 	resetState(): void {
 
-		this.description = this.info.description;
-		this.tooltip = this.info.tooltip;
+		if ((this.description !== this.info.description) || (this.tooltip !== this.info.tooltip)) {
+			this.description = this.info.description;
+			this.tooltip = this.info.tooltip;
+			this.sendStateNeeded = true;
+		}
 
 		for (const child of this._children) {
 			child.resetState();
 		}
 
-		this.neededUpdates = 'recalc';
+		this.recalcStateNeeded = true;
 	}
 
 	setAutorun(autorun: boolean): void {
@@ -120,15 +129,15 @@ export class TestSuiteNode implements TreeNode {
 			child.setAutorun(autorun);
 		}
 
-		this.neededUpdates = 'recalc';
+		this.recalcStateNeeded = true;
 	}
 
 	getTreeItem(): vscode.TreeItem {
 
-		if (this.neededUpdates === 'recalc') {
+		if (this.recalcStateNeeded) {
 			this.recalcState();
 		}
-		this.neededUpdates = 'none';
+		this.sendStateNeeded = false;
 
 		let label = this.info.label;
 		if ((this.parent === undefined) && this.collection.adapter.workspaceFolder &&

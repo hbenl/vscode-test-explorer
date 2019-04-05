@@ -17,10 +17,13 @@ export class TestNode implements TreeNode {
 	readonly fileUri: string | undefined;
 	uniqueId: string;
 	get state(): NodeState { return this._state; }
-	neededUpdates: 'none' | 'send' = 'none';
 	get log(): string { return this._log; }
 	get decorations(): TestDecoration[] { return this._decorations; }
 	readonly children: TreeNode[] = [];
+
+	/** set to true if the state, description or tooltip of this node has changed
+	 *  and needs to be sent to VS Code so that the UI is updated */
+	sendStateNeeded: boolean;
 
 	constructor(
 		public readonly collection: TestCollection,
@@ -102,9 +105,9 @@ export class TestNode implements TreeNode {
 			this.tooltip = tooltip;
 		}
 
-		this.neededUpdates = 'send';
+		this.sendStateNeeded = true;
 		if (this.parent) {
-			this.parent.neededUpdates = 'recalc';
+			this.parent.recalcStateNeeded = true;
 		}
 
 		this.collection.sendNodeChangedEvents();
@@ -120,7 +123,7 @@ export class TestNode implements TreeNode {
 			(this.state.current === 'skipped') || (this.state.current === 'errored')) {
 
 			this._state.current = 'pending';
-			this.neededUpdates = 'send';
+			this.sendStateNeeded = true;
 
 			if (this.fileUri) {
 				this.collection.explorer.decorator.updateDecorationsFor(this.fileUri);
@@ -134,18 +137,18 @@ export class TestNode implements TreeNode {
 
 		if ((this.state.current !== 'pending') && (this.state.current !== 'always-skipped') && (this.state.current !== 'duplicate')) {
 			this._state.current = 'pending';
-			this.neededUpdates = 'send';
+			this.sendStateNeeded = true;
 		}
 
 		if ((this.state.previous !== 'pending') && (this.state.previous !== 'always-skipped') && (this.state.previous !== 'duplicate')) {
 			this._state.previous = 'pending';
-			this.neededUpdates = 'send';
+			this.sendStateNeeded = true;
 		}
 
 		if ((this.description !== this.info.description) || (this.tooltip !== this.info.tooltip)) {
 			this.description = this.info.description;
 			this.tooltip = this.info.tooltip;
-			this.neededUpdates = 'send';
+			this.sendStateNeeded = true;
 		}
 
 		if (this._decorations.length > 0) {
@@ -160,12 +163,12 @@ export class TestNode implements TreeNode {
 
 	setAutorun(autorun: boolean): void {
 		this._state.autorun = autorun;
-		this.neededUpdates = 'send';
+		this.sendStateNeeded = true;
 	}
 
 	getTreeItem(): vscode.TreeItem {
 
-		this.neededUpdates = 'none';
+		this.sendStateNeeded = false;
 
 		const treeItem = new vscode.TreeItem(this.info.label, vscode.TreeItemCollapsibleState.None);
 		treeItem.id = this.uniqueId;

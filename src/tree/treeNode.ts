@@ -4,14 +4,12 @@ import { TestCollection } from './testCollection';
 import { TestSuiteNode } from './testSuiteNode';
 import { TestSuiteInfo, TestInfo } from 'vscode-test-adapter-api';
 
-export type TreeNodeUpdates = 'none' | 'send' | 'recalc';
-
 export interface TreeNode {
 	readonly info: TestSuiteInfo | TestInfo;
 	readonly fileUri: string | undefined;
 	uniqueId: string;
 	readonly state: NodeState;
-	neededUpdates: TreeNodeUpdates;
+	sendStateNeeded: boolean;
 	readonly log: string | undefined;
 	readonly collection: TestCollection;
 	readonly parent: TestSuiteNode | undefined;
