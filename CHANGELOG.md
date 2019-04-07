@@ -1,11 +1,12 @@
 ### Version 2.9.2
-* performance fix for large trees
+* performance fix for large trees (proper fix for suite description updates not being sent to VS Code)
 
 ### Version 2.9.1
 * bugfix: sending a retire event with multiple nodes opened the test picker
 
 ### Version 2.9.0
 * add support for the retire event
+* the default behavior for retiring tests after reloading has changed! Previously, the test states did not change after reloading (unless the user set `testExplorer.onReload` in his configuration), now the default is to retire them because the states may be outdated. This default behavior is disabled when a Test Adapter implements the retire event because then it is up to the Adapter to tell the Test Explorer which tests should be retired.
 
 ### Version 2.8.2
 * temporary workaround for suite description updates not being sent to VS Code
