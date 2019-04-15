@@ -1,3 +1,6 @@
+### Version 2.9.3
+* update list of test adapters in README.md
+
 ### Version 2.9.2
 * performance fix for large trees (proper fix for suite description updates not being sent to VS Code)
 
