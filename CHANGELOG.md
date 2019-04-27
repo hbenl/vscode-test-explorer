@@ -1,3 +1,7 @@
+### Version 2.10.0
+* enable the expand/collapse buttons by default
+* update list of test adapters in README.md
+
 ### Version 2.9.3
 * update list of test adapters in README.md
 
