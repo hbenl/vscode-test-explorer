@@ -144,13 +144,13 @@
         "testExplorer.showExpandButton": {
           "description": "Show a button for expanding the top nodes of the test tree, recursively for the given number of levels",
           "type": "number",
-          "default": 0,
+          "default": 3,
           "scope": "resource"
         },
         "testExplorer.showCollapseButton": {
           "description": "Show a button for collapsing the nodes of the test tree",
           "type": "boolean",
-          "default": false,
+          "default": true,
           "scope": "resource"
         },
         "testExplorer.showOnRun": {
