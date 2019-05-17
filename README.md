@@ -40,6 +40,11 @@ Currently the following Test Adapters are available:
 
 * [Python Test Explorer](https://marketplace.visualstudio.com/items?itemName=LittleFoxTeam.vscode-python-test-adapter)
 
+### PHP
+
+* [PHPUnit Test Explorer](https://marketplace.visualstudio.com/items?itemName=recca0120.vscode-phpunit)
+* [PHP Tools for VSCode](https://marketplace.visualstudio.com/items?itemName=DEVSENSE.phptools-vscode)
+
 ### Ruby
 
 * [Ruby Test Explorer](https://marketplace.visualstudio.com/items?itemName=connorshea.vscode-ruby-test-adapter)
