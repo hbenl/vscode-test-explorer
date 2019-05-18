@@ -278,6 +278,26 @@
           "dark": "./icons/expand-all-dark.svg",
           "light": "./icons/expand-all-light.svg"
         }
+      },
+      {
+        "command": "test-explorer.sort-by-label",
+        "title": "Sort by label"
+      },
+      {
+        "command": "test-explorer.sort-by-location",
+        "title": "Sort by location"
+      },
+      {
+        "command": "test-explorer.sort-by-label-with-suites-first",
+        "title": "Sort by label with suites on top"
+      },
+      {
+        "command": "test-explorer.sort-by-location-with-suites-first",
+        "title": "Sort by location with suites on top"
+      },
+      {
+        "command": "test-explorer.dont-sort",
+        "title": "No sorting"
       }
     ],
     "menus": {
@@ -319,12 +339,37 @@
         },
         {
           "command": "test-explorer.retire",
-          "group": "2_state@3",
+          "group": "2_state@1",
           "when": "view == test-explorer"
         },
         {
           "command": "test-explorer.reset",
-          "group": "2_state@4",
+          "group": "2_state@2",
+          "when": "view == test-explorer"
+        },
+        {
+          "command": "test-explorer.sort-by-label",
+          "group": "3_sort@1",
+          "when": "view == test-explorer"
+        },
+        {
+          "command": "test-explorer.sort-by-location",
+          "group": "3_sort@2",
+          "when": "view == test-explorer"
+        },
+        {
+          "command": "test-explorer.sort-by-label-with-suites-first",
+          "group": "3_sort@3",
+          "when": "view == test-explorer"
+        },
+        {
+          "command": "test-explorer.sort-by-location-with-suites-first",
+          "group": "3_sort@4",
+          "when": "view == test-explorer"
+        },
+        {
+          "command": "test-explorer.dont-sort",
+          "group": "3_sort@5",
           "when": "view == test-explorer"
         }
       ],
@@ -438,6 +483,26 @@
         {
           "command": "test-explorer.expand",
           "when": "showTestExplorerExpandButton"
+        },
+        {
+          "command": "test-explorer.sort-by-label",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.sort-by-location",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.sort-by-label-with-suites-first",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.sort-by-location-with-suites-first",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.dont-sort",
+          "when": "false"
         }
       ]
     }

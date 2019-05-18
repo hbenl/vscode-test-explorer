@@ -75,6 +75,16 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	registerCommand('test-explorer.expand', () => expand(testExplorer, treeView, expandLevels));
 
+	registerCommand('test-explorer.sort-by-label', () => testExplorer.setSortBy('byLabel'));
+
+	registerCommand('test-explorer.sort-by-location', () => testExplorer.setSortBy('byLocation'));
+
+	registerCommand('test-explorer.sort-by-label-with-suites-first', () => testExplorer.setSortBy('byLabelWithSuitesFirst'));
+
+	registerCommand('test-explorer.sort-by-location-with-suites-first', () => testExplorer.setSortBy('byLocationWithSuitesFirst'));
+
+	registerCommand('test-explorer.dont-sort', () => testExplorer.setSortBy(null));
+
 	return {
 		registerAdapter: adapter => hub.registerAdapter(adapter),
 		unregisterAdapter: adapter => hub.unregisterAdapter(adapter),

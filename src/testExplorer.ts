@@ -7,6 +7,7 @@ import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './treeEventDebouncer';
 import { Decorator } from './decorator';
 import { pickNode, findLineContaining } from './util';
+import { SortSetting } from './tree/sort';
 
 export class TestExplorer implements TestController, vscode.TreeDataProvider<TreeNode | ErrorNode>, vscode.CodeLensProvider, vscode.HoverProvider {
 
@@ -31,7 +32,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	private lastTestRun?: [ TestCollection, string[] ];
 
 	constructor(
-		context: vscode.ExtensionContext
+		public readonly context: vscode.ExtensionContext
 	) {
 		this.iconPaths = new IconPaths(context);
 		this.decorator = new Decorator(context, this);
@@ -271,6 +272,12 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		}
 
 		return undefined;
+	}
+
+	async setSortBy(sortBy: SortSetting | null): Promise<void> {
+		for (const collection of this.collections) {
+			await collection.setSortBy(sortBy, true);
+		}
 	}
 
 	testLoadStarted(): void {

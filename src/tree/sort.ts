@@ -2,7 +2,7 @@ import { TreeNode } from './treeNode';
 
 export type SortSetting = 'byLabel' | 'byLocation' | 'byLabelWithSuitesFirst' | 'byLocationWithSuitesFirst';
 
-export function getCompareFn(sortSetting: SortSetting | undefined): ((a: TreeNode, b: TreeNode) => number) | undefined {
+export function getCompareFn(sortSetting: SortSetting | null | undefined): ((a: TreeNode, b: TreeNode) => number) | undefined {
 	switch (sortSetting) {
 
 		case 'byLabel':
@@ -16,6 +16,9 @@ export function getCompareFn(sortSetting: SortSetting | undefined): ((a: TreeNod
 
 		case 'byLocationWithSuitesFirst':
 			return compareWithSuitesFirst(compareLocation);
+
+		case null:
+			return compareOriginalPosition;
 
 		default:
 			return undefined;
@@ -69,5 +72,15 @@ function compareWithSuitesFirst(compareFn: (a: TreeNode, b: TreeNode) => number)
 		}
 	
 		return compareFn(a, b);
+	}
+}
+
+// this will restore the "original" (as delivered by the adapter) sort order of the tests and suites
+function compareOriginalPosition(a: TreeNode, b: TreeNode): number {
+	if (a.parent) {
+		const siblings = a.parent.info.children;
+		return siblings.indexOf(a.info) - siblings.indexOf(b.info);
+	} else {
+		return 0;
 	}
 }

@@ -20,6 +20,9 @@ export class TestCollection {
 	private allRunningTests: TestNode[] | undefined;
 	private runningSuite: TestSuiteNode | undefined;
 	private _autorunNode: TreeNode | undefined;
+	private sortBy: SortSetting | null;
+	private readonly sortMementoKey: string | undefined;
+
 	private readonly nodesById = new Map<string, TreeNode>();
 	private readonly idCount = new Map<string, number>();
 	private readonly locatedNodes = new Map<string, Map<number, TreeNode[]>>();
@@ -36,6 +39,15 @@ export class TestCollection {
 
 		this.id = TestCollection.nextCollectionId++;
 
+		let sortBy = this.getSortSetting();
+		if (this.adapter.workspaceFolder) {
+			this.sortMementoKey = `sort ${this.adapter.workspaceFolder.uri.fsPath}`;
+			if (sortBy === undefined) {
+				sortBy = this.getSortMemento();
+			}
+		}
+		this.sortBy = sortBy || null;
+
 		const workspaceUri = adapter.workspaceFolder ? adapter.workspaceFolder.uri : undefined;
 
 		this.disposables.push(vscode.workspace.onDidChangeConfiguration(configChange => {
@@ -50,24 +62,12 @@ export class TestCollection {
 			}
 
 			if (configChange.affectsConfiguration('testExplorer.sort', workspaceUri)) {
-				if (this.rootSuite) {
-
-					let compareFn = getCompareFn(this.getSortSetting());
-
-					if (!compareFn) {
-						// this will restore the "original" (as delivered by the adapter) sort order of the tests and suites
-						compareFn = (a: TreeNode, b: TreeNode) => {
-							if (a.parent) {
-								const siblings = a.parent.info.children;
-								return siblings.indexOf(a.info) - siblings.indexOf(b.info);
-							} else {
-								return 0;
-							}
-						}
-					}
-
-					this.sortRec(this.rootSuite, compareFn);
-					this.explorer.treeEvents.sendTreeChangedEvent();
+				let sortBy = this.getSortSetting();
+				if (sortBy === undefined) {
+					sortBy = this.getSortMemento();
+				}
+				if (sortBy !== undefined) {
+					this.setSortBy(sortBy);
 				}
 			}
 		}));
@@ -123,7 +123,7 @@ export class TestCollection {
 					this.rootSuite.resetState();
 				}
 
-				const sortCompareFn = getCompareFn(this.getSortSetting());
+				const sortCompareFn = getCompareFn(this.sortBy || undefined);
 				if (sortCompareFn) {
 					this.sortRec(this.rootSuite, sortCompareFn);
 				}
@@ -337,6 +337,35 @@ export class TestCollection {
 		this.explorer.treeEvents.sendNodeChangedEvents(true);
 	}
 
+	getSortSetting(): SortSetting | null | undefined {
+
+		let settings = this.getConfiguration().inspect<SortSetting | null>('sort');
+		if (!settings) return undefined;
+
+		if (settings.workspaceFolderValue !== undefined) {
+			return settings.workspaceFolderValue;
+		} else if (settings.workspaceValue !== undefined) {
+			return settings.workspaceValue;
+		} else if (settings.globalValue !== undefined) {
+			return settings.globalValue;
+		} else {
+			return undefined;
+		}
+	}
+
+	getSortMemento(): SortSetting | null | undefined {
+		if (!this.sortMementoKey) return undefined;
+		return this.explorer.context.workspaceState.get<SortSetting | null>(this.sortMementoKey);
+	}
+
+	async setSortBy(sortBy: SortSetting | null, saveMemento = false): Promise<void> {
+		this.sortBy = sortBy;
+		if (saveMemento && this.sortMementoKey) {
+			await this.explorer.context.workspaceState.update(this.sortMementoKey, sortBy);
+		}
+		this.sort();
+	}
+
 	sendNodeChangedEvents(): void {
 		this.explorer.treeEvents.sendNodeChangedEvents(false);
 	}
@@ -375,10 +404,6 @@ export class TestCollection {
 
 	shouldShowExplorerOnRun(): boolean {
 		return (this.getConfiguration().get('showOnRun') === true);
-	}
-
-	getSortSetting(): SortSetting | undefined {
-		return this.getConfiguration().get('sort');
 	}
 
 	computeCodeLenses(): void {
@@ -465,6 +490,15 @@ export class TestCollection {
 		const workspaceFolder = this.adapter.workspaceFolder;
 		var workspaceUri = workspaceFolder ? workspaceFolder.uri : null;
 		return vscode.workspace.getConfiguration('testExplorer', workspaceUri);
+	}
+
+	private sort(): void {
+		if (!this.rootSuite) return;
+
+		let compareFn = getCompareFn(this.sortBy);
+
+		this.sortRec(this.rootSuite, compareFn!);
+		this.explorer.treeEvents.sendTreeChangedEvent();
 	}
 
 	private sortRec(suite: TestSuiteNode, compareFn: (a: TreeNode, b: TreeNode) => number): void {
