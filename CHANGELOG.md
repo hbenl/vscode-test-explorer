@@ -1,3 +1,8 @@
+### Version 2.11.0
+* add menu items to the main menu in the Test Explorer sidebar for sorting the tests
+* add menu items to the editor context menu for running and debugging the tests in the current file (set `testExplorer.addToEditorContextMenu` to `true` to enable them)
+* bugfix: decorations were sometimes not updated
+
 ### Version 2.10.1
 * update list of test adapters in README.md
 
