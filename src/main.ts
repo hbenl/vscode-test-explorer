@@ -14,15 +14,22 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	const configuration = vscode.workspace.getConfiguration('testExplorer', workspaceUri);
 	const expandLevels = configuration.get<number>('showExpandButton') || 0;
 	const showCollapseAll = configuration.get<boolean>('showCollapseButton');
+	const addToEditorContextMenu = configuration.get<boolean>('addToEditorContextMenu');
 
 	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(configChange => {
 		if (configChange.affectsConfiguration('testExplorer.showExpandButton') ||
 			configChange.affectsConfiguration('testExplorer.showCollapseButton')) {
 			vscode.window.showInformationMessage('The change will take effect when you restart Visual Studio Code');
 		}
+		if (configChange.affectsConfiguration('testExplorer.addToEditorContextMenu')) {
+			const configuration = vscode.workspace.getConfiguration('testExplorer', workspaceUri);
+			const addToEditorContextMenu = configuration.get<boolean>('addToEditorContextMenu');
+			vscode.commands.executeCommand('setContext', 'showTestExplorerEditorContextMenu', addToEditorContextMenu);
+		}
 	}));
 
 	vscode.commands.executeCommand('setContext', 'showTestExplorerExpandButton', (expandLevels > 0));
+	vscode.commands.executeCommand('setContext', 'showTestExplorerEditorContextMenu', addToEditorContextMenu);
 
 	const treeView = vscode.window.createTreeView('test-explorer', { treeDataProvider: testExplorer, showCollapseAll });
 	context.subscriptions.push(treeView);
@@ -51,6 +58,10 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	registerCommand('test-explorer.run-test-at-cursor', () => runTestAtCursor(testExplorer));
 
+	registerCommand('test-explorer.run-this-file', (fileUri: vscode.Uri) => runTestsInFile(fileUri.toString(), testExplorer));
+
+	registerCommand('test-explorer.run-this-test', () => runTestAtCursor(testExplorer));
+
 	registerCommand('test-explorer.cancel', () => testExplorer.cancel());
 
 	registerCommand('test-explorer.debug', (...nodes) => testExplorer.debug(nodes));
@@ -58,6 +69,8 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	registerCommand('test-explorer.redebug', () => testExplorer.redebug());
 
 	registerCommand('test-explorer.debug-test-at-cursor', () => debugTestAtCursor(testExplorer));
+
+	registerCommand('test-explorer.debug-this-test', () => debugTestAtCursor(testExplorer));
 
 	registerCommand('test-explorer.show-error', (message) => testExplorer.showError(message));
 

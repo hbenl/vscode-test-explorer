@@ -153,6 +153,12 @@
           "default": true,
           "scope": "resource"
         },
+        "testExplorer.addToEditorContextMenu": {
+          "description": "Add menu items to the editor context menu for running and debugging the tests in the current file",
+          "type": "boolean",
+          "default": false,
+          "scope": "resource"
+        },
         "testExplorer.showOnRun": {
           "description": "Switch to the Test Explorer view whenever a test run is started",
           "type": "boolean",
@@ -219,6 +225,14 @@
         "title": "Test Explorer: Run the test at the current cursor position"
       },
       {
+        "command": "test-explorer.run-this-file",
+        "title": "Run all tests in this file"
+      },
+      {
+        "command": "test-explorer.run-this-test",
+        "title": "Run this test"
+      },
+      {
         "command": "test-explorer.debug",
         "title": "Debug this test",
         "icon": {
@@ -233,6 +247,10 @@
       {
         "command": "test-explorer.debug-test-at-cursor",
         "title": "Test Explorer: Debug the test at the current cursor position"
+      },
+      {
+        "command": "test-explorer.debug-this-test",
+        "title": "Debug this test"
       },
       {
         "command": "test-explorer.cancel",
@@ -435,6 +453,23 @@
           "when": "view == test-explorer && viewItem != error"
         }
       ],
+      "editor/context": [
+        {
+          "command": "test-explorer.run-this-file",
+          "group": "a_testexplorer@1",
+          "when": "showTestExplorerEditorContextMenu"
+        },
+        {
+          "command": "test-explorer.run-this-test",
+          "group": "a_testexplorer@2",
+          "when": "showTestExplorerEditorContextMenu"
+        },
+        {
+          "command": "test-explorer.debug-this-test",
+          "group": "a_testexplorer@3",
+          "when": "showTestExplorerEditorContextMenu"
+        }
+      ],
       "commandPalette": [
         {
           "command": "test-explorer.reload-collection",
@@ -449,7 +484,19 @@
           "when": "false"
         },
         {
+          "command": "test-explorer.run-this-file",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.run-this-test",
+          "when": "false"
+        },
+        {
           "command": "test-explorer.debug",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.debug-this-test",
           "when": "false"
         },
         {
