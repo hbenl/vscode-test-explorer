@@ -58,7 +58,7 @@ export class TestCollection {
 
 			if (configChange.affectsConfiguration('testExplorer.gutterDecoration', workspaceUri) ||
 				configChange.affectsConfiguration('testExplorer.errorDecoration', workspaceUri)) {
-				this.explorer.decorator.updateDecorationsNow();
+				this.explorer.decorator.updateAllDecorations();
 			}
 
 			if (configChange.affectsConfiguration('testExplorer.sort', workspaceUri)) {
@@ -148,7 +148,7 @@ export class TestCollection {
 			this.runningSuite = undefined;
 
 			this.computeCodeLenses();
-			this.explorer.decorator.updateDecorationsNow();
+			this.explorer.decorator.updateAllDecorations();
 
 			this.explorer.treeEvents.sendTreeChangedEvent();
 		}

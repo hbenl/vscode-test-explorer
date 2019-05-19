@@ -10,7 +10,7 @@ export class Decorator {
 	private readonly stateDecorationTypes: StateDecorationTypes;
 	private readonly errorDecorationType: vscode.TextEditorDecorationType;
 
-	private activeTextEditor: vscode.TextEditor | undefined;
+	private filesWithCurrentDecorations = new Set<string>();
 	private timeout: NodeJS.Timer | undefined;
 
 	constructor(
@@ -26,28 +26,59 @@ export class Decorator {
 		});
 		context.subscriptions.push(this.errorDecorationType);
 
-		context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
-			this.activeTextEditor = editor;
-			this.updateDecorationsNow();
+		context.subscriptions.push(vscode.window.onDidChangeVisibleTextEditors(() => {
+			this.updateAllDecorations();
 		}));
 
-		this.activeTextEditor = vscode.window.activeTextEditor;
+		this.updateDecorationsNow();
 	}
 
 	updateDecorationsFor(fileUri: string): void {
 
-		if (!this.timeout && this.activeTextEditor &&
-			(this.activeTextEditor.document.uri.toString() === fileUri)) {
+		if (!this.filesWithCurrentDecorations.has(fileUri)) return;
 
-			this.timeout = setTimeout(() => this.updateDecorationsNow(), 200);
+		this.filesWithCurrentDecorations.delete(fileUri);
+
+		if (!this.timeout) {
+			this.timeout = setTimeout(() => {
+				this.timeout = undefined;
+				this.updateDecorationsNow();
+			}, 200);
 		}
 	}
 
-	updateDecorationsNow(): void {
-		this.timeout = undefined;
-		if (!this.activeTextEditor) return;
+	updateAllDecorations(): void {
 
-		const fileUri = this.activeTextEditor.document.uri.toString();
+		this.filesWithCurrentDecorations.clear();
+
+		this.updateDecorationsNow();
+	}
+
+	private updateDecorationsNow(): void {
+
+		if (this.timeout !== undefined) {
+			clearTimeout(this.timeout);
+			this.timeout = undefined;
+		}
+
+		const newFilesWithCurrentDecorations = new Set<string>();
+		for (const textEditor of vscode.window.visibleTextEditors) {
+
+			const fileUri = textEditor.document.uri.toString();
+
+			if (!this.filesWithCurrentDecorations.has(fileUri)) {
+				this.setDecorations(textEditor);
+			}
+
+			newFilesWithCurrentDecorations.add(fileUri);
+		}
+
+		this.filesWithCurrentDecorations = newFilesWithCurrentDecorations;
+	}
+
+	private setDecorations(textEditor: vscode.TextEditor): void {
+
+		const fileUri = textEditor.document.uri.toString();
 
 		const decorations = new Map<vscode.TextEditorDecorationType, vscode.DecorationOptions[]>();
 		for (const decorationType of this.stateDecorationTypes.all) {
@@ -61,7 +92,7 @@ export class Decorator {
 		}
 
 		for (const [ decorationType, decorationOptions ] of decorations) {
-			this.activeTextEditor.setDecorations(decorationType, decorationOptions);
+			textEditor.setDecorations(decorationType, decorationOptions);
 		}
 	}
 
