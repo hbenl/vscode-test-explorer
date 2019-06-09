@@ -1,3 +1,6 @@
+### Version 2.11.1
+* add Test Explorer Status Bar to the list of test controllers in README.md
+
 ### Version 2.11.0
 * add menu items to the main menu in the Test Explorer sidebar for sorting the tests
 * add menu items to the editor context menu for running and debugging the tests in the current file (set `testExplorer.addToEditorContextMenu` to `true` to enable them)

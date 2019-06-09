@@ -69,9 +69,9 @@ If there is no Test Adapter for your favorite testing framework yet, you can eas
 Currently the following Test Controllers are available:
 
 * The Test Explorer UI (which is the main part of this extension) is itself implemented as a Test Controller
+* The [Test Explorer Status Bar](https://marketplace.visualstudio.com/items?itemName=connorshea.vscode-test-explorer-status-bar) extension provides information about the current test suite in the Status Bar.
 * The [Test Explorer Live Share](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer-liveshare) extension creates Test Controllers in
 the Live Share host that act as proxies for the Test Explorers in the Live Share guests.
-* The [Test Explorer Status Bar](https://marketplace.visualstudio.com/items?itemName=connorshea.vscode-test-explorer-status-bar) extension provides information about the current test suite in the Status Bar.
 
 Do you have a new idea for interacting with the Test Adapters? You can easily get full access to all Test Adapters in your own extension by [implementing your own controller](https://github.com/hbenl/vscode-example-test-controller).
 
