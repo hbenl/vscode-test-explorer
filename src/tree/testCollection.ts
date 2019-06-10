@@ -20,6 +20,7 @@ export class TestCollection {
 	private allRunningTests: TestNode[] | undefined;
 	private runningSuite: TestSuiteNode | undefined;
 	private _autorunNode: TreeNode | undefined;
+	private readonly autorunMementoKey: string | undefined;
 	private sortBy: SortSetting | null;
 	private readonly sortMementoKey: string | undefined;
 
@@ -39,12 +40,15 @@ export class TestCollection {
 
 		this.id = TestCollection.nextCollectionId++;
 
-		let sortBy = this.getSortSetting();
 		if (this.adapter.workspaceFolder) {
-			this.sortMementoKey = `sort ${this.adapter.workspaceFolder.uri.fsPath}`;
-			if (sortBy === undefined) {
-				sortBy = this.getSortMemento();
-			}
+			const folderPath = this.adapter.workspaceFolder.uri.fsPath;
+			this.sortMementoKey = `sort ${folderPath}`;
+			this.autorunMementoKey = `autorun ${folderPath}`;
+		}
+
+		let sortBy = this.getSortSetting();
+		if (sortBy === undefined) {
+			sortBy = this.getSortMemento();
 		}
 		this.sortBy = sortBy || null;
 
@@ -144,8 +148,20 @@ export class TestCollection {
 			this.collectNodesById();
 
 			if (this._autorunNode) {
+
 				const newAutorunNode = this.nodesById.get(this._autorunNode.info.id);
 				this.setAutorun(newAutorunNode);
+
+			} else if (this.autorunMementoKey) {
+
+				const autorunMemento = this.explorer.context.workspaceState.get<string>(this.autorunMementoKey);
+				if (autorunMemento) {
+					const newAutorunNode = this.nodesById.get(autorunMemento);
+					if (newAutorunNode) {
+						this.setAutorun(newAutorunNode);
+					}
+				}
+
 			}
 
 			this.runningSuite = undefined;
@@ -340,6 +356,11 @@ export class TestCollection {
 				node.parent.recalcStateNeeded = true;
 			}
 			this._autorunNode = node;
+		}
+
+		if (this.autorunMementoKey) {
+			const nodeId = this._autorunNode ? this._autorunNode.info.id : undefined;
+			this.explorer.context.workspaceState.update(this.autorunMementoKey, nodeId);
 		}
 
 		this.explorer.treeEvents.sendNodeChangedEvents(true);
