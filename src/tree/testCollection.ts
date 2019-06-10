@@ -304,11 +304,16 @@ export class TestCollection {
 
 			if (node.parent) {
 				node.parent.recalcStateNeeded = true;
+			} else {
+				this.explorer.testLoadFinished(this);
+				this.explorer.testRunFinished(this);
 			}
 
 		} else if (this.rootSuite) {
 
 			this.rootSuite.resetState();
+			this.explorer.testLoadFinished(this);
+			this.explorer.testRunFinished(this);
 
 		}
 
