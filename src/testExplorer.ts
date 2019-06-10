@@ -24,10 +24,10 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	public readonly onDidChangeCodeLenses: vscode.Event<void>;
 
 	public readonly collections = new Map<TestAdapter, TestCollection>();
-	// the number of adapters that are in the process of loading their test definitions
-	private loadingCount = 0;
-	// the number of adapters that are running tests
-	private runningCount = 0;
+	// the collections that are in the process of loading their test definitions
+	private readonly loadingCollections = new Set<TestCollection>();
+	// the collections that are running tests
+	private readonly runningCollections = new Set<TestCollection>();
 
 	private lastTestRun?: [ TestCollection, string[] ];
 
@@ -283,26 +283,26 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		}
 	}
 
-	testLoadStarted(): void {
-		this.loadingCount++;
+	testLoadStarted(collection: TestCollection): void {
+		this.loadingCollections.add(collection);
 		vscode.commands.executeCommand('setContext', 'testsLoading', true);
 	}
 
-	testLoadFinished(): void {
-		this.loadingCount--;
-		if (this.loadingCount === 0) {
+	testLoadFinished(collection: TestCollection): void {
+		this.loadingCollections.delete(collection);
+		if (this.loadingCollections.size === 0) {
 			vscode.commands.executeCommand('setContext', 'testsLoading', false);
 		}
 	}
 
-	testRunStarted(): void {
-		this.runningCount++;
+	testRunStarted(collection: TestCollection): void {
+		this.runningCollections.add(collection)
 		vscode.commands.executeCommand('setContext', 'testsRunning', true);
 	}
 
-	testRunFinished(): void {
-		this.runningCount--;
-		if (this.runningCount === 0) {
+	testRunFinished(collection: TestCollection): void {
+		this.runningCollections.delete(collection);
+		if (this.runningCollections.size === 0) {
 			vscode.commands.executeCommand('setContext', 'testsRunning', false);
 		}
 	}

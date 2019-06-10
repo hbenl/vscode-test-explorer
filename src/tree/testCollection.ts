@@ -106,11 +106,11 @@ export class TestCollection {
 
 		if (testLoadEvent.type === 'started') {
 
-			this.explorer.testLoadStarted();
+			this.explorer.testLoadStarted(this);
 
 		} else if (testLoadEvent.type === 'finished') {
 
-			this.explorer.testLoadFinished();
+			this.explorer.testLoadFinished(this);
 
 			if (testLoadEvent.suite) {
 
@@ -180,7 +180,7 @@ export class TestCollection {
 				testNode.setCurrentState('scheduled');
 			}
 
-			this.explorer.testRunStarted();
+			this.explorer.testRunStarted(this);
 
 		} else if (testRunEvent.type === 'finished') {
 
@@ -193,7 +193,7 @@ export class TestCollection {
 				this.allRunningTests = undefined;
 			}
 
-			this.explorer.testRunFinished();
+			this.explorer.testRunFinished(this);
 
 			this.computeCodeLenses();
 
