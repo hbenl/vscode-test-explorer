@@ -23,7 +23,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	public readonly codeLensesChanged = new vscode.EventEmitter<void>();
 	public readonly onDidChangeCodeLenses: vscode.Event<void>;
 
-	public readonly collections: TestCollection[] = [];
+	public readonly collections = new Map<TestAdapter, TestCollection>();
 	// the number of adapters that are in the process of loading their test definitions
 	private loadingCount = 0;
 	// the number of adapters that are running tests
@@ -46,14 +46,14 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	}
 
 	registerTestAdapter(adapter: TestAdapter): void {
-		this.collections.push(new TestCollection(adapter, this));
+		this.collections.set(adapter, new TestCollection(adapter, this));
 	}
 
 	unregisterTestAdapter(adapter: TestAdapter): void {
-		var index = this.collections.findIndex((collection) => (collection.adapter === adapter));
-		if (index >= 0) {
-			this.collections[index].dispose();
-			this.collections.splice(index, 1);
+		const collection = this.collections.get(adapter);
+		if (collection) {
+			collection.dispose();
+			this.collections.delete(adapter);
 		}
 	}
 
@@ -69,7 +69,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 		} else {
 
-			const nonEmptyCollections = this.collections.filter(
+			const nonEmptyCollections = [ ...this.collections.values() ].filter(
 				(collection) => ((collection.suite !== undefined) || (collection.error !== undefined)));
 
 			if (nonEmptyCollections.length === 0) {
@@ -101,9 +101,9 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		if (node) {
 			node.collection.adapter.load();
 		} else {
-			for (const collection of this.collections) {
+			for (const adapter of this.collections.keys()) {
 				try {
-					collection.adapter.load();
+					adapter.load();
 				} catch (err) {}
 			}
 		}
@@ -123,7 +123,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 		} else {
 
-			for (const collection of this.collections) {
+			for (const collection of this.collections.values()) {
 				if (collection.suite) {
 					try {
 						collection.adapter.run([ collection.suite.info.id ]);
@@ -174,11 +174,11 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	}
 
 	cancel(): void {
-		this.collections.forEach(collection => {
+		for (const adapter of this.collections.keys()) {
 			try {
-				collection.adapter.cancel();
+				adapter.cancel();
 			} catch (err) {}
-		});
+		};
 	}
 
 	showError(message: string | undefined): void {
@@ -218,7 +218,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		if (node) {
 			node.collection.setAutorun(node);
 		} else {
-			for (const collection of this.collections) {
+			for (const collection of this.collections.values()) {
 				collection.setAutorun(collection.suite);
 			}
 		}
@@ -228,7 +228,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		if (node) {
 			node.collection.setAutorun(undefined);
 		} else {
-			for (const collection of this.collections) {
+			for (const collection of this.collections.values()) {
 				collection.setAutorun(undefined);
 			}
 		}
@@ -238,7 +238,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		if (node) {
 			node.collection.retireState(node);
 		} else {
-			for (const collection of this.collections) {
+			for (const collection of this.collections.values()) {
 				collection.retireState();
 			}
 		}
@@ -248,7 +248,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		if (node) {
 			node.collection.resetState(node);
 		} else {
-			for (const collection of this.collections) {
+			for (const collection of this.collections.values()) {
 				collection.resetState();
 			}
 		}
@@ -257,14 +257,17 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	provideCodeLenses(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.CodeLens[] {
 
 		const fileUri = document.uri.toString();
-		const codeLenses = this.collections.map(collection => collection.getCodeLenses(fileUri));
+		let codeLenses: vscode.CodeLens[] = [];
+		for (const collection of this.collections.values()) {
+			codeLenses = codeLenses.concat(collection.getCodeLenses(fileUri));
+		}
 
-		return (<vscode.CodeLens[]>[]).concat(...codeLenses);
+		return codeLenses;
 	}
 
 	provideHover(document: vscode.TextDocument, position: vscode.Position): vscode.Hover | undefined {
 
-		for (const collection of this.collections) {
+		for (const collection of this.collections.values()) {
 			var hover = collection.getHover(document, position);
 			if (hover) {
 				return hover;
@@ -275,7 +278,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	}
 
 	async setSortBy(sortBy: SortSetting | null): Promise<void> {
-		for (const collection of this.collections) {
+		for (const collection of this.collections.values()) {
 			await collection.setSortBy(sortBy, true);
 		}
 	}

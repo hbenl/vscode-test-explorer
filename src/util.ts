@@ -37,7 +37,7 @@ export function runTestsInFile(fileUri: string | undefined, testExplorer: TestEx
 	}
 
 	if (fileUri) {
-		for (const collection of testExplorer.collections) {
+		for (const collection of testExplorer.collections.values()) {
 			if (collection.suite) {
 				const found = findFileNode(fileUri, collection.suite);
 				if (found) {
@@ -111,7 +111,7 @@ function findNodesLocatedAboveCursor(fileUri: string, cursorLine: number, testEx
 	let currentLine = -1;
 	let currentNodes: TreeNode[] = [];
 
-	for (const collection of testExplorer.collections) {
+	for (const collection of testExplorer.collections.values()) {
 
 		const locatedNodes = collection.getLocatedNodes(fileUri);
 		if (locatedNodes) {

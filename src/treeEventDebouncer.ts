@@ -1,13 +1,14 @@
 import * as vscode from 'vscode';
 import { TreeNode } from "./tree/treeNode";
 import { TestCollection } from './tree/testCollection';
+import { TestAdapter } from 'vscode-test-adapter-api';
 
 export class TreeEventDebouncer {
 
 	private timeout: NodeJS.Timer | undefined;
 
 	constructor(
-		private readonly collections: TestCollection[],
+		private readonly collections: Map<TestAdapter, TestCollection>,
 		private readonly treeDataChanged: vscode.EventEmitter<TreeNode>
 	) {}
 
@@ -45,7 +46,7 @@ export class TreeEventDebouncer {
 	private sendNodeChangedEventsNow(): void {
 
 		const changedNodes: TreeNode[] = [];
-		for (const collection of this.collections) {
+		for (const collection of this.collections.values()) {
 			if (collection.suite) {
 				collection.recalcState();
 				changedNodes.push(...this.collectChangedNodes(collection.suite));

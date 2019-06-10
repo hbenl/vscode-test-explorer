@@ -86,7 +86,7 @@ export class Decorator {
 		}
 		decorations.set(this.errorDecorationType, []);
 
-		for (const collection of this.testExplorer.collections) {
+		for (const collection of this.testExplorer.collections.values()) {
 			this.addStateDecorations(collection, fileUri, decorations);
 			this.addErrorDecorations(collection, fileUri, decorations);
 		}
