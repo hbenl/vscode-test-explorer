@@ -96,7 +96,10 @@ export class TestCollection {
 				if (this._autorunNode === this.rootSuite) {
 					this.adapter.run(nodes.map(node => node.info.id));
 				} else {
-					this.adapter.run(intersect(this._autorunNode, nodes).map(node => node.info.id));
+					const nodesToRun = intersect(this._autorunNode, nodes);
+					if (nodesToRun.length > 0) {
+						this.adapter.run(nodesToRun.map(node => node.info.id));
+					}
 				}
 			}));
 		}
