@@ -1,3 +1,7 @@
+### Version 2.12.0
+* automatically update the output channel if the test whose log is shown is run again
+* remember the autorun setting when VS Code is restarted
+
 ### Version 2.11.1
 * add Test Explorer Status Bar to the list of test controllers in README.md
 
