@@ -484,6 +484,20 @@ export class TestCollection {
 		return undefined;
 	}
 
+	findNodesById(ids: string[]): TreeNode[] {
+
+		const nodes: TreeNode[] = [];
+
+		for (const id of ids) {
+			const node = this.nodesById.get(id);
+			if (node) {
+				nodes.push(node);
+			}
+		}
+
+		return nodes;
+	}
+
 	dispose(): void {
 		for (const disposable of this.disposables) {
 			disposable.dispose();

@@ -258,6 +258,10 @@
         "icon": "./icons/stop.svg"
       },
       {
+        "command": "test-explorer.show-log",
+        "title": "Show test log"
+      },
+      {
         "command": "test-explorer.show-error",
         "title": "Show error message"
       },
@@ -497,6 +501,10 @@
         },
         {
           "command": "test-explorer.debug-this-test",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.show-log",
           "when": "false"
         },
         {

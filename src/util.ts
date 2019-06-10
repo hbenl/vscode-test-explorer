@@ -189,17 +189,11 @@ export function createDebugCodeLens(line: number, nodes: TreeNode[]): vscode.Cod
 export function createLogCodeLens(line: number, nodes: TreeNode[]): vscode.CodeLens {
 
 	const range = new vscode.Range(line, 0, line, 0);
-	let log = '';
-	for (const node of nodes) {
-		if (node.log) {
-			log += node.log;
-		}
-	}
 
 	return new vscode.CodeLens(range, {
 		title: 'Show Log',
-		command: 'test-explorer.show-error',
-		arguments: [ log ]
+		command: 'test-explorer.show-log',
+		arguments: [ nodes ]
 	});
 }
 

@@ -85,13 +85,21 @@ export class TestNode implements TreeNode {
 			this.state.previous = currentState;
 		}
 
+		let logChanged = false;
+
 		if (currentState === 'scheduled') {
 			this._log = "";
 			this._decorations = [];
+			logChanged = true;
 		}
 
 		if (logMessage) {
 			this._log += logMessage + "\n";
+			logChanged = true;
+		}
+
+		if (logChanged) {
+			this.collection.explorer.logChanged(this);
 		}
 
 		if (decorations) {
@@ -159,6 +167,8 @@ export class TestNode implements TreeNode {
 				this.collection.explorer.decorator.updateDecorationsFor(this.fileUri);
 			}
 		}
+
+		this.collection.explorer.logChanged(this);
 	}
 
 	setAutorun(autorun: boolean): void {
@@ -178,8 +188,8 @@ export class TestNode implements TreeNode {
 			(this.fileUri ? 'testWithSource' : 'test');
 		treeItem.command = {
 			title: '',
-			command: 'test-explorer.show-error',
-			arguments: [ this.log ]
+			command: 'test-explorer.show-log',
+			arguments: [ [ this ] ]
 		};
 		treeItem.description = this.description;
 		treeItem.tooltip = this.tooltip;

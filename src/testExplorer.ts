@@ -16,6 +16,10 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	public readonly treeEvents: TreeEventDebouncer;
 
 	private readonly outputChannel: vscode.OutputChannel;
+	private nodesShownInOutputChannel: undefined | {
+		collection: TestCollection,
+		ids: string[]
+	};
 
 	private readonly treeDataChanged = new vscode.EventEmitter<TreeNode>();
 	public readonly onDidChangeTreeData: vscode.Event<TreeNode>;
@@ -181,11 +185,29 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		};
 	}
 
+	showLog(nodes: TreeNode[]): void {
+
+		if (nodes.length > 0) {
+
+			this.nodesShownInOutputChannel = {
+				collection: nodes[0].collection,
+				ids: nodes.map(node => node.info.id)
+			}
+
+		} else {
+			this.nodesShownInOutputChannel = undefined;
+		}
+
+		this.updateLog();
+	}
+
 	showError(message: string | undefined): void {
+
+		this.outputChannel.clear();
+		this.nodesShownInOutputChannel = undefined;
 
 		if (message) {
 
-			this.outputChannel.clear();
 			this.outputChannel.append(message);
 			this.outputChannel.show(true);
 
@@ -304,6 +326,39 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		this.runningCollections.delete(collection);
 		if (this.runningCollections.size === 0) {
 			vscode.commands.executeCommand('setContext', 'testsRunning', false);
+		}
+	}
+
+	logChanged(node: TreeNode): void {
+		if (this.nodesShownInOutputChannel &&
+			(this.nodesShownInOutputChannel.collection === node.collection) &&
+			this.nodesShownInOutputChannel.ids.includes(node.info.id)
+		) {
+			this.updateLog();
+		}
+	}
+
+	private updateLog(): void {
+
+		this.outputChannel.clear();
+
+		let logIsEmpty = true;
+		if (this.nodesShownInOutputChannel) {
+
+			const nodes = this.nodesShownInOutputChannel.collection.findNodesById(this.nodesShownInOutputChannel.ids);
+
+			for (const node of nodes) {
+				if (node.log) {
+					this.outputChannel.append(node.log);
+					logIsEmpty = false;
+				}
+			}
+		}
+
+		if (logIsEmpty) {
+			this.outputChannel.hide();
+		} else {
+			this.outputChannel.show(true);
 		}
 	}
 }
