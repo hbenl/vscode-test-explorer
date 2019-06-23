@@ -139,7 +139,7 @@ export class TestCollection {
 
 				this.rootSuite = undefined;
 				if (testLoadEvent.errorMessage) {
-					this.errorNode = new ErrorNode(this, testLoadEvent.errorMessage);
+					this.errorNode = new ErrorNode(this, `${this.id}:error`, testLoadEvent.errorMessage);
 				} else {
 					this.errorNode = undefined;
 				}
