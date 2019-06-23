@@ -1,3 +1,6 @@
+### Version 2.12.1
+* bugfix: when multiple adapters failed to load tests, Test Explorer didn't show their error messages
+
 ### Version 2.12.0
 * automatically update the output channel if the test whose log is shown is run again
 * remember the autorun setting when VS Code is restarted
