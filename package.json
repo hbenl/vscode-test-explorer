@@ -34,16 +34,16 @@
     "publish": "vsce publish"
   },
   "dependencies": {
-    "escape-string-regexp": "^1.0.5",
-    "tslib": "^1.9.3",
+    "escape-string-regexp": "^2.0.0",
+    "tslib": "^1.10.0",
     "vscode-test-adapter-api": "^1.7.0"
   },
   "devDependencies": {
-    "@types/escape-string-regexp": "1.0.0",
+    "@types/escape-string-regexp": "2.0.1",
     "rimraf": "^2.6.3",
-    "typescript": "^3.4.1",
-    "vsce": "^1.59.0",
-    "vscode": "^1.1.33"
+    "typescript": "^3.5.2",
+    "vsce": "^1.64.0",
+    "vscode": "^1.1.34"
   },
   "engines": {
     "vscode": "^1.30.0"
