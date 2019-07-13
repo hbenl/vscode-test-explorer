@@ -24,7 +24,6 @@
   ],
   "main": "out/main.js",
   "scripts": {
-    "postinstall": "node ./node_modules/vscode/bin/install",
     "reinstall": "rimraf node_modules package-lock.json && npm install",
     "clean": "rimraf out vscode-test-explorer-*.vsix",
     "build": "tsc",
@@ -40,10 +39,10 @@
   },
   "devDependencies": {
     "@types/escape-string-regexp": "2.0.1",
+    "@types/vscode": "~1.30.0",
     "rimraf": "^2.6.3",
-    "typescript": "^3.5.2",
-    "vsce": "^1.64.0",
-    "vscode": "^1.1.34"
+    "typescript": "^3.5.3",
+    "vsce": "^1.65.0"
   },
   "engines": {
     "vscode": "^1.30.0"
