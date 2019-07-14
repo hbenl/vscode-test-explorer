@@ -4,7 +4,7 @@ import { TreeNode } from "./treeNode";
 import { NodeState, stateIcon, parentNodeState, parentCurrentNodeState, parentPreviousNodeState, parentAutorunFlag } from "./state";
 import { TestCollection } from './testCollection';
 import { TestNode } from './testNode';
-import { normalizeFilename } from '../util';
+import { normalizeFilename, groupSuitesByLabel, mergeSuiteInfos, getAdapterIds } from '../util';
 
 export class TestSuiteNode implements TreeNode {
 
@@ -19,6 +19,16 @@ export class TestSuiteNode implements TreeNode {
 	readonly log = undefined;
 	get children(): TreeNode[] { return this._children; }
 
+	get adapterIds(): string[] {
+		if (this.isMergedNode) {
+			return getAdapterIds(this._children);
+		} else {
+			return [ this.info.id ];
+		}
+	}
+
+	get isHidden(): boolean { return (this.parent !== undefined) && this.parent.isMergedNode; }
+
 	/** set to true if one of the children's state may have changed and hence
 	 *  the state of this node needs to be recalculated */
 	recalcStateNeeded: boolean;
@@ -31,6 +41,7 @@ export class TestSuiteNode implements TreeNode {
 		public readonly collection: TestCollection,
 		public readonly info: TestSuiteInfo,
 		public readonly parent: TestSuiteNode | undefined,
+		public readonly isMergedNode: boolean,
 		oldNodesById?: Map<string, TreeNode>
 	) {
 
@@ -39,13 +50,32 @@ export class TestSuiteNode implements TreeNode {
 		this.description = info.description;
 		this.tooltip = info.tooltip;
 
-		this._children = info.children.map(childInfo => {
-			if (childInfo.type === 'test') {
-				return new TestNode(collection, childInfo, this, oldNodesById);
-			} else {
-				return new TestSuiteNode(collection, childInfo, this, oldNodesById);
-			}
-		});
+		if (!this.collection.shouldMergeSuites()) {
+
+			this._children = info.children.map(childInfo => {
+				if (childInfo.type === 'test') {
+					return new TestNode(collection, childInfo, this, oldNodesById);
+				} else {
+					return new TestSuiteNode(collection, childInfo, this, false, oldNodesById);
+				}
+			});
+	
+		} else {
+
+			this._children = groupSuitesByLabel(info.children).map(childInfos => {
+				if (!Array.isArray(childInfos)) {
+					return new TestNode(collection, childInfos, this, oldNodesById);
+				} else {
+					if (childInfos.length === 1) {
+						return new TestSuiteNode(collection, childInfos[0], this, false, oldNodesById);
+					} else {
+						const mergedSuite = new TestSuiteNode(collection, mergeSuiteInfos(childInfos), this, true, oldNodesById);
+						mergedSuite._children = childInfos.map(childInfo => new TestSuiteNode(collection, childInfo, mergedSuite, false, oldNodesById));
+						return mergedSuite;
+					}
+				}
+			});
+		}
 
 		this._state = parentNodeState(this._children);
 	}

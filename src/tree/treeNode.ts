@@ -8,6 +8,7 @@ export interface TreeNode {
 	readonly info: TestSuiteInfo | TestInfo;
 	readonly fileUri: string | undefined;
 	uniqueId: string;
+	readonly adapterIds: string[];
 	readonly state: NodeState;
 	sendStateNeeded: boolean;
 	readonly log: string | undefined;

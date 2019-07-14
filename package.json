@@ -163,6 +163,12 @@
           "type": "boolean",
           "default": false,
           "scope": "resource"
+        },
+        "testExplorer.mergeSuites": {
+          "description": "Merge suites with the same label and parent",
+          "type": "boolean",
+          "default": false,
+          "scope": "resource"
         }
       }
     },

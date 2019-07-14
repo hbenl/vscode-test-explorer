@@ -21,6 +21,8 @@ export class TestNode implements TreeNode {
 	get decorations(): TestDecoration[] { return this._decorations; }
 	readonly children: TreeNode[] = [];
 
+	get adapterIds(): string[] { return [ this.info.id ]; }
+
 	/** set to true if the state, description or tooltip of this node has changed
 	 *  and needs to be sent to VS Code so that the UI is updated */
 	sendStateNeeded: boolean;

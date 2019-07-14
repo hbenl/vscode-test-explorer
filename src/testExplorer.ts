@@ -8,6 +8,8 @@ import { TreeEventDebouncer } from './treeEventDebouncer';
 import { Decorator } from './decorator';
 import { pickNode, findLineContaining } from './util';
 import { SortSetting } from './tree/sort';
+import { TestNode } from './tree/testNode';
+import { TestSuiteNode } from './tree/testSuiteNode';
 
 export class TestExplorer implements TestController, vscode.TreeDataProvider<TreeNode | ErrorNode>, vscode.CodeLensProvider, vscode.HoverProvider {
 
@@ -69,6 +71,9 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 		if (node) {
 
+			if ((node instanceof TestSuiteNode) && node.isMergedNode) {
+				return ([] as TreeNode[]).concat(...node.children.map(child => child.children));
+			}
 			return node.children;
 
 		} else {
@@ -121,8 +126,8 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 			const node = await pickNode(nodes);
 			if (node) {
-				this.lastTestRun = [ node.collection, [ node.info.id ] ];
-				node.collection.adapter.run([ node.info.id ]);
+				this.lastTestRun = [ node.collection, node.adapterIds ];
+				node.collection.adapter.run(node.adapterIds);
 			}
 
 		} else {
@@ -130,7 +135,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 			for (const collection of this.collections.values()) {
 				if (collection.suite) {
 					try {
-						collection.adapter.run([ collection.suite.info.id ]);
+						collection.adapter.run(collection.suite.adapterIds);
 					} catch (err) {}
 				}
 			}
@@ -156,8 +161,8 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		if (node && node.collection.adapter.debug) {
 			try {
 
-				this.lastTestRun = [ node.collection, [ node.info.id ] ];
-				await node.collection.adapter.debug([ node.info.id ]);
+				this.lastTestRun = [ node.collection, node.adapterIds ];
+				await node.collection.adapter.debug(node.adapterIds);
 
 			} catch(e) {
 				vscode.window.showErrorMessage(`Error while debugging test: ${e}`);
@@ -185,7 +190,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		};
 	}
 
-	showLog(nodes: TreeNode[]): void {
+	showLog(nodes: TestNode[]): void {
 
 		if (nodes.length > 0) {
 
@@ -329,7 +334,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		}
 	}
 
-	logChanged(node: TreeNode): void {
+	logChanged(node: TestNode): void {
 		if (this.nodesShownInOutputChannel &&
 			(this.nodesShownInOutputChannel.collection === node.collection) &&
 			this.nodesShownInOutputChannel.ids.includes(node.info.id)

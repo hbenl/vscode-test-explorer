@@ -5,7 +5,7 @@ import { TestNode } from './testNode';
 import { TestExplorer } from '../testExplorer';
 import { TreeNode } from './treeNode';
 import { ErrorNode } from './errorNode';
-import { allTests, createRunCodeLens, createDebugCodeLens, createRevealCodeLens, createLogCodeLens, intersect } from '../util';
+import { allTests, createRunCodeLens, createDebugCodeLens, createRevealCodeLens, createLogCodeLens, intersect, getAdapterIds } from '../util';
 import { SortSetting, getCompareFn } from './sort';
 
 export class TestCollection {
@@ -74,6 +74,10 @@ export class TestCollection {
 					this.setSortBy(sortBy);
 				}
 			}
+
+			if (configChange.affectsConfiguration('testExplorer.mergeSuites', workspaceUri)) {
+				this.adapter.load();
+			}
 		}));
 
 		this.disposables.push(adapter.tests(testLoadEvent => this.onTestLoadEvent(testLoadEvent)));
@@ -98,11 +102,11 @@ export class TestCollection {
 				if (!this._autorunNode) return;
 
 				if (this._autorunNode === this.rootSuite) {
-					this.adapter.run(nodes.map(node => node.info.id));
+					this.adapter.run(getAdapterIds(nodes));
 				} else {
 					const nodesToRun = intersect(this._autorunNode, nodes);
 					if (nodesToRun.length > 0) {
-						this.adapter.run(nodesToRun.map(node => node.info.id));
+						this.adapter.run(getAdapterIds(nodesToRun));
 					}
 				}
 			}));
@@ -121,7 +125,7 @@ export class TestCollection {
 
 			if (testLoadEvent.suite) {
 
-				this.rootSuite = new TestSuiteNode(this, testLoadEvent.suite, undefined, this.nodesById);
+				this.rootSuite = new TestSuiteNode(this, testLoadEvent.suite, undefined, false, this.nodesById);
 				this.errorNode = undefined;
 
 				if (this.shouldRetireStateOnReload()) {
@@ -227,7 +231,7 @@ export class TestCollection {
 				if (!suiteNode && this.runningSuite && (typeof testRunEvent.suite === 'object')) {
 
 					this.runningSuite.info.children.push(testRunEvent.suite);
-					suiteNode = new TestSuiteNode(this, testRunEvent.suite, this.runningSuite);
+					suiteNode = new TestSuiteNode(this, testRunEvent.suite, this.runningSuite, false);
 					this.runningSuite.children.push(suiteNode);
 					this.runningSuite.recalcStateNeeded = true;
 					this.nodesById.set(suiteId, suiteNode);
@@ -431,6 +435,10 @@ export class TestCollection {
 		return (this.getConfiguration().get('showOnRun') === true);
 	}
 
+	shouldMergeSuites(): boolean {
+		return (this.getConfiguration().get('mergeSuites') === true);
+	}
+
 	computeCodeLenses(): void {
 
 		this.codeLenses.clear();
@@ -458,7 +466,10 @@ export class TestCollection {
 							fileCodeLenses.push(createLogCodeLens(line, lineLocatedNodes));
 						}
 
-						fileCodeLenses.push(createRevealCodeLens(line, lineLocatedNodes));
+						const firstNode = lineLocatedNodes[0];
+						if (!(firstNode instanceof TestSuiteNode) || !firstNode.isHidden) {
+							fileCodeLenses.push(createRevealCodeLens(line, firstNode));
+						}
 					}
 
 					this.codeLenses.set(file, fileCodeLenses);

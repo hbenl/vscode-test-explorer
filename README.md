@@ -92,6 +92,7 @@ Property                              | Description
 `testExplorer.showExpandButton`       | Show a button for expanding the top nodes of the test tree, recursively for the given number of levels
 `testExplorer.showOnRun`              | Switch to the Test Explorer view whenever a test run is started
 `testExplorer.addToEditorContextMenu` | Add menu items for running and debugging the tests in the current file to the editor context menu
+`testExplorer.mergeSuites`            | Merge suites with the same label and parent
 
 Further configuration options are provided by the Test Adapters.
 

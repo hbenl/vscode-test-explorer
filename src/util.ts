@@ -4,6 +4,7 @@ import { TestExplorer } from './testExplorer';
 import { TreeNode } from './tree/treeNode';
 import { TestNode } from './tree/testNode';
 import { ErrorNode } from './tree/errorNode';
+import { TestSuiteInfo, TestInfo } from 'vscode-test-adapter-api';
 
 export function* allTests(treeNode: TreeNode): IterableIterator<TestNode> {
 	if (treeNode.info.type === 'suite') {
@@ -197,14 +198,14 @@ export function createLogCodeLens(line: number, nodes: TreeNode[]): vscode.CodeL
 	});
 }
 
-export function createRevealCodeLens(line: number, nodes: TreeNode[]): vscode.CodeLens {
+export function createRevealCodeLens(line: number, node: TreeNode): vscode.CodeLens {
 
 	const range = new vscode.Range(line, 0, line, 0);
 
 	return new vscode.CodeLens(range, {
 		title: 'Show in Test Explorer',
 		command: 'test-explorer.reveal',
-		arguments: nodes
+		arguments: [ node ]
 	});
 }
 
@@ -223,4 +224,51 @@ export function expand(testExplorer: TestExplorer, treeView: vscode.TreeView<Tre
 	for (const node of testExplorer.getChildren()) {
 		treeView.reveal(node, { expand: levels });
 	}
+}
+
+export function groupSuitesByLabel(nodes: (TestSuiteInfo | TestInfo)[]): (TestSuiteInfo[] | TestInfo)[] {
+
+	const grouped = new Map<string, TestSuiteInfo[] | TestInfo>();
+	let testCount = 0;
+
+	for (const node of nodes) {
+
+		if (node.type === 'test') {
+
+			const key = `t${testCount++}`;
+			grouped.set(key, node);
+
+		} else { // node.type === 'suite'
+
+			const key = `s${node.label}`;
+			if (!grouped.has(key)) {
+				grouped.set(key, [ node ]);
+			} else {
+				(grouped.get(key) as TestSuiteInfo[]).push(node);
+			}
+		}
+	}
+
+	return [...grouped.values()];
+}
+
+export function mergeSuiteInfos(suites: TestSuiteInfo[]): TestSuiteInfo {
+
+	if (suites.length === 1) {
+
+		return suites[0];
+
+	} else {
+
+		return {
+			type: 'suite',
+			id: JSON.stringify(suites.map(suite => suite.id).sort()),
+			label: suites[0].label,
+			children: ([] as (TestSuiteInfo | TestInfo)[]).concat(...suites.map(suite => suite.children))
+		}
+	}
+}
+
+export function getAdapterIds(nodes: TreeNode[]): string[] {
+	return ([] as string[]).concat(...nodes.map(node => node.adapterIds));
 }

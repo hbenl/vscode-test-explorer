@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { TreeNode } from "./tree/treeNode";
 import { TestCollection } from './tree/testCollection';
 import { TestAdapter } from 'vscode-test-adapter-api';
+import { TestSuiteNode } from './tree/testSuiteNode';
 
 export class TreeEventDebouncer {
 
@@ -67,7 +68,12 @@ export class TreeEventDebouncer {
 		if (node.sendStateNeeded) {
 
 			this.resetNeededUpdates(node);
-			return [ node ];
+
+			if ((node instanceof TestSuiteNode) && node.isHidden) {
+				return [ node.parent! ];
+			} else {
+				return [ node ];
+			}
 
 		} else {
 
