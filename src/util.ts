@@ -148,20 +148,22 @@ export function findLineContaining(needle: string, haystack: string | undefined)
 	return haystack.substr(0, index).split('\n').length - 1;
 }
 
-export async function pickNode(nodes: TreeNode[]): Promise<TreeNode | undefined> {
+export async function pickNodes(nodes: TreeNode[]): Promise<TreeNode[]> {
 
-	if (nodes.length === 1) {
-
-		return nodes[0];
-
-	} else if (nodes.length > 1) {
+	if (nodes.length > 1) {
 
 		const labels = nodes.map(node => node.info.label);
+		labels.push("All of them");
 		const pickedLabel = await vscode.window.showQuickPick(labels);
-		return nodes.find(node => (node.info.label === pickedLabel));
-		
+
+		if (pickedLabel === "All of them") {
+			return nodes;
+		} else {
+			return nodes.filter(node => (node.info.label === pickedLabel));
+		}
+
 	} else {
-		return undefined;
+		return nodes;
 	}
 }
 

@@ -6,7 +6,7 @@ import { ErrorNode } from './tree/errorNode';
 import { IconPaths } from './iconPaths';
 import { TreeEventDebouncer } from './treeEventDebouncer';
 import { Decorator } from './decorator';
-import { pickNode, findLineContaining } from './util';
+import { pickNodes, findLineContaining, getAdapterIds } from './util';
 import { SortSetting } from './tree/sort';
 import { TestNode } from './tree/testNode';
 import { TestSuiteNode } from './tree/testSuiteNode';
@@ -124,10 +124,10 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 		if (nodes) {
 
-			const node = await pickNode(nodes);
-			if (node) {
-				this.lastTestRun = [ node.collection, node.adapterIds ];
-				node.collection.adapter.run(node.adapterIds);
+			const nodesToRun = await pickNodes(nodes);
+			if (nodesToRun.length > 0) {
+				this.lastTestRun = [ nodesToRun[0].collection, getAdapterIds(nodesToRun) ];
+				nodesToRun[0].collection.adapter.run(getAdapterIds(nodesToRun));
 			}
 
 		} else {
@@ -157,12 +157,12 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 		this.lastTestRun = undefined;
 
-		const node = await pickNode(nodes);
-		if (node && node.collection.adapter.debug) {
+		const nodesToRun = await pickNodes(nodes);
+		if ((nodesToRun.length > 0) && nodesToRun[0].collection.adapter.debug) {
 			try {
 
-				this.lastTestRun = [ node.collection, node.adapterIds ];
-				await node.collection.adapter.debug(node.adapterIds);
+				this.lastTestRun = [ nodesToRun[0].collection, getAdapterIds(nodesToRun) ];
+				await nodesToRun[0].collection.adapter.debug(getAdapterIds(nodesToRun));
 
 			} catch(e) {
 				vscode.window.showErrorMessage(`Error while debugging test: ${e}`);
