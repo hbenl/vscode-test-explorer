@@ -220,30 +220,26 @@ export class TestCollection {
 
 			const suiteId = (typeof testRunEvent.suite === 'string') ? testRunEvent.suite : testRunEvent.suite.id;
 			const node = this.nodesById.get(suiteId);
-			let testSuiteNode = (node && (node.info.type === 'suite')) ? <TestSuiteNode>node : undefined;
+			let suiteNode = (node && (node.info.type === 'suite')) ? <TestSuiteNode>node : undefined;
 
 			if (testRunEvent.state === 'running') {
 
-				if (!testSuiteNode && this.runningSuite && (typeof testRunEvent.suite === 'object')) {
+				if (!suiteNode && this.runningSuite && (typeof testRunEvent.suite === 'object')) {
 
 					this.runningSuite.info.children.push(testRunEvent.suite);
-					testSuiteNode = new TestSuiteNode(this, testRunEvent.suite, this.runningSuite);
-					this.runningSuite.children.push(testSuiteNode);
+					suiteNode = new TestSuiteNode(this, testRunEvent.suite, this.runningSuite);
+					this.runningSuite.children.push(suiteNode);
 					this.runningSuite.recalcStateNeeded = true;
-					this.nodesById.set(suiteId, testSuiteNode);
+					this.nodesById.set(suiteId, suiteNode);
 
 				}
 
-				if (testSuiteNode) {
-					testSuiteNode.update(testRunEvent.description, testRunEvent.tooltip);
-					this.runningSuite = testSuiteNode;
+				if (suiteNode) {
+					suiteNode.update(testRunEvent.description, testRunEvent.tooltip);
+					this.runningSuite = suiteNode;
 				}
 
 			} else { // testStateMessage.state === 'completed'
-
-				const suiteId = (typeof testRunEvent.suite === 'object') ? testRunEvent.suite.id : testRunEvent.suite;
-				const node = this.nodesById.get(suiteId);
-				const suiteNode = (node && (node.info.type === 'suite')) ? <TestSuiteNode>node : undefined;
 
 				if (suiteNode) {
 					suiteNode.update(testRunEvent.description, testRunEvent.tooltip);
