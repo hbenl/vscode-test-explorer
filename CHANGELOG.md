@@ -1,3 +1,7 @@
+### Version 2.13.0
+* add configuration option for merging suites with the same label
+* bugfix: "Run all test in file" did not always run all of the tests
+
 ### Version 2.12.1
 * bugfix: when multiple adapters failed to load tests, Test Explorer didn't show their error messages
 
