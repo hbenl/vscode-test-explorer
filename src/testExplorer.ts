@@ -118,13 +118,13 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		}
 	}
 
-	async run(nodes?: TreeNode[]): Promise<void> {
+	async run(nodes?: TreeNode[], pick = true): Promise<void> {
 
 		this.lastTestRun = undefined;
 
 		if (nodes) {
 
-			const nodesToRun = await pickNodes(nodes);
+			const nodesToRun = pick ? await pickNodes(nodes) : nodes;
 			if (nodesToRun.length > 0) {
 				this.lastTestRun = [ nodesToRun[0].collection, getAdapterIds(nodesToRun) ];
 				nodesToRun[0].collection.adapter.run(getAdapterIds(nodesToRun));

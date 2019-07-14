@@ -40,9 +40,9 @@ export function runTestsInFile(fileUri: string | undefined, testExplorer: TestEx
 	if (fileUri) {
 		for (const collection of testExplorer.collections.values()) {
 			if (collection.suite) {
-				const found = findFileNode(fileUri, collection.suite);
-				if (found) {
-					testExplorer.run([ found ]);
+				const found = findFileNodes(fileUri, collection.suite);
+				if (found.length > 0) {
+					testExplorer.run(found, false);
 					return;
 				}
 			}
@@ -50,27 +50,21 @@ export function runTestsInFile(fileUri: string | undefined, testExplorer: TestEx
 	}
 }
 
-function findFileNode(fileUri: string, searchNode: TreeNode): TreeNode | undefined {
+function findFileNodes(fileUri: string, searchNode: TreeNode): TreeNode[] {
 
 	if (searchNode.fileUri) {
 
 		if (searchNode.fileUri === fileUri) {
-			return searchNode;
+			return [ searchNode ];
 		} else {
-			return undefined;
+			return [];
 		}
 
 	} else {
 
-		for (const childNode of searchNode.children) {
-			const found = findFileNode(fileUri, childNode);
-			if (found) {
-				return found;
-			}
-		}
-	}
+		return ([] as TreeNode[]).concat(...searchNode.children.map(childNode => findFileNodes(fileUri, childNode)));
 
-	return undefined;
+	}
 }
 
 export function runTestAtCursor(testExplorer: TestExplorer): void {
