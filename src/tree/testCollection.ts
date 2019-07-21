@@ -439,6 +439,10 @@ export class TestCollection {
 		return (this.getConfiguration().get('mergeSuites') === true);
 	}
 
+	shouldHideEmptyLog(): boolean {
+		return (this.getConfiguration().get('hideEmptyLog') !== false);
+	}
+
 	computeCodeLenses(): void {
 
 		this.codeLenses.clear();

@@ -169,6 +169,12 @@
           "type": "boolean",
           "default": false,
           "scope": "resource"
+        },
+        "testExplorer.hideEmptyLog": {
+          "description": "Hide the output channel used to show a test's log when the user clicks on a test whose log is empty",
+          "type": "boolean",
+          "default": true,
+          "scope": "resource"
         }
       }
     },

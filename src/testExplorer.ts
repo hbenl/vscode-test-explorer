@@ -361,7 +361,10 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		}
 
 		if (logIsEmpty) {
-			this.outputChannel.hide();
+			if (this.nodesShownInOutputChannel &&
+				this.nodesShownInOutputChannel.collection.shouldHideEmptyLog()) {
+				this.outputChannel.hide();
+			}
 		} else {
 			this.outputChannel.show(true);
 		}
