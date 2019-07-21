@@ -1,3 +1,6 @@
+### Version 2.14.0
+* add `testExplorer.hideEmptyLog` configuration option
+
 ### Version 2.13.0
 * add configuration option for merging suites with the same label
 * bugfix: "Run all test in file" did not always run all of the tests
