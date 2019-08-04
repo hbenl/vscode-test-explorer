@@ -29,6 +29,8 @@ export class TestCollection {
 	private readonly locatedNodes = new Map<string, Map<number, TreeNode[]>>();
 	private readonly codeLenses = new Map<string, vscode.CodeLens[]>();
 
+	private changeEventsWhileLoading: vscode.TextDocumentChangeEvent[] | undefined;
+
 	get suite() { return this.rootSuite; }
 	get error() { return this.errorNode; }
 	get autorunNode() { return this._autorunNode; }
@@ -111,6 +113,13 @@ export class TestCollection {
 				}
 			}));
 		}
+
+		this.disposables.push(vscode.workspace.onDidChangeTextDocument(changeEvent => {
+			this.adjustCodeLenses(changeEvent);
+			if (this.changeEventsWhileLoading) {
+				this.changeEventsWhileLoading.push(changeEvent);
+			}
+		}))
 	}
 
 	private onTestLoadEvent(testLoadEvent: TestLoadStartedEvent | TestLoadFinishedEvent): void {
@@ -118,6 +127,7 @@ export class TestCollection {
 		if (testLoadEvent.type === 'started') {
 
 			this.explorer.testLoadStarted(this);
+			this.changeEventsWhileLoading = [];
 
 		} else if (testLoadEvent.type === 'finished') {
 
@@ -481,7 +491,47 @@ export class TestCollection {
 			}
 		}
 
+		if (this.changeEventsWhileLoading) {
+			for (const changeEvent of this.changeEventsWhileLoading) {
+				this.adjustCodeLenses(changeEvent);
+			}
+			this.changeEventsWhileLoading = undefined;
+		}
+
 		this.explorer.codeLensesChanged.fire();
+	}
+
+	private adjustCodeLenses(changeEvent: vscode.TextDocumentChangeEvent): void {
+
+		const documentCodeLenses = this.codeLenses.get(changeEvent.document.uri.toString());
+		if (!documentCodeLenses) return;
+
+		for (const change of changeEvent.contentChanges) {
+
+			const startLine = change.range.start.line;
+			const endLine = change.range.end.line;
+			const replacedByLines = change.text.split('\n').length - 1;
+
+			if ((startLine === endLine) && (replacedByLines === 0)) continue;
+
+			for (let i = documentCodeLenses.length - 1; i >= 0; i--) {
+
+				const codeLens = documentCodeLenses[i];
+				const oldCodeLensLine = codeLens.range.start.line;
+				let newCodeLensLine: number;
+
+				if (oldCodeLensLine >= startLine) {
+
+					if (oldCodeLensLine <= endLine) {
+						newCodeLensLine = startLine;
+					} else {
+						newCodeLensLine = oldCodeLensLine - (endLine - startLine) + replacedByLines;
+					}
+
+					codeLens.range = new vscode.Range(newCodeLensLine, 0, newCodeLensLine, 0);
+				} 
+			}
+		}
 	}
 
 	getCodeLenses(fileUri: string): vscode.CodeLens[] {
