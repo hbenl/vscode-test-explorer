@@ -1,3 +1,6 @@
+### Version 2.14.1
+* adjust the CodeLens positions when a test file is edited
+
 ### Version 2.14.0
 * add `testExplorer.hideEmptyLog` configuration option
 
