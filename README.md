@@ -20,6 +20,7 @@ Currently the following Test Adapters are available:
 * [Jasmine Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-jasmine-test-adapter)
 * [Angular/Karma Test Explorer](https://marketplace.visualstudio.com/items?itemName=raagh.angular-karma-test-explorer)
 * [Jest Test Explorer](https://marketplace.visualstudio.com/items?itemName=rtbenfield.vscode-jest-test-adapter)
+* [AVA Test Explorer](https://marketplace.visualstudio.com/items?itemName=gwenio.vscode-ava-test-adapter)
 * [TestyTs Test Explorer](https://marketplace.visualstudio.com/items?itemName=Testy.vscode-testyts-test-adapter)
 
 ### C
@@ -31,6 +32,7 @@ Currently the following Test Adapters are available:
 * [Catch2 and Google Test Explorer](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)
 * [CppUnitTestFramework Explorer](https://marketplace.visualstudio.com/items?itemName=drleq.vscode-cpputf-test-adapter)
 * [Bandit Test Explorer](https://marketplace.visualstudio.com/items?itemName=dampsoft.vscode-banditcpp-test-adapter)
+* [catkin-tools](https://marketplace.visualstudio.com/items?itemName=betwo.b2-catkin-tools)
 
 ### Haxe
 
@@ -56,6 +58,10 @@ Currently the following Test Adapters are available:
 ### .NET Framework
 
 * [NXunit Test Explorer](https://marketplace.visualstudio.com/items?itemName=wghats.vscode-nxunit-test-adapter)
+
+### Z80 Assembler
+
+* [Z80 Unit Tests](https://marketplace.visualstudio.com/items?itemName=maziac.z80-unit-tests)
 
 ### Live Share
 
