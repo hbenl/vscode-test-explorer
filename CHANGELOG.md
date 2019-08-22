@@ -1,3 +1,6 @@
+### Version 2.14.3
+* update list of test adapters in README.md
+
 ### Version 2.14.2
 * update list of test adapters in README.md
 
