@@ -1,3 +1,6 @@
+### Version 2.14.4
+* bugfix: running tests from the tree view stopped working in VS Code 1.38
+
 ### Version 2.14.3
 * update list of test adapters in README.md
 
