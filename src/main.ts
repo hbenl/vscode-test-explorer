@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	registerCommand('test-explorer.run-all', () => testExplorer.run());
 
-	registerCommand('test-explorer.run', (...nodes) => testExplorer.run(nodes));
+	registerCommand('test-explorer.run', (clickedNode, allNodes) => testExplorer.run(allNodes || [ clickedNode ], false));
 
 	registerCommand('test-explorer.rerun', () => testExplorer.rerun());
 
@@ -64,7 +64,7 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	registerCommand('test-explorer.cancel', () => testExplorer.cancel());
 
-	registerCommand('test-explorer.debug', (...nodes) => testExplorer.debug(nodes));
+	registerCommand('test-explorer.debug', (node) => testExplorer.debug(node));
 
 	registerCommand('test-explorer.redebug', () => testExplorer.redebug());
 

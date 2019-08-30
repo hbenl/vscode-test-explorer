@@ -168,7 +168,7 @@ export function createRunCodeLens(line: number, nodes: TreeNode[]): vscode.CodeL
 	return new vscode.CodeLens(range, {
 		title: 'Run',
 		command: 'test-explorer.run',
-		arguments: nodes
+		arguments: [ nodes[0], nodes ]
 	});
 }
 
