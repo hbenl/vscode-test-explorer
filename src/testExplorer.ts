@@ -123,8 +123,11 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		this.lastTestRun = undefined;
 
 		if (nodes) {
+			// Remove all `null`s from the nodes array, in case there are any
+			// This can happen when this function is called via the command interface
+			const nodesWithoutNull = nodes.filter((x) => x !== null);
 
-			const nodesToRun = pick ? await pickNodes(nodes) : nodes;
+			const nodesToRun = pick ? await pickNodes(nodesWithoutNull) : nodesWithoutNull;
 			if (nodesToRun.length > 0) {
 				this.lastTestRun = [ nodesToRun[0].collection, getAdapterIds(nodesToRun) ];
 				nodesToRun[0].collection.adapter.run(getAdapterIds(nodesToRun));
