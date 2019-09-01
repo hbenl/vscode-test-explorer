@@ -64,7 +64,7 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	registerCommand('test-explorer.cancel', () => testExplorer.cancel());
 
-	registerCommand('test-explorer.debug', (node) => testExplorer.debug(node));
+	registerCommand('test-explorer.debug', (node) => testExplorer.debug([ node ]));
 
 	registerCommand('test-explorer.redebug', () => testExplorer.redebug());
 
