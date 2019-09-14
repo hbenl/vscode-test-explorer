@@ -1,3 +1,6 @@
+### Version 2.14.6
+* allow selecting (and running) multiple items in the tree view
+
 ### Version 2.14.5
 * bugfix: the debug buttons in the tree view and debug code lenses were broken in 2.14.4
 
