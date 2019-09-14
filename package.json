@@ -39,13 +39,13 @@
   },
   "devDependencies": {
     "@types/escape-string-regexp": "2.0.1",
-    "@types/vscode": "~1.30.0",
-    "rimraf": "^2.6.3",
-    "typescript": "^3.5.3",
-    "vsce": "^1.65.0"
+    "@types/vscode": "~1.38.0",
+    "rimraf": "^3.0.0",
+    "typescript": "^3.6.3",
+    "vsce": "^1.66.0"
   },
   "engines": {
-    "vscode": "^1.30.0"
+    "vscode": "^1.38.0"
   },
   "activationEvents": [
     "*"
