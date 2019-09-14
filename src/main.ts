@@ -31,7 +31,7 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	vscode.commands.executeCommand('setContext', 'showTestExplorerExpandButton', (expandLevels > 0));
 	vscode.commands.executeCommand('setContext', 'showTestExplorerEditorContextMenu', addToEditorContextMenu);
 
-	const treeView = vscode.window.createTreeView('test-explorer', { treeDataProvider: testExplorer, showCollapseAll });
+	const treeView = vscode.window.createTreeView('test-explorer', { treeDataProvider: testExplorer, showCollapseAll, canSelectMany: true });
 	context.subscriptions.push(treeView);
 
 	const documentSelector = { scheme: '*', pattern: '**/*' };
