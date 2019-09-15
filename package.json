@@ -178,8 +178,17 @@
         }
       }
     },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "custom-test",
+          "title": "Test Explorer",
+          "icon": "icons/activitybar.svg"
+        }
+      ]
+    },
     "views": {
-      "test": [
+      "custom-test": [
         {
           "id": "test-explorer",
           "name": "Test Explorer"
