@@ -182,7 +182,7 @@
       "activitybar": [
         {
           "id": "custom-test",
-          "title": "Test Explorer",
+          "title": "Test",
           "icon": "icons/activitybar.svg"
         }
       ]
