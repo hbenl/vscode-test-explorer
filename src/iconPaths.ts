@@ -23,18 +23,42 @@ export class IconPaths {
 	erroredFaint: IconPath;
 
 	constructor(context: ExtensionContext) {
-		this.pending = context.asAbsolutePath('icons/pending.svg');
+		this.pending = {
+			dark: context.asAbsolutePath('icons/pending-dark.svg'),
+			light: context.asAbsolutePath('icons/pending-light.svg')
+		};
 		this.pendingAutorun = {
 			dark: context.asAbsolutePath('icons/pending-autorun-dark.svg'),
 			light: context.asAbsolutePath('icons/pending-autorun-light.svg')
 		};
-		this.scheduled = context.asAbsolutePath('icons/scheduled.svg');
-		this.running = context.asAbsolutePath('icons/running.svg');
-		this.runningFailed = context.asAbsolutePath('icons/running-failed.svg');
-		this.passed = context.asAbsolutePath('icons/passed.svg');
-		this.failed = context.asAbsolutePath('icons/failed.svg');
-		this.passedFaint = context.asAbsolutePath('icons/passed-faint.svg');
-		this.failedFaint = context.asAbsolutePath('icons/failed-faint.svg')
+		this.scheduled = {
+			dark: context.asAbsolutePath('icons/scheduled-dark.svg'),
+			light: context.asAbsolutePath('icons/scheduled-light.svg')
+		};
+		this.running = {
+			dark: context.asAbsolutePath('icons/running-dark.svg'),
+			light: context.asAbsolutePath('icons/running-light.svg')
+		};
+		this.runningFailed = {
+			dark: context.asAbsolutePath('icons/running-failed-dark.svg'),
+			light: context.asAbsolutePath('icons/running-failed-light.svg')
+		};
+		this.passed = {
+			dark: context.asAbsolutePath('icons/passed-dark.svg'),
+			light: context.asAbsolutePath('icons/passed-light.svg')
+		};
+		this.failed = {
+			dark: context.asAbsolutePath('icons/failed-dark.svg'),
+			light: context.asAbsolutePath('icons/failed-light.svg')
+		};
+		this.passedFaint = {
+			dark: context.asAbsolutePath('icons/passed-faint-dark.svg'),
+			light: context.asAbsolutePath('icons/passed-faint-light.svg')
+		};
+		this.failedFaint = {
+			dark: context.asAbsolutePath('icons/failed-faint-dark.svg'),
+			light: context.asAbsolutePath('icons/failed-faint-light.svg')
+		};
 		this.passedAutorun = {
 			dark: context.asAbsolutePath('icons/passed-autorun-dark.svg'),
 			light: context.asAbsolutePath('icons/passed-autorun-light.svg')
@@ -51,9 +75,21 @@ export class IconPaths {
 			dark: context.asAbsolutePath('icons/failed-faint-autorun-dark.svg'),
 			light: context.asAbsolutePath('icons/failed-faint-autorun-light.svg')
 		};
-		this.skipped = context.asAbsolutePath('icons/skipped.svg');
-		this.duplicate = context.asAbsolutePath('icons/duplicate.svg');
-		this.errored = context.asAbsolutePath('icons/errored.svg');
-		this.erroredFaint = context.asAbsolutePath('icons/errored-faint.svg');
+		this.skipped = {
+			dark: context.asAbsolutePath('icons/skipped-dark.svg'),
+			light: context.asAbsolutePath('icons/skipped-light.svg')
+		};
+		this.duplicate = {
+			dark: context.asAbsolutePath('icons/duplicate-dark.svg'),
+			light: context.asAbsolutePath('icons/duplicate-light.svg')
+		};
+		this.errored = {
+			dark: context.asAbsolutePath('icons/errored-dark.svg'),
+			light: context.asAbsolutePath('icons/errored-light.svg')
+		};
+		this.erroredFaint = {
+			dark: context.asAbsolutePath('icons/errored-faint-dark.svg'),
+			light: context.asAbsolutePath('icons/errored-faint-light.svg')
+		};
 	}
 }

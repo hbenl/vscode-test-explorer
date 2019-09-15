@@ -266,7 +266,10 @@
       {
         "command": "test-explorer.cancel",
         "title": "Test Explorer: Cancel running tests",
-        "icon": "./icons/stop.svg"
+        "icon": {
+          "dark": "./icons/stop-dark.svg",
+          "light": "./icons/stop-light.svg"
+        }
       },
       {
         "command": "test-explorer.show-log",
