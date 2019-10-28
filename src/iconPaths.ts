@@ -1,4 +1,4 @@
-import { ExtensionContext } from 'vscode';
+import * as vscode from 'vscode';
 
 export type IconPath = string | { dark: string, light: string };
 
@@ -22,7 +22,9 @@ export class IconPaths {
 	errored: IconPath;
 	erroredFaint: IconPath;
 
-	constructor(context: ExtensionContext) {
+	constructor(context: vscode.ExtensionContext) {
+		const useFilledIcons = vscode.workspace.getConfiguration('testExplorer').get('filledIcons') === true;
+		const iconsPath = useFilledIcons ? 'icons/filled' : 'icons';
 		this.pending = {
 			dark: context.asAbsolutePath('icons/pending-dark.svg'),
 			light: context.asAbsolutePath('icons/pending-light.svg')
@@ -44,36 +46,36 @@ export class IconPaths {
 			light: context.asAbsolutePath('icons/running-failed-light.svg')
 		};
 		this.passed = {
-			dark: context.asAbsolutePath('icons/passed-dark.svg'),
-			light: context.asAbsolutePath('icons/passed-light.svg')
+			dark: context.asAbsolutePath(`${iconsPath}/passed-dark.svg`),
+			light: context.asAbsolutePath(`${iconsPath}/passed-light.svg`)
 		};
 		this.failed = {
-			dark: context.asAbsolutePath('icons/failed-dark.svg'),
-			light: context.asAbsolutePath('icons/failed-light.svg')
+			dark: context.asAbsolutePath(`${iconsPath}/failed-dark.svg`),
+			light: context.asAbsolutePath(`${iconsPath}/failed-light.svg`)
 		};
 		this.passedFaint = {
-			dark: context.asAbsolutePath('icons/passed-faint-dark.svg'),
-			light: context.asAbsolutePath('icons/passed-faint-light.svg')
+			dark: context.asAbsolutePath(`${iconsPath}/passed-faint-dark.svg`),
+			light: context.asAbsolutePath(`${iconsPath}/passed-faint-light.svg`)
 		};
 		this.failedFaint = {
-			dark: context.asAbsolutePath('icons/failed-faint-dark.svg'),
-			light: context.asAbsolutePath('icons/failed-faint-light.svg')
+			dark: context.asAbsolutePath(`${iconsPath}/failed-faint-dark.svg`),
+			light: context.asAbsolutePath(`${iconsPath}/failed-faint-light.svg`)
 		};
 		this.passedAutorun = {
-			dark: context.asAbsolutePath('icons/passed-autorun-dark.svg'),
-			light: context.asAbsolutePath('icons/passed-autorun-light.svg')
+			dark: context.asAbsolutePath(`${iconsPath}/passed-autorun-dark.svg`),
+			light: context.asAbsolutePath(`${iconsPath}/passed-autorun-light.svg`)
 		};
 		this.failedAutorun = {
-			dark: context.asAbsolutePath('icons/failed-autorun-dark.svg'),
-			light: context.asAbsolutePath('icons/failed-autorun-light.svg')
+			dark: context.asAbsolutePath(`${iconsPath}/failed-autorun-dark.svg`),
+			light: context.asAbsolutePath(`${iconsPath}/failed-autorun-light.svg`)
 		};
 		this.passedFaintAutorun = {
-			dark: context.asAbsolutePath('icons/passed-faint-autorun-dark.svg'),
-			light: context.asAbsolutePath('icons/passed-faint-autorun-light.svg')
+			dark: context.asAbsolutePath(`${iconsPath}/passed-faint-autorun-dark.svg`),
+			light: context.asAbsolutePath(`${iconsPath}/passed-faint-autorun-light.svg`)
 		};
 		this.failedFaintAutorun = {
-			dark: context.asAbsolutePath('icons/failed-faint-autorun-dark.svg'),
-			light: context.asAbsolutePath('icons/failed-faint-autorun-light.svg')
+			dark: context.asAbsolutePath(`${iconsPath}/failed-faint-autorun-dark.svg`),
+			light: context.asAbsolutePath(`${iconsPath}/failed-faint-autorun-light.svg`)
 		};
 		this.skipped = {
 			dark: context.asAbsolutePath('icons/skipped-dark.svg'),

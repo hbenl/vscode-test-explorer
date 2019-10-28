@@ -175,6 +175,12 @@
           "type": "boolean",
           "default": true,
           "scope": "resource"
+        },
+        "testExplorer.filledIcons": {
+          "description": "Use filled icons in the explorer tree",
+          "type": "boolean",
+          "default": false,
+          "scope": "resource"
         }
       }
     },
