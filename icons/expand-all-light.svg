@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg xmlns='http://www.w3.org/2000/svg' viewBox='-1 0 16 16'>
-	<path d='M 5 1 H 14 V 10 H 13 V 2 H 5 Z' fill='#424242'/>
-	<path d='M 3 3 H 12 V 12 H 11 V 4 H 3 Z' fill='#424242'/>
-	<path d='M 1 5 H 10 V 14 H 1 V 5 Z M 2 6 V 13 H 9 V 6 Z' fill='#424242'/>
-	<path d='M 5 7 H 6 V 12 H 5 Z' fill='#00539C'/>
-	<path d='M 3 9 V 10 H 8 V 9 Z' fill='#00539C'/>
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M6 1H15V10H14V2H6V1ZM4 3H13V12H12V4H4V3ZM11 5H2V14H11V5ZM3 13V6H10V13H3Z" fill="#424242"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M7 7H6V9H4V10H6V12H7V10H9V9H7V7Z" fill="#007ACC"/>
 </svg>
