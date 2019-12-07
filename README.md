@@ -26,6 +26,7 @@ Currently the following Test Adapters are available:
 ### C
 
 * [Ceedling Test Explorer](https://marketplace.visualstudio.com/items?itemName=numaru.vscode-ceedling-test-adapter)
+* [CppUTest Test Explorer](https://marketplace.visualstudio.com/items?itemName=bneumann.cpputest-test-adapter)
 
 ### C++
 
@@ -34,6 +35,7 @@ Currently the following Test Adapters are available:
 * [CppUnitTestFramework Explorer](https://marketplace.visualstudio.com/items?itemName=drleq.vscode-cpputf-test-adapter)
 * [Bandit Test Explorer](https://marketplace.visualstudio.com/items?itemName=dampsoft.vscode-banditcpp-test-adapter)
 * [catkin-tools](https://marketplace.visualstudio.com/items?itemName=betwo.b2-catkin-tools)
+* [CppUTest Test Explorer](https://marketplace.visualstudio.com/items?itemName=bneumann.cpputest-test-adapter)
 
 ### Haxe
 
