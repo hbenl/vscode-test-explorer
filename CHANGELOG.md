@@ -1,3 +1,6 @@
+### Version 2.15.0
+* let the user pick a test when he clicks a run or debug code lens that represents multiple tests
+
 ### Version 2.14.6
 * allow selecting (and running) multiple items in the tree view
 
