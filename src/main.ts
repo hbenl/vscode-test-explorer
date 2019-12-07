@@ -52,6 +52,8 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	registerCommand('test-explorer.run', (clickedNode, allNodes) => testExplorer.run(allNodes || [ clickedNode ], false));
 
+	registerCommand('test-explorer.pick-and-run', (nodes) => testExplorer.run(nodes, true));
+
 	registerCommand('test-explorer.rerun', () => testExplorer.rerun());
 
 	registerCommand('test-explorer.run-file', (file?: string) => runTestsInFile(file, testExplorer));

@@ -19,4 +19,5 @@ export interface TreeNode {
 	resetState(): void;
 	setAutorun(autorun: boolean): void;
 	getTreeItem(): vscode.TreeItem;
+	getFullLabel(): string;
 }

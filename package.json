@@ -224,6 +224,10 @@
         }
       },
       {
+        "command": "test-explorer.pick-and-run",
+        "title": "Run tests"
+      },
+      {
         "command": "test-explorer.rerun",
         "title": "Test Explorer: Repeat the last test run"
       },
@@ -496,6 +500,10 @@
         },
         {
           "command": "test-explorer.run",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.pick-and-run",
           "when": "false"
         },
         {

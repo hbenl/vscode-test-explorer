@@ -198,4 +198,8 @@ export class TestNode implements TreeNode {
 
 		return treeItem;
 	}
+
+	getFullLabel(): string {
+		return `${this.parent.getFullLabel()} ${this.info.label}`;
+	}
 }

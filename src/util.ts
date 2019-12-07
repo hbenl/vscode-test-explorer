@@ -146,14 +146,14 @@ export async function pickNodes(nodes: TreeNode[]): Promise<TreeNode[]> {
 
 	if (nodes.length > 1) {
 
-		const labels = nodes.map(node => node.info.label);
+		const labels = nodes.map(node => node.getFullLabel());
 		labels.push("All of them");
 		const pickedLabel = await vscode.window.showQuickPick(labels);
 
 		if (pickedLabel === "All of them") {
 			return nodes;
 		} else {
-			return nodes.filter(node => (node.info.label === pickedLabel));
+			return nodes.filter(node => (node.getFullLabel() === pickedLabel));
 		}
 
 	} else {
@@ -167,8 +167,8 @@ export function createRunCodeLens(line: number, nodes: TreeNode[]): vscode.CodeL
 
 	return new vscode.CodeLens(range, {
 		title: 'Run',
-		command: 'test-explorer.run',
-		arguments: [ nodes[0], nodes ]
+		command: 'test-explorer.pick-and-run',
+		arguments: [ nodes ]
 	});
 }
 

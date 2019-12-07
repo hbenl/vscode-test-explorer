@@ -184,4 +184,8 @@ export class TestSuiteNode implements TreeNode {
 
 		return treeItem;
 	}
+
+	getFullLabel(): string {
+		return this.parent ? `${this.parent.getFullLabel()} ${this.info.label}` : this.info.label;
+	}
 }
