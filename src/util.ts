@@ -178,8 +178,8 @@ export function createDebugCodeLens(line: number, nodes: TreeNode[]): vscode.Cod
 
 	return new vscode.CodeLens(range, {
 		title: 'Debug',
-		command: 'test-explorer.debug',
-		arguments: nodes
+		command: 'test-explorer.pick-and-debug',
+		arguments: [ nodes ]
 	});
 }
 

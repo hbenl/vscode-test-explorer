@@ -68,6 +68,8 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	registerCommand('test-explorer.debug', (node) => testExplorer.debug([ node ]));
 
+	registerCommand('test-explorer.pick-and-debug', (nodes) => testExplorer.debug(nodes));
+
 	registerCommand('test-explorer.redebug', () => testExplorer.redebug());
 
 	registerCommand('test-explorer.debug-test-at-cursor', () => debugTestAtCursor(testExplorer));

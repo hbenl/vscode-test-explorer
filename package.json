@@ -256,6 +256,10 @@
         }
       },
       {
+        "command": "test-explorer.pick-and-debug",
+        "title": "Debug this test"
+      },
+      {
         "command": "test-explorer.redebug",
         "title": "Test Explorer: Repeat the last test run in the debugger"
       },
@@ -516,6 +520,10 @@
         },
         {
           "command": "test-explorer.debug",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.pick-and-debug",
           "when": "false"
         },
         {
