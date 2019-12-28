@@ -175,11 +175,26 @@
           "type": "boolean",
           "default": true,
           "scope": "resource"
+        },
+        "testExplorer.filledIcons": {
+          "description": "Use filled icons in the explorer tree",
+          "type": "boolean",
+          "default": false,
+          "scope": "resource"
         }
       }
     },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "custom-test",
+          "title": "Test",
+          "icon": "icons/activitybar.svg"
+        }
+      ]
+    },
     "views": {
-      "test": [
+      "custom-test": [
         {
           "id": "test-explorer",
           "name": "Test Explorer"
@@ -274,7 +289,10 @@
       {
         "command": "test-explorer.cancel",
         "title": "Test Explorer: Cancel running tests",
-        "icon": "./icons/stop.svg"
+        "icon": {
+          "dark": "./icons/stop-dark.svg",
+          "light": "./icons/stop-light.svg"
+        }
       },
       {
         "command": "test-explorer.show-log",
