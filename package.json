@@ -182,7 +182,8 @@
       "test": [
         {
           "id": "test-explorer",
-          "name": "Test Explorer"
+          "name": "Test Explorer",
+          "when": "testExplorerVisible"
         }
       ]
     },

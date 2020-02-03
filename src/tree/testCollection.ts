@@ -131,8 +131,6 @@ export class TestCollection {
 
 		} else if (testLoadEvent.type === 'finished') {
 
-			this.explorer.testLoadFinished(this);
-
 			if (testLoadEvent.suite) {
 
 				this.rootSuite = new TestSuiteNode(this, testLoadEvent.suite, undefined, false, this.nodesById);
@@ -184,6 +182,8 @@ export class TestCollection {
 			this.explorer.decorator.updateAllDecorations();
 
 			this.explorer.treeEvents.sendTreeChangedEvent();
+
+			this.explorer.testLoadFinished(this);
 		}
 	}
 

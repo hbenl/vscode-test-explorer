@@ -60,6 +60,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		if (collection) {
 			collection.dispose();
 			this.collections.delete(adapter);
+			this.updateVisibility();
 		}
 	}
 
@@ -320,6 +321,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		if (this.loadingCollections.size === 0) {
 			vscode.commands.executeCommand('setContext', 'testsLoading', false);
 		}
+		this.updateVisibility();
 	}
 
 	testRunStarted(collection: TestCollection): void {
@@ -341,6 +343,12 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		) {
 			this.updateLog();
 		}
+	}
+
+	updateVisibility(): void {
+		const visible = [ ...this.collections.values() ].some(
+			collection => ((collection.suite !== undefined) || (collection.error !== undefined)));
+		vscode.commands.executeCommand('setContext', 'testExplorerVisible', visible);
 	}
 
 	private updateLog(): void {
