@@ -13,6 +13,8 @@ import { TestSuiteNode } from './tree/testSuiteNode';
 
 export class TestExplorer implements TestController, vscode.TreeDataProvider<TreeNode | ErrorNode>, vscode.CodeLensProvider, vscode.HoverProvider {
 
+	public hideWhenEmpty: boolean;
+
 	public readonly iconPaths: IconPaths;
 	public readonly decorator: Decorator;
 	public readonly treeEvents: TreeEventDebouncer;
@@ -346,7 +348,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	}
 
 	updateVisibility(): void {
-		const visible = [ ...this.collections.values() ].some(
+		const visible = !this.hideWhenEmpty || [ ...this.collections.values() ].some(
 			collection => ((collection.suite !== undefined) || (collection.error !== undefined)));
 		vscode.commands.executeCommand('setContext', 'testExplorerVisible', visible);
 	}

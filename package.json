@@ -175,6 +175,12 @@
           "type": "boolean",
           "default": true,
           "scope": "resource"
+        },
+        "testExplorer.hideWhenEmpty": {
+          "description": "Hide the Test Explorer when no tests have been found",
+          "type": "boolean",
+          "default": true,
+          "scope": "resource"
         }
       }
     },
