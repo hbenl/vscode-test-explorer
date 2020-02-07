@@ -641,16 +641,17 @@ export class TestCollection {
 			this.idCount.set(node.info.id, count);
 
 			const errorMessage = 'There are multiple tests with the same ID, Test Explorer will not be able to show test results for these tests.';
+			const errorDescription = '*** duplicate ID ***';
 
 			if (node instanceof TestNode) {
-				node.setCurrentState('duplicate', errorMessage);
+				node.setCurrentState('duplicate', errorMessage, undefined, errorDescription, errorMessage);
 			}
 
 			const otherNode = this.nodesById.get(node.info.id);
 			if (otherNode) {
 				this.nodesById.delete(node.info.id);
 				if (otherNode instanceof TestNode) {
-					otherNode.setCurrentState('duplicate', errorMessage);
+					otherNode.setCurrentState('duplicate', errorMessage, undefined, errorDescription, errorMessage);
 				}
 			}
 		}
