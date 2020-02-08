@@ -13,13 +13,18 @@ export class TestNode implements TreeNode {
 	private _decorations: TestDecoration[] = [];
 	private description?: string;
 	private tooltip?: string;
+	private _file?: string;
+	private _line?: number;
 
-	readonly fileUri: string | undefined;
+	private _fileUri: string | undefined;
+	get fileUri(): string | undefined { return this._fileUri; }
 	uniqueId: string;
 	get state(): NodeState { return this._state; }
 	get log(): string { return this._log; }
 	get decorations(): TestDecoration[] { return this._decorations; }
 	readonly children: TreeNode[] = [];
+	get file(): string | undefined { return this._file; }
+	get line(): number | undefined { return this._line; }
 
 	get adapterIds(): string[] { return [ this.info.id ]; }
 
@@ -34,10 +39,12 @@ export class TestNode implements TreeNode {
 		oldNodesById?: Map<string, TreeNode>
 	) {
 
-		this.fileUri = normalizeFilename(info.file);
-
 		this.description = info.description;
 		this.tooltip = info.tooltip;
+		this._file = info.file;
+		this._line = info.line;
+
+		this._fileUri = normalizeFilename(this.file);
 
 		const oldNode = oldNodesById ? oldNodesById.get(info.id) : undefined;
 		if (oldNode && (oldNode.info.type === 'test')) {
@@ -76,7 +83,9 @@ export class TestNode implements TreeNode {
 		logMessage?: string,
 		decorations?: TestDecoration[],
 		description?: string,
-		tooltip?: string
+		tooltip?: string,
+		file?: string,
+		line?: number
 	): void {
 
 		this.state.current = currentState;
@@ -113,6 +122,13 @@ export class TestNode implements TreeNode {
 		}
 		if (tooltip !== undefined) {
 			this.tooltip = tooltip;
+		}
+		if (file !== undefined) {
+			this._file = file;
+			this._fileUri = normalizeFilename(this.file);
+		}
+		if (line !== undefined) {
+			this._line = line;
 		}
 
 		this.sendStateNeeded = true;
@@ -169,6 +185,10 @@ export class TestNode implements TreeNode {
 				this.collection.explorer.decorator.updateDecorationsFor(this.fileUri);
 			}
 		}
+
+		this._file = this.info.file;
+		this._line = this.info.line;
+		this._fileUri = normalizeFilename(this.file);
 
 		this.collection.explorer.logChanged(this);
 	}

@@ -12,12 +12,17 @@ export class TestSuiteNode implements TreeNode {
 	private _children: TreeNode[];
 	private description?: string;
 	private tooltip?: string;
+	private _file?: string;
+	private _line?: number;
 
-	readonly fileUri: string | undefined;
+	private _fileUri: string | undefined;
+	get fileUri(): string | undefined { return this._fileUri; }
 	uniqueId: string;
 	get state(): NodeState { return this._state; }
 	readonly log = undefined;
 	get children(): TreeNode[] { return this._children; }
+	get file(): string | undefined { return this._file; }
+	get line(): number | undefined { return this._line; }
 
 	get adapterIds(): string[] {
 		if (this.isMergedNode) {
@@ -45,10 +50,12 @@ export class TestSuiteNode implements TreeNode {
 		oldNodesById?: Map<string, TreeNode>
 	) {
 
-		this.fileUri = normalizeFilename(info.file);
-
 		this.description = info.description;
 		this.tooltip = info.tooltip;
+		this._file = info.file;
+		this._line = info.line;
+
+		this._fileUri = normalizeFilename(this.file);
 
 		if (!this.collection.shouldMergeSuites()) {
 
@@ -80,14 +87,25 @@ export class TestSuiteNode implements TreeNode {
 		this._state = parentNodeState(this._children);
 	}
 
-	update(description?: string, tooltip?: string) {
+	update(description?: string, tooltip?: string, file?: string, line?: number) {
+
 		if ((description !== undefined) && (description !== this.description)) {
 			this.description = description;
 			this.sendStateNeeded = true;
 		}
+
 		if ((tooltip !== undefined) && (tooltip !== this.tooltip)) {
 			this.tooltip = tooltip;
 			this.sendStateNeeded = true;
+		}
+
+		if (file !== undefined) {
+			this._file = file;
+			this._fileUri = normalizeFilename(this.file);
+		}
+
+		if (line !== undefined) {
+			this._line = line;
 		}
 	}
 
@@ -143,6 +161,9 @@ export class TestSuiteNode implements TreeNode {
 		if ((this.description !== this.info.description) || (this.tooltip !== this.info.tooltip)) {
 			this.description = this.info.description;
 			this.tooltip = this.info.tooltip;
+			this._file = this.info.file;
+			this._line = this.info.line;
+			this._fileUri = normalizeFilename(this.file);
 			this.sendStateNeeded = true;
 		}
 

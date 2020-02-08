@@ -44,16 +44,16 @@ function compareLocation(a: TreeNode, b: TreeNode): number {
 		return 1;
 	}
 
-	if (a.info.line !== undefined) { //TODO is line === 0 possible?
-		if (b.info.line !== undefined) {
-			const compared = a.info.line - b.info.line;
+	if (a.line !== undefined) { //TODO is line === 0 possible?
+		if (b.line !== undefined) {
+			const compared = a.line - b.line;
 			if (compared !== 0) {
 				return compared;
 			}
 		} else {
 			return -1;
 		}
-	} else if (b.info.line !== undefined) {
+	} else if (b.line !== undefined) {
 		return 1;
 	}
 

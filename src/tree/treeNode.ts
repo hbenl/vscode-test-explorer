@@ -6,6 +6,8 @@ import { TestSuiteInfo, TestInfo } from 'vscode-test-adapter-api';
 
 export interface TreeNode {
 	readonly info: TestSuiteInfo | TestInfo;
+	readonly file: string | undefined;
+	readonly line: number | undefined;
 	readonly fileUri: string | undefined;
 	uniqueId: string;
 	readonly adapterIds: string[];

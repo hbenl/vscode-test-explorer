@@ -249,14 +249,14 @@ export class TestCollection {
 				}
 
 				if (suiteNode) {
-					suiteNode.update(testRunEvent.description, testRunEvent.tooltip);
+					suiteNode.update(testRunEvent.description, testRunEvent.tooltip, testRunEvent.file, testRunEvent.line);
 					this.runningSuite = suiteNode;
 				}
 
 			} else { // testStateMessage.state === 'completed'
 
 				if (suiteNode) {
-					suiteNode.update(testRunEvent.description, testRunEvent.tooltip);
+					suiteNode.update(testRunEvent.description, testRunEvent.tooltip, testRunEvent.file, testRunEvent.line);
 					for (const testNode of allTests(suiteNode)) {
 						if ((testNode.state.current === 'scheduled') || (testNode.state.current === 'running')) {
 							testNode.setCurrentState('pending');
@@ -292,7 +292,9 @@ export class TestCollection {
 					testRunEvent.message,
 					testRunEvent.decorations,
 					testRunEvent.description,
-					testRunEvent.tooltip
+					testRunEvent.tooltip,
+					testRunEvent.file,
+					testRunEvent.line
 				);
 			}
 		}
@@ -676,7 +678,7 @@ export class TestCollection {
 
 	private addLocatedNode(node: TreeNode): void {
 
-		if ((node.fileUri === undefined) || (node.info.line === undefined)) return;
+		if ((node.fileUri === undefined) || (node.line === undefined)) return;
 
 		let fileLocatedNodes = this.locatedNodes.get(node.fileUri);
 		if (!fileLocatedNodes) {
@@ -684,10 +686,10 @@ export class TestCollection {
 			this.locatedNodes.set(node.fileUri, fileLocatedNodes);
 		}
 
-		let lineLocatedNodes = fileLocatedNodes.get(node.info.line);
+		let lineLocatedNodes = fileLocatedNodes.get(node.line);
 		if (!lineLocatedNodes) {
 			lineLocatedNodes = [];
-			fileLocatedNodes.set(node.info.line, lineLocatedNodes);
+			fileLocatedNodes.set(node.line, lineLocatedNodes);
 		}
 
 		lineLocatedNodes.push(node);

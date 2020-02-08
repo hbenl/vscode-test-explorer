@@ -233,10 +233,9 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 			const document = await vscode.workspace.openTextDocument(vscode.Uri.parse(fileUri));
 
-			let line = node.info.line;
+			let line = node.line;
 			if (line === undefined) {
 				line = findLineContaining(node.info.label, document.getText());
-				node.info.line = line;
 			}
 
 			const options = (line !== undefined) ? { selection: new vscode.Range(line, 0, line, 0) } : undefined;
