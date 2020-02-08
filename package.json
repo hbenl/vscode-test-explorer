@@ -35,7 +35,7 @@
   "dependencies": {
     "escape-string-regexp": "^2.0.0",
     "tslib": "^1.10.0",
-    "vscode-test-adapter-api": "^1.7.0"
+    "vscode-test-adapter-api": "^1.8.0"
   },
   "devDependencies": {
     "@types/escape-string-regexp": "2.0.1",
