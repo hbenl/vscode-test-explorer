@@ -1,3 +1,8 @@
+### Version 2.16.0
+* initial support for Test(Suite)Event#file and Test(Suite)Event#line; this is still experimental, the gutter decorations sometimes show up in the wrong place when these properties are used and there may be other bugs
+* only show the Test Explorer when some tests have been found; set `testExplorer.hideWhenEmpty` to `false` to get back the old behavior
+* show more prominent warnings about multiple tests with the same ID
+
 ### Version 2.15.0
 * let the user pick a test when he clicks a run or debug code lens that represents multiple tests
 
