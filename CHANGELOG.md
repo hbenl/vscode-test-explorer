@@ -1,3 +1,6 @@
+### Version 2.17.0
+* replace `testExplorer.hideWhenEmpty` with `testExplorer.hideWhen` and change the default back to the old behavior (never hide the Test Explorer) because the other settings don't work or are confusing with some test adapters
+
 ### Version 2.16.0
 * initial support for Test(Suite)Event#file and Test(Suite)Event#line; this is still experimental, the gutter decorations sometimes show up in the wrong place when these properties are used and there may be other bugs
 * only show the Test Explorer when some tests have been found; set `testExplorer.hideWhenEmpty` to `false` to get back the old behavior
