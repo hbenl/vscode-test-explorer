@@ -11,9 +11,11 @@ import { SortSetting } from './tree/sort';
 import { TestNode } from './tree/testNode';
 import { TestSuiteNode } from './tree/testSuiteNode';
 
+export type HideWhenSetting = 'never' | 'noAdapters' | 'noTests';
+
 export class TestExplorer implements TestController, vscode.TreeDataProvider<TreeNode | ErrorNode>, vscode.CodeLensProvider, vscode.HoverProvider {
 
-	public hideWhenEmpty: boolean;
+	public hideWhen: HideWhenSetting;
 
 	public readonly iconPaths: IconPaths;
 	public readonly decorator: Decorator;
@@ -55,6 +57,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 
 	registerTestAdapter(adapter: TestAdapter): void {
 		this.collections.set(adapter, new TestCollection(adapter, this));
+		this.updateVisibility();
 	}
 
 	unregisterTestAdapter(adapter: TestAdapter): void {
@@ -347,8 +350,13 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	}
 
 	updateVisibility(): void {
-		const visible = !this.hideWhenEmpty || [ ...this.collections.values() ].some(
-			collection => ((collection.suite !== undefined) || (collection.error !== undefined)));
+		let visible = true;
+		if (this.hideWhen === 'noAdapters') {
+			visible = (this.collections.size > 0);
+		} else if (this.hideWhen === 'noTests') {
+			visible = [ ...this.collections.values() ].some(
+				collection => ((collection.suite !== undefined) || (collection.error !== undefined)));
+		}
 		vscode.commands.executeCommand('setContext', 'testExplorerVisible', visible);
 	}
 

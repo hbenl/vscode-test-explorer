@@ -176,10 +176,15 @@
           "default": true,
           "scope": "resource"
         },
-        "testExplorer.hideWhenEmpty": {
-          "description": "Hide the Test Explorer when no tests have been found",
-          "type": "boolean",
-          "default": true,
+        "testExplorer.hideWhen": {
+          "description": "Hide the Test Explorer when no test adapters have been registered or when no tests have been found",
+          "type": "string",
+          "enum": [
+            "never",
+            "noAdapters",
+            "noTests"
+          ],
+          "default": "never",
           "scope": "resource"
         }
       }

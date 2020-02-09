@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { TestHub as ITestHub} from 'vscode-test-adapter-api';
 import { TestHub } from './hub/testHub';
-import { TestExplorer } from './testExplorer';
+import { TestExplorer, HideWhenSetting } from './testExplorer';
 import { runTestsInFile, runTestAtCursor, debugTestAtCursor, expand } from './util';
 
 export function activate(context: vscode.ExtensionContext): ITestHub {
@@ -15,7 +15,7 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	const expandLevels = configuration.get<number>('showExpandButton') || 0;
 	const showCollapseAll = configuration.get<boolean>('showCollapseButton');
 	const addToEditorContextMenu = configuration.get<boolean>('addToEditorContextMenu');
-	const hideWhenEmpty = configuration.get<boolean>('hideWhenEmpty');
+	const hideWhen = configuration.get<HideWhenSetting>('hideWhen');
 
 	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(configChange => {
 		if (configChange.affectsConfiguration('testExplorer.showExpandButton') ||
@@ -27,17 +27,18 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 			const addToEditorContextMenu = configuration.get<boolean>('addToEditorContextMenu');
 			vscode.commands.executeCommand('setContext', 'showTestExplorerEditorContextMenu', addToEditorContextMenu);
 		}
-		if (configChange.affectsConfiguration('testExplorer.hideWhenEmpty')) {
+		if (configChange.affectsConfiguration('testExplorer.hideWhen')) {
 			const configuration = vscode.workspace.getConfiguration('testExplorer', workspaceUri);
-			const hideWhenEmpty = configuration.get<boolean>('hideWhenEmpty');
-			testExplorer.hideWhenEmpty = (hideWhenEmpty !== undefined) ? hideWhenEmpty : true;
+			const hideWhen = configuration.get<HideWhenSetting>('hideWhen');
+			testExplorer.hideWhen = (hideWhen !== undefined) ? hideWhen : 'never';
 			testExplorer.updateVisibility();
 		}
 	}));
 
 	vscode.commands.executeCommand('setContext', 'showTestExplorerExpandButton', (expandLevels > 0));
 	vscode.commands.executeCommand('setContext', 'showTestExplorerEditorContextMenu', addToEditorContextMenu);
-	testExplorer.hideWhenEmpty = (hideWhenEmpty !== undefined) ? hideWhenEmpty : true;
+	testExplorer.hideWhen = (hideWhen !== undefined) ? hideWhen : 'never';
+	testExplorer.updateVisibility();
 
 	const treeView = vscode.window.createTreeView('test-explorer', { treeDataProvider: testExplorer, showCollapseAll, canSelectMany: true });
 	context.subscriptions.push(treeView);

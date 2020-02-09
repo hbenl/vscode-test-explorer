@@ -103,7 +103,7 @@ Property                              | Description
 `testExplorer.addToEditorContextMenu` | Add menu items for running and debugging the tests in the current file to the editor context menu
 `testExplorer.mergeSuites`            | Merge suites with the same label and parent
 `testExplorer.hideEmptyLog`           | Hide the output channel used to show a test's log when the user clicks on a test whose log is empty
-`testExplorer.hideWhenEmpty`          | Hide the Test Explorer when no tests have been found
+`testExplorer.hideWhen`               | Hide the Test Explorer when no test adapters have been registered or when no tests have been found by the registered adapters. The default is to never hide the Test Explorer (some test adapters only work with this default setting).
 
 Further configuration options are provided by the Test Adapters.
 
