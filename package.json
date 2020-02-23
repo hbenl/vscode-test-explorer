@@ -229,7 +229,7 @@
       },
       {
         "command": "test-explorer.run",
-        "title": "Run tests",
+        "title": "Run",
         "icon": {
           "dark": "./icons/start-dark.svg",
           "light": "./icons/start-light.svg"
@@ -261,7 +261,7 @@
       },
       {
         "command": "test-explorer.debug",
-        "title": "Debug this test",
+        "title": "Debug",
         "icon": {
           "dark": "./icons/debug-dark.svg",
           "light": "./icons/debug-light.svg"
@@ -291,6 +291,10 @@
       {
         "command": "test-explorer.show-log",
         "title": "Show test log"
+      },
+      {
+        "command": "test-explorer.on-click",
+        "title": "On test node click"
       },
       {
         "command": "test-explorer.show-error",
@@ -468,6 +472,31 @@
           "when": "view == test-explorer && viewItem == error"
         },
         {
+          "command": "test-explorer.run",
+          "group": "1_basic@1",
+          "when": "view == test-explorer && viewItem != error"
+        },
+        {
+          "command": "test-explorer.debug",
+          "group": "1_basic@2",
+          "when": "view == test-explorer && viewItem == debuggableTestWithSource"
+        },
+        {
+          "command": "test-explorer.debug",
+          "group": "1_basic@2",
+          "when": "view == test-explorer && viewItem == debuggableTest"
+        },
+        {
+          "command": "test-explorer.show-source",
+          "group": "1_basic@3",
+          "when": "view == test-explorer && viewItem == debuggableTestWithSource"
+        },
+        {
+          "command": "test-explorer.show-source",
+          "group": "1_basic@3",
+          "when": "view == test-explorer && viewItem == testWithSource"
+        },
+        {
           "command": "test-explorer.enable-autorun",
           "group": "4_autorun@4",
           "when": "view == test-explorer && viewItem != error"
@@ -544,6 +573,10 @@
         },
         {
           "command": "test-explorer.show-log",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.on-click",
           "when": "false"
         },
         {
