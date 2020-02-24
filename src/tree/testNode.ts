@@ -210,7 +210,7 @@ export class TestNode implements TreeNode {
 			(this.fileUri ? 'testWithSource' : 'test');
 		treeItem.command = {
 			title: '',
-			command: 'test-explorer.show-log',
+			command: 'test-explorer.on-click',
 			arguments: [ [ this ] ]
 		};
 		treeItem.description = this.description;
