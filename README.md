@@ -23,6 +23,10 @@ Currently the following Test Adapters are available:
 * [AVA Test Explorer](https://marketplace.visualstudio.com/items?itemName=gwenio.vscode-ava-test-adapter)
 * [TestyTs Test Explorer](https://marketplace.visualstudio.com/items?itemName=Testy.vscode-testyts-test-adapter)
 
+### ABAP
+
+* [ABAP remote filesystem](https://marketplace.visualstudio.com/items?itemName=murbani.vscode-abap-remote-fs)
+  
 ### C
 
 * [Ceedling Test Explorer](https://marketplace.visualstudio.com/items?itemName=numaru.vscode-ceedling-test-adapter)
