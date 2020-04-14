@@ -66,6 +66,9 @@ Currently the following Test Adapters are available:
 
 * [Z80 Unit Tests](https://marketplace.visualstudio.com/items?itemName=maziac.z80-unit-tests)
 
+### Go
+* [Go Test Explorer](https://marketplace.visualstudio.com/items?itemName=ethan-reesor.vscode-go-test-adapter)
+
 ### Live Share
 
 * The [Test Explorer Live Share](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer-liveshare) extension creates Test Adapters in
