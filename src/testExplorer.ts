@@ -246,8 +246,8 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		}
 	}
 
-	setAutorun(node?: TreeNode): void {
-		if (node) {
+	setAutorun(node?: any): void {
+		if ((node instanceof TestNode) || (node instanceof TestSuiteNode)) {
 			node.collection.setAutorun(node);
 		} else {
 			for (const collection of this.collections.values()) {
@@ -256,8 +256,8 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		}
 	}
 
-	clearAutorun(node?: TreeNode): void {
-		if (node) {
+	clearAutorun(node?: any): void {
+		if ((node instanceof TestNode) || (node instanceof TestSuiteNode)) {
 			node.collection.setAutorun(undefined);
 		} else {
 			for (const collection of this.collections.values()) {
@@ -266,8 +266,8 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		}
 	}
 
-	retireState(node: TreeNode): void {
-		if (node) {
+	retireState(node?: any): void {
+		if ((node instanceof TestNode) || (node instanceof TestSuiteNode)) {
 			node.collection.retireState(node);
 		} else {
 			for (const collection of this.collections.values()) {
@@ -276,8 +276,8 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		}
 	}
 
-	resetState(node: TreeNode): void {
-		if (node) {
+	resetState(node?: any): void {
+		if ((node instanceof TestNode) || (node instanceof TestSuiteNode)) {
 			node.collection.resetState(node);
 		} else {
 			for (const collection of this.collections.values()) {
