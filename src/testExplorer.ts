@@ -315,6 +315,25 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		}
 	}
 
+	reveal(node: string | TreeNode | ErrorNode, treeView: vscode.TreeView<TreeNode | ErrorNode>): void {
+
+		if (typeof node === 'string') {
+
+			for (const collection of this.collections.values()) {
+				const nodes = collection.findNodesById([ node ]);
+				if (nodes.length > 0) {
+					treeView.reveal(nodes[0]);
+					return;
+				}
+			}
+
+		} else {
+
+			treeView.reveal(node);
+
+		}
+	}
+
 	testLoadStarted(collection: TestCollection): void {
 		this.loadingCollections.add(collection);
 		vscode.commands.executeCommand('setContext', 'testsLoading', true);

@@ -99,7 +99,7 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	registerCommand('test-explorer.reset', (node) => testExplorer.resetState(node));
 
-	registerCommand('test-explorer.reveal', (node) => treeView.reveal(node));
+	registerCommand('test-explorer.reveal', (node) => testExplorer.reveal(node, treeView));
 
 	registerCommand('test-explorer.expand', () => expand(testExplorer, treeView, expandLevels));
 
