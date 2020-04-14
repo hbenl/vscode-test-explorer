@@ -1,3 +1,8 @@
+### Version 2.18.0
+* Workaround for microsoft/vscode#94872, which broke some of the global menu items in the Test Explorer view
+* Allow test-explorer.reveal command argument to be the ID of a node
+* update list of test adapters in README.md
+
 ### Version 2.17.0
 * replace `testExplorer.hideWhenEmpty` with `testExplorer.hideWhen` and change the default back to the old behavior (never hide the Test Explorer) because the other settings don't work or are confusing with some test adapters
 
