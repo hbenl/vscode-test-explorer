@@ -127,6 +127,7 @@
             "byLocation",
             "byLabelWithSuitesFirst",
             "byLocationWithSuitesFirst",
+            "byFailingSuitesFirst",
             null
           ],
           "enumDescriptions": [
@@ -134,6 +135,7 @@
             "sort by location (filename and line), if multiple tests or suites appear at the same location, they are sorted by label",
             "sort by label, but always put the suites on top",
             "sort by location, but always put the suites on top",
+            "sort by test status, failing tests first",
             "don't sort, the tests and suites will be shown in the order that they were received from the adapter"
           ],
           "default": null,
@@ -348,6 +350,10 @@
         "title": "Sort by location with suites on top"
       },
       {
+        "command": "test-explorer.sort-by-failing-suites-first",
+        "title": "Sort by status with failing suites on top"
+      },
+      {
         "command": "test-explorer.dont-sort",
         "title": "No sorting"
       }
@@ -420,8 +426,13 @@
           "when": "view == test-explorer"
         },
         {
-          "command": "test-explorer.dont-sort",
+          "command": "test-explorer.sort-by-failing-suites-first",
           "group": "3_sort@5",
+          "when": "view == test-explorer"
+        },
+        {
+          "command": "test-explorer.dont-sort",
+          "group": "3_sort@6",
           "when": "view == test-explorer"
         }
       ],
@@ -591,6 +602,10 @@
         },
         {
           "command": "test-explorer.sort-by-location-with-suites-first",
+          "when": "false"
+        },
+        {
+          "command": "test-explorer.sort-by-failing-suites-first",
           "when": "false"
         },
         {
