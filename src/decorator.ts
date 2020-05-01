@@ -20,9 +20,9 @@ export class Decorator {
 
 		this.stateDecorationTypes = new StateDecorationTypes(context, this.testExplorer.iconPaths);
 		this.errorDecorationType = vscode.window.createTextEditorDecorationType({
-			backgroundColor: 'rgba(255,0,0,0.3)',
+			backgroundColor: new vscode.ThemeColor('testExplorer.errorDecorationBackground'),
 			isWholeLine: true,
-			overviewRulerColor: 'rgba(255,0,0,0.3)',
+			overviewRulerColor: new vscode.ThemeColor('testExplorer.errorDecorationBackground'),
 		});
 		context.subscriptions.push(this.errorDecorationType);
 
