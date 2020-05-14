@@ -1,3 +1,6 @@
+### Version 2.18.1
+* bugfix: skipped tests were run using autorun+retire
+
 ### Version 2.18.0
 * Workaround for microsoft/vscode#94872, which broke some of the global menu items in the Test Explorer view
 * Allow test-explorer.reveal command argument to be the ID of a node

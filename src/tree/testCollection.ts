@@ -103,10 +103,13 @@ export class TestCollection {
 
 				if (!this._autorunNode) return;
 
+				const skippedFilter = (node:TreeNode) => node.info.type === 'suite' || node.info.skipped !== true;
+
 				if (this._autorunNode === this.rootSuite) {
-					this.adapter.run(getAdapterIds(nodes));
+					const nodesToRun = nodes.filter(skippedFilter);
+					this.adapter.run(getAdapterIds(nodesToRun));
 				} else {
-					const nodesToRun = intersect(this._autorunNode, nodes);
+					const nodesToRun = intersect(this._autorunNode, nodes).filter(skippedFilter);
 					if (nodesToRun.length > 0) {
 						this.adapter.run(getAdapterIds(nodesToRun));
 					}
