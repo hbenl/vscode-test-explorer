@@ -33,14 +33,14 @@
     "publish": "vsce publish"
   },
   "dependencies": {
-    "escape-string-regexp": "^3.0.0",
-    "tslib": "^1.11.1",
+    "escape-string-regexp": "^4.0.0",
+    "tslib": "^2.0.0",
     "vscode-test-adapter-api": "^1.8.0"
   },
   "devDependencies": {
     "@types/vscode": "~1.38.0",
     "rimraf": "^3.0.2",
-    "typescript": "^3.8.3",
+    "typescript": "^3.9.2",
     "vsce": "^1.75.0"
   },
   "engines": {
