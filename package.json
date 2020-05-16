@@ -50,6 +50,17 @@
     "*"
   ],
   "contributes": {
+    "colors": [
+      {
+        "id": "testExplorer.errorDecorationBackground",
+        "description": "Background color of the editor error decoration",
+        "defaults": {
+          "dark": "inputValidation.errorBackground",
+          "light": "inputValidation.errorBackground",
+          "highContrast": "inputValidation.errorBackground"
+        }
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "Test Explorer",
