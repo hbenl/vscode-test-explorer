@@ -434,12 +434,27 @@
         {
           "command": "test-explorer.debug",
           "group": "inline@1",
+          "when": "view == test-explorer && viewItem == debuggableSuiteWithSource"
+        },
+        {
+          "command": "test-explorer.debug",
+          "group": "inline@1",
+          "when": "view == test-explorer && viewItem == debuggableSuite"
+        },
+        {
+          "command": "test-explorer.debug",
+          "group": "inline@1",
           "when": "view == test-explorer && viewItem == debuggableTestWithSource"
         },
         {
           "command": "test-explorer.debug",
           "group": "inline@1",
           "when": "view == test-explorer && viewItem == debuggableTest"
+        },
+        {
+          "command": "test-explorer.show-source",
+          "group": "inline@3",
+          "when": "view == test-explorer && viewItem == debuggableSuiteWithSource"
         },
         {
           "command": "test-explorer.show-source",
