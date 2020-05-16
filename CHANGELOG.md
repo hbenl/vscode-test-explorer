@@ -1,3 +1,8 @@
+### Version 2.18.1
+* The debug icon in the Test Explorer is now also shown for test suites 
+* The background color for error decorations can now be customized by color themes
+* update list of test adapters in README.md
+
 ### Version 2.18.0
 * Workaround for microsoft/vscode#94872, which broke some of the global menu items in the Test Explorer view
 * Allow test-explorer.reveal command argument to be the ID of a node
