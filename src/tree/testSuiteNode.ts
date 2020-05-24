@@ -201,7 +201,7 @@ export class TestSuiteNode implements TreeNode {
 		treeItem.iconPath = this.collection.explorer.iconPaths[stateIcon(this.state)];
 		treeItem.contextValue =
 			this.parent ?
-				((this.collection.adapter.debug ?
+				(((this.collection.adapter.debug && (this.info.debuggable !== false)) ?
 					(this.fileUri ? 'debuggableSuiteWithSource' : 'debuggableSuite') :
 					(this.fileUri ? 'suiteWithSource' : 'suite'))) :
 				'collection';

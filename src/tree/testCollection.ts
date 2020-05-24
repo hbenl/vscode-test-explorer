@@ -474,7 +474,8 @@ export class TestCollection {
 
 						fileCodeLenses.push(createRunCodeLens(line, lineLocatedNodes));
 
-						if (this.adapter.debug) {
+						if (this.adapter.debug &&
+							lineLocatedNodes.some(node => (node.info.debuggable !== false))) {
 							fileCodeLenses.push(createDebugCodeLens(line, lineLocatedNodes));
 						}
 
