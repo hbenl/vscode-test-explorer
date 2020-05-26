@@ -11,10 +11,10 @@ export interface NodeState {
 	autorun: boolean
 }
 
-export function defaultState(skipped?: boolean): NodeState {
+export function defaultState(skipped?: boolean, errored?: boolean): NodeState {
 	return {
-		current: skipped ? 'always-skipped' : 'pending',
-		previous: skipped ? 'always-skipped' : 'pending',
+		current: errored ? 'errored' : (skipped ? 'always-skipped' : 'pending'),
+		previous: errored ? 'errored' : (skipped ? 'always-skipped' : 'pending'),
 		autorun: false
 	};
 }

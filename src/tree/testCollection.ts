@@ -251,14 +251,32 @@ export class TestCollection {
 				}
 
 				if (suiteNode) {
-					suiteNode.update(testRunEvent.description, testRunEvent.tooltip, testRunEvent.file, testRunEvent.line);
+
+					suiteNode.update(
+						undefined,
+						testRunEvent.message,
+						testRunEvent.description,
+						testRunEvent.tooltip,
+						testRunEvent.file,
+						testRunEvent.line
+					);
+
 					this.runningSuite.set(testRunEvent.testRunId, suiteNode);
 				}
 
-			} else { // testStateMessage.state === 'completed'
+			} else { // testStateMessage.state === 'completed' || testStateMessage.state === 'errored'
 
 				if (suiteNode) {
-					suiteNode.update(testRunEvent.description, testRunEvent.tooltip, testRunEvent.file, testRunEvent.line);
+
+					suiteNode.update(
+						testRunEvent.state === 'errored',
+						testRunEvent.message,
+						testRunEvent.description,
+						testRunEvent.tooltip,
+						testRunEvent.file,
+						testRunEvent.line
+					);
+
 					for (const testNode of allTests(suiteNode)) {
 						if ((testNode.state.current === 'scheduled') || (testNode.state.current === 'running')) {
 							testNode.setCurrentState('pending');
