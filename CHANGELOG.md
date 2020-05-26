@@ -1,5 +1,10 @@
+### Version 2.19.0
+* add support for marking suites as errored
+* add support for marking tests and suites as not debuggable
+* improve support for running multiple test runs in parallel
+
 ### Version 2.18.1
-* The debug icon in the Test Explorer is now also shown for test suites 
+* The debug icon in the Test Explorer is now also shown for test suites
 * The background color for error decorations can now be customized by color themes
 * update list of test adapters in README.md
 
