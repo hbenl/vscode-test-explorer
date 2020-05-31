@@ -227,7 +227,9 @@ export class TestCollection {
 				this.allRunningTests.delete(testRunEvent.testRunId);
 			}
 
-			this.explorer.testRunFinished(this);
+			if (this.allRunningTests.size === 0) {
+				this.explorer.testRunFinished(this);
+			}
 
 			this.computeCodeLenses();
 
@@ -362,6 +364,7 @@ export class TestCollection {
 			if (node.parent) {
 				node.parent.recalcStateNeeded = true;
 			} else {
+				this.allRunningTests.clear();
 				this.explorer.testLoadFinished(this);
 				this.explorer.testRunFinished(this);
 			}
@@ -369,6 +372,7 @@ export class TestCollection {
 		} else if (this.rootSuite) {
 
 			this.rootSuite.resetState();
+			this.allRunningTests.clear();
 			this.explorer.testLoadFinished(this);
 			this.explorer.testRunFinished(this);
 
