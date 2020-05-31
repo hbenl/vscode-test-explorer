@@ -93,6 +93,7 @@ If there is no Test Adapter for your favorite testing framework yet, you can eas
 Currently the following Test Controllers are available:
 
 * The Test Explorer UI (which is the main part of this extension) is itself implemented as a Test Controller
+* The [Test Explorer Diagnostics Controller](https://marketplace.visualstudio.com/items?itemName=emilylilylime.vscode-test-explorer-diagnostics) adds test results to the Problems panel in VS Code.
 * The [Test Explorer Status Bar](https://marketplace.visualstudio.com/items?itemName=connorshea.vscode-test-explorer-status-bar) extension provides information about the current test suite in the Status Bar.
 * The [Test Explorer Live Share](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer-liveshare) extension creates Test Controllers in
 the Live Share host that act as proxies for the Test Explorers in the Live Share guests.
