@@ -1,3 +1,6 @@
+### Version 2.19.1
+* UI bugfix for running multiple test runs in parallel
+
 ### Version 2.19.0
 * add support for marking suites as errored
 * add support for marking tests and suites as not debuggable
