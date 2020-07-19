@@ -254,6 +254,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 				collection.setAutorun(collection.suite);
 			}
 		}
+		vscode.commands.executeCommand('setContext', 'autorunEnabled', true);
 	}
 
 	clearAutorun(node?: any): void {
@@ -264,6 +265,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 				collection.setAutorun(undefined);
 			}
 		}
+		vscode.commands.executeCommand('setContext', 'autorunEnabled', false);
 	}
 
 	retireState(node?: any): void {

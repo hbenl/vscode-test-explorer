@@ -393,12 +393,12 @@
         {
           "command": "test-explorer.enable-autorun",
           "group": "1_autorun@1",
-          "when": "view == test-explorer"
+          "when": "view == test-explorer && !autorunEnabled"
         },
         {
           "command": "test-explorer.disable-autorun",
           "group": "1_autorun@2",
-          "when": "view == test-explorer"
+          "when": "view == test-explorer && autorunEnabled"
         },
         {
           "command": "test-explorer.retire",
