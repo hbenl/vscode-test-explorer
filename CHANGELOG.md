@@ -1,3 +1,6 @@
+### Version 2.19.2
+* This release is identical to the previous one, it was only created to republish this extension at open-vsx.org
+
 ### Version 2.19.1
 * UI bugfix for running multiple test runs in parallel
 
