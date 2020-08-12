@@ -17,8 +17,8 @@ export class TestCollection {
 	private id: number;
 	private rootSuite: TestSuiteNode | undefined;
 	private errorNode: ErrorNode | undefined;
-	private allRunningTests: TestNode[] | undefined;
-	private runningSuite: TestSuiteNode | undefined;
+	private allRunningTests = new Map<string | undefined, TestNode[]>();
+	private runningSuite = new Map<string | undefined, TestSuiteNode>();
 	private _autorunNode: TreeNode | undefined;
 	private readonly autorunMementoKey: string | undefined;
 	private sortBy: SortSetting | null;
@@ -176,7 +176,7 @@ export class TestCollection {
 
 			}
 
-			this.runningSuite = undefined;
+			this.runningSuite.clear();
 
 			this.computeCodeLenses();
 			this.explorer.decorator.updateAllDecorations();
@@ -202,14 +202,15 @@ export class TestCollection {
 				vscode.commands.executeCommand('workbench.view.extension.test');
 			}
 
-			this.allRunningTests = [];
+			const allRunningTests: TestNode[] = [];
+			this.allRunningTests.set(testRunEvent.testRunId, allRunningTests);
 			for (const nodeId of testRunEvent.tests) {
 				const node = this.nodesById.get(nodeId);
 				if (node) {
-					this.allRunningTests.push(...allTests(node));
+					allRunningTests.push(...allTests(node));
 				}
 			}
-			for (const testNode of this.allRunningTests) {
+			for (const testNode of allRunningTests) {
 				testNode.setCurrentState('scheduled');
 			}
 
@@ -217,16 +218,18 @@ export class TestCollection {
 
 		} else if (testRunEvent.type === 'finished') {
 
-			if (this.allRunningTests) {
-				for (const testNode of this.allRunningTests) {
+			if (this.allRunningTests.has(testRunEvent.testRunId)) {
+				for (const testNode of this.allRunningTests.get(testRunEvent.testRunId)!) {
 					if ((testNode.state.current === 'scheduled') || (testNode.state.current === 'running')) {
 						testNode.setCurrentState('pending');
 					}
 				}
-				this.allRunningTests = undefined;
+				this.allRunningTests.delete(testRunEvent.testRunId);
 			}
 
-			this.explorer.testRunFinished(this);
+			if (this.allRunningTests.size === 0) {
+				this.explorer.testRunFinished(this);
+			}
 
 			this.computeCodeLenses();
 
@@ -238,25 +241,44 @@ export class TestCollection {
 
 			if (testRunEvent.state === 'running') {
 
-				if (!suiteNode && this.runningSuite && (typeof testRunEvent.suite === 'object')) {
+				if (!suiteNode && this.runningSuite.has(testRunEvent.testRunId) && (typeof testRunEvent.suite === 'object')) {
 
-					this.runningSuite.info.children.push(testRunEvent.suite);
-					suiteNode = new TestSuiteNode(this, testRunEvent.suite, this.runningSuite, false);
-					this.runningSuite.children.push(suiteNode);
-					this.runningSuite.recalcStateNeeded = true;
+					const runningSuite = this.runningSuite.get(testRunEvent.testRunId)!;
+					runningSuite.info.children.push(testRunEvent.suite);
+					suiteNode = new TestSuiteNode(this, testRunEvent.suite, runningSuite, false);
+					runningSuite.children.push(suiteNode);
+					runningSuite.recalcStateNeeded = true;
 					this.nodesById.set(suiteId, suiteNode);
 
 				}
 
 				if (suiteNode) {
-					suiteNode.update(testRunEvent.description, testRunEvent.tooltip, testRunEvent.file, testRunEvent.line);
-					this.runningSuite = suiteNode;
+
+					suiteNode.update(
+						undefined,
+						testRunEvent.message,
+						testRunEvent.description,
+						testRunEvent.tooltip,
+						testRunEvent.file,
+						testRunEvent.line
+					);
+
+					this.runningSuite.set(testRunEvent.testRunId, suiteNode);
 				}
 
-			} else { // testStateMessage.state === 'completed'
+			} else { // testStateMessage.state === 'completed' || testStateMessage.state === 'errored'
 
 				if (suiteNode) {
-					suiteNode.update(testRunEvent.description, testRunEvent.tooltip, testRunEvent.file, testRunEvent.line);
+
+					suiteNode.update(
+						testRunEvent.state === 'errored',
+						testRunEvent.message,
+						testRunEvent.description,
+						testRunEvent.tooltip,
+						testRunEvent.file,
+						testRunEvent.line
+					);
+
 					for (const testNode of allTests(suiteNode)) {
 						if ((testNode.state.current === 'scheduled') || (testNode.state.current === 'running')) {
 							testNode.setCurrentState('pending');
@@ -264,8 +286,13 @@ export class TestCollection {
 					}
 				}
 
-				if (this.runningSuite) {
-					this.runningSuite = this.runningSuite.parent;
+				if (this.runningSuite.has(testRunEvent.testRunId)) {
+					const runningSuite = this.runningSuite.get(testRunEvent.testRunId)!;
+					if (runningSuite.parent) {
+						this.runningSuite.set(testRunEvent.testRunId, runningSuite.parent);
+					} else {
+						this.runningSuite.delete(testRunEvent.testRunId);
+					}
 				}
 
 			}
@@ -276,12 +303,13 @@ export class TestCollection {
 			const node = this.nodesById.get(testId);
 			let testNode = (node && (node.info.type === 'test')) ? <TestNode>node : undefined;
 
-			if (!testNode && this.runningSuite && (typeof testRunEvent.test === 'object')) {
+			if (!testNode && this.runningSuite.has(testRunEvent.testRunId) && (typeof testRunEvent.test === 'object')) {
 
-				this.runningSuite.info.children.push(testRunEvent.test);
-				testNode = new TestNode(this, testRunEvent.test, this.runningSuite);
-				this.runningSuite.children.push(testNode);
-				this.runningSuite.recalcStateNeeded = true;
+				const runningSuite = this.runningSuite.get(testRunEvent.testRunId)!;
+				runningSuite.info.children.push(testRunEvent.test);
+				testNode = new TestNode(this, testRunEvent.test, runningSuite);
+				runningSuite.children.push(testNode);
+				runningSuite.recalcStateNeeded = true;
 				this.nodesById.set(testId, testNode);
 
 			}
@@ -336,6 +364,7 @@ export class TestCollection {
 			if (node.parent) {
 				node.parent.recalcStateNeeded = true;
 			} else {
+				this.allRunningTests.clear();
 				this.explorer.testLoadFinished(this);
 				this.explorer.testRunFinished(this);
 			}
@@ -343,6 +372,7 @@ export class TestCollection {
 		} else if (this.rootSuite) {
 
 			this.rootSuite.resetState();
+			this.allRunningTests.clear();
 			this.explorer.testLoadFinished(this);
 			this.explorer.testRunFinished(this);
 
@@ -474,7 +504,8 @@ export class TestCollection {
 
 						fileCodeLenses.push(createRunCodeLens(line, lineLocatedNodes));
 
-						if (this.adapter.debug) {
+						if (this.adapter.debug &&
+							lineLocatedNodes.some(node => (node.info.debuggable !== false))) {
 							fileCodeLenses.push(createDebugCodeLens(line, lineLocatedNodes));
 						}
 

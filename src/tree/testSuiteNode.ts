@@ -9,6 +9,7 @@ import { normalizeFilename, groupSuitesByLabel, mergeSuiteInfos, getAdapterIds }
 export class TestSuiteNode implements TreeNode {
 
 	private _state: NodeState;
+	private _log: string;
 	private _children: TreeNode[];
 	private description?: string;
 	private tooltip?: string;
@@ -19,7 +20,7 @@ export class TestSuiteNode implements TreeNode {
 	get fileUri(): string | undefined { return this._fileUri; }
 	uniqueId: string;
 	get state(): NodeState { return this._state; }
-	readonly log = undefined;
+	get log(): string { return this._log; }
 	get children(): TreeNode[] { return this._children; }
 	get file(): string | undefined { return this._file; }
 	get line(): number | undefined { return this._line; }
@@ -57,6 +58,8 @@ export class TestSuiteNode implements TreeNode {
 
 		this._fileUri = normalizeFilename(this.file);
 
+		this._log = info.message || "";
+
 		if (!this.collection.shouldMergeSuites()) {
 
 			this._children = info.children.map(childInfo => {
@@ -85,9 +88,31 @@ export class TestSuiteNode implements TreeNode {
 		}
 
 		this._state = parentNodeState(this._children);
+		if (info.errored) {
+			this._state.current = 'errored';
+			this._state.previous = 'errored';
+		}
 	}
 
-	update(description?: string, tooltip?: string, file?: string, line?: number) {
+	update(
+		errored?: boolean,
+		message?: string,
+		description?: string,
+		tooltip?: string,
+		file?: string,
+		line?: number
+	) {
+
+		if ((errored !== undefined) && (errored !== (this._state.current === 'errored'))) {
+			this._state.current = errored ? 'errored' : 'pending';
+			this._state.previous = errored ? 'errored' : 'pending';
+			this.recalcStateNeeded = true;
+		}
+
+		if (message !== undefined) {
+			this._log = message;
+			this.sendStateNeeded = true;
+		}
 
 		if ((description !== undefined) && (description !== this.description)) {
 			this.description = description;
@@ -119,8 +144,8 @@ export class TestSuiteNode implements TreeNode {
 
 		if (this.recalcStateNeeded) {
 
-			const newCurrentNodeState = parentCurrentNodeState(this.children);
-			const newPreviousNodeState = parentPreviousNodeState(this.children);
+			const newCurrentNodeState = (this._state.current === 'errored') ? 'errored' : parentCurrentNodeState(this.children);
+			const newPreviousNodeState = (this._state.previous === 'errored') ? 'errored' : parentPreviousNodeState(this.children);
 			const newAutorunFlag = parentAutorunFlag(this.children);
 
 			if ((this.state.current !== newCurrentNodeState) ||
@@ -154,11 +179,19 @@ export class TestSuiteNode implements TreeNode {
 		}
 
 		this.recalcStateNeeded = true;
+
+		if ((this._state.current === 'errored') && !this.info.errored) {
+			this._state.current = 'pending';
+			this.sendStateNeeded = true;
+		}
 	}
 
 	resetState(): void {
 
 		if ((this.description !== this.info.description) || (this.tooltip !== this.info.tooltip)) {
+			this._state.current = this.info.errored ? 'errored' : 'pending';
+			this._state.previous = this.info.errored ? 'errored' : 'pending';
+			this._log = this.info.message || "";
 			this.description = this.info.description;
 			this.tooltip = this.info.tooltip;
 			this._file = this.info.file;
@@ -199,7 +232,17 @@ export class TestSuiteNode implements TreeNode {
 		const treeItem = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.Collapsed);
 		treeItem.id = this.uniqueId;
 		treeItem.iconPath = this.collection.explorer.iconPaths[stateIcon(this.state)];
-		treeItem.contextValue = this.parent ? (this.fileUri ? 'suiteWithSource' : 'suite') : 'collection';
+		treeItem.contextValue =
+			this.parent ?
+				(((this.collection.adapter.debug && (this.info.debuggable !== false)) ?
+					(this.fileUri ? 'debuggableSuiteWithSource' : 'debuggableSuite') :
+					(this.fileUri ? 'suiteWithSource' : 'suite'))) :
+				'collection';
+		treeItem.command = {
+			title: '',
+			command: 'test-explorer.show-log',
+			arguments: [ [ this ] ]
+		};
 		treeItem.description = this.description;
 		treeItem.tooltip = this.tooltip;
 

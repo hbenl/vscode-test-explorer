@@ -1,3 +1,24 @@
+### Version 2.19.2
+* This release is identical to the previous one, it was only created to republish this extension at open-vsx.org
+
+### Version 2.19.1
+* UI bugfix for running multiple test runs in parallel
+
+### Version 2.19.0
+* add support for marking suites as errored
+* add support for marking tests and suites as not debuggable
+* improve support for running multiple test runs in parallel
+
+### Version 2.18.1
+* The debug icon in the Test Explorer is now also shown for test suites
+* The background color for error decorations can now be customized by color themes
+* update list of test adapters in README.md
+
+### Version 2.18.0
+* Workaround for microsoft/vscode#94872, which broke some of the global menu items in the Test Explorer view
+* Allow test-explorer.reveal command argument to be the ID of a node
+* update list of test adapters in README.md
+
 ### Version 2.17.0
 * replace `testExplorer.hideWhenEmpty` with `testExplorer.hideWhen` and change the default back to the old behavior (never hide the Test Explorer) because the other settings don't work or are confusing with some test adapters
 
