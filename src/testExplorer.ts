@@ -196,21 +196,31 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		};
 	}
 
-	showLog(nodes: TestNode[]): void {
+	showLog = (function () {
+		let lastCalled = new Date(); // function-local static
+		function showLog(this: TestExplorer, nodes: TestNode[]) {
+			// first check if the user double-clicked
+			const dateDiff = <any>new Date() - <any>lastCalled;
+			lastCalled = new Date();
+			if (dateDiff < 250) {
+				// show the source instead
+				this.showSource(nodes[0]);
+				return;
+			}
+			if (nodes.length > 0) {
+				this.nodesShownInOutputChannel = {
+					collection: nodes[0].collection,
+					ids: nodes.map(node => node.info.id)
+				}
 
-		if (nodes.length > 0) {
-
-			this.nodesShownInOutputChannel = {
-				collection: nodes[0].collection,
-				ids: nodes.map(node => node.info.id)
+			} else {
+				this.nodesShownInOutputChannel = undefined;
 			}
 
-		} else {
-			this.nodesShownInOutputChannel = undefined;
+			this.updateLog();
 		}
-
-		this.updateLog();
-	}
+		return showLog;
+	})();
 
 	showError(message: string | undefined): void {
 
