@@ -11,7 +11,14 @@ export class ErrorNode {
 
 	getTreeItem(): vscode.TreeItem {
 
-		const treeItem = new vscode.TreeItem('Error while loading tests - click to show', vscode.TreeItemCollapsibleState.None);
+		// @ts-ignore
+		let label = this.collection.adapter.adapter.constructor.name.replace (/(.*)Adapter/, "$1");
+		if (this.collection.adapter.workspaceFolder && vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 1)) {
+			label = `${this.collection.adapter.workspaceFolder.name} - ${label}`;
+		}
+		label += ': Error';
+
+		const treeItem = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.None);
 		treeItem.id = this.id;
 		treeItem.iconPath = this.collection.explorer.iconPaths.errored;
 		treeItem.contextValue = 'error';
@@ -20,6 +27,7 @@ export class ErrorNode {
 			command: 'test-explorer.show-error',
 			arguments: [ this.errorMessage ]
 		};
+		treeItem.tooltip = 'Error while loading tests - click to show';
 
 		return treeItem;
 	}
