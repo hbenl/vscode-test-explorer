@@ -60,6 +60,10 @@ Currently the following Test Adapters are available:
 * [PHPUnit Test Explorer](https://marketplace.visualstudio.com/items?itemName=recca0120.vscode-phpunit)
 * [PHP Tools for VSCode](https://marketplace.visualstudio.com/items?itemName=DEVSENSE.phptools-vscode)
 
+### REST/GraphQL
+
+* [Ply](https://marketplace.visualstudio.com/items?itemName=ply-ct.vscode-ply)
+
 ### Ruby
 
 * [Ruby Test Explorer](https://marketplace.visualstudio.com/items?itemName=connorshea.vscode-ruby-test-adapter)
