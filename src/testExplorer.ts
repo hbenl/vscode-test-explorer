@@ -254,7 +254,7 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 			const range = (line !== undefined) ? new vscode.Range(line, 0, line, 0) : undefined;
 			const editor = await vscode.window.showTextDocument(document, { selection: range });
 			if (range !== undefined) {
-				editor.revealRange(range.with(new vscode.Position(line! - 1, 0)), vscode.TextEditorRevealType.AtTop);
+				editor.revealRange(range.with(new vscode.Position(Math.max(line! - 1, 0), 0)), vscode.TextEditorRevealType.AtTop);
 			}
 		}
 	}
