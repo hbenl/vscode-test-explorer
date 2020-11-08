@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { TestCollection } from './testCollection';
+import { TestAdapterDelegate } from '../hub/testAdapterDelegate';
 
 export class ErrorNode {
 
@@ -11,8 +12,8 @@ export class ErrorNode {
 
 	getTreeItem(): vscode.TreeItem {
 
-		// @ts-ignore
-		let label = this.collection.adapter.adapter.constructor.name.replace (/(.*)Adapter/, "$1");
+		const adapterDelegate = this.collection.adapter as TestAdapterDelegate;
+		let label = adapterDelegate.adapter.constructor.name.replace (/(.*)Adapter/, "$1");
 		if (this.collection.adapter.workspaceFolder && vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 1)) {
 			label = `${this.collection.adapter.workspaceFolder.name} - ${label}`;
 		}
