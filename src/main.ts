@@ -10,7 +10,8 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	const testExplorer = new TestExplorer(context);
 	hub.registerTestController(testExplorer);
 
-	const workspaceUri = (vscode.workspace.workspaceFolders !== undefined) ? vscode.workspace.workspaceFolders[0].uri : undefined;
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	const workspaceUri = (workspaceFolders !== undefined && workspaceFolders.length > 0) ? workspaceFolders[0].uri : undefined;
 	const configuration = vscode.workspace.getConfiguration('testExplorer', workspaceUri);
 	const expandLevels = configuration.get<number>('showExpandButton') || 0;
 	const showCollapseAll = configuration.get<boolean>('showCollapseButton');
