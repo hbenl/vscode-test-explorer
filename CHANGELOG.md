@@ -1,3 +1,8 @@
+### Version 2.19.3
+* show source on tree item double-click
+* show workspace folder and Test Adapter label when the tests fail to load
+* update list of test adapters in README.md
+
 ### Version 2.19.2
 * This release is identical to the previous one, it was only created to republish this extension at open-vsx.org
 
