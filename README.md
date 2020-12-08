@@ -81,6 +81,9 @@ Currently the following Test Adapters are available:
 * [NXunit Test Explorer](https://marketplace.visualstudio.com/items?itemName=wghats.vscode-nxunit-test-adapter)
 * [.Net Core Test Explorer](https://marketplace.visualstudio.com/items?itemName=derivitec-ltd.vscode-dotnet-adapter)
 
+### Powershell
+* [Pester Test Explorer](https://marketplace.visualstudio.com/items?itemName=TylerLeonhardt.vscode-pester-test-adapter)
+
 ### VHDL/SystemVerilog
 
 * [VUnit Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbohlin.vunit-test-explorer)
