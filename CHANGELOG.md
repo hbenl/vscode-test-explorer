@@ -1,3 +1,11 @@
+<!--
+
+Please add your own contribution below inside the Master section
+
+## Master
+* bugfix: tests were sometimes duplicated when describes were found while running tests (e.g. describe.each)
+-->
+
 ### Version 2.19.3
 * show source on tree item double-click
 * show workspace folder and Test Adapter label when the tests fail to load

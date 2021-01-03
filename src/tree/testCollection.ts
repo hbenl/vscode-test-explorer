@@ -187,6 +187,13 @@ export class TestCollection {
 		}
 	}
 
+	private addChildNodes(children: TreeNode[]) {
+		children.forEach(childNode => {
+			this.nodesById.set(childNode.info.id, childNode);
+			this.addChildNodes(childNode.children);
+		});
+	}
+
 	private onTestRunEvent(testRunEvent: TestRunStartedEvent | TestRunFinishedEvent | TestSuiteEvent | TestEvent): void {
 		if (this.rootSuite === undefined) return;
 
@@ -249,7 +256,7 @@ export class TestCollection {
 					runningSuite.children.push(suiteNode);
 					runningSuite.recalcStateNeeded = true;
 					this.nodesById.set(suiteId, suiteNode);
-
+					this.addChildNodes(suiteNode.children);
 				}
 
 				if (suiteNode) {
@@ -311,7 +318,7 @@ export class TestCollection {
 				runningSuite.children.push(testNode);
 				runningSuite.recalcStateNeeded = true;
 				this.nodesById.set(testId, testNode);
-
+				this.addChildNodes(testNode.children);
 			}
 
 			if (testNode) {
