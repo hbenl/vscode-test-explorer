@@ -55,6 +55,10 @@ Currently the following Test Adapters are available:
 
 * [Haxe Test Explorer](https://marketplace.visualstudio.com/items?itemName=vshaxe.haxe-test-adapter)
 
+### Lua
+
+* [LuaUnit Test Explorer](https://marketplace.visualstudio.com/items?itemName=lej.vscode-lua-test-adapter)
+
 ### Python
 
 * [Python Test Explorer](https://marketplace.visualstudio.com/items?itemName=LittleFoxTeam.vscode-python-test-adapter)
