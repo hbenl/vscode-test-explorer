@@ -1,10 +1,6 @@
-<!--
-
-Please add your own contribution below inside the Master section
-
-## Master
+### Version 2.19.4
 * bugfix: tests were sometimes duplicated when describes were found while running tests (e.g. describe.each)
--->
+* update list of test adapters in README.md
 
 ### Version 2.19.3
 * show source on tree item double-click
