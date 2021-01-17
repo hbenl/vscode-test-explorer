@@ -1,3 +1,6 @@
+### Version 2.19.5
+* update list of test adapters in README.md
+
 ### Version 2.19.4
 * bugfix: tests were sometimes duplicated when describes were found while running tests (e.g. describe.each)
 * update list of test adapters in README.md
