@@ -80,6 +80,10 @@ Currently the following Test Adapters are available:
 
 * [Rust Test Explorer](https://marketplace.visualstudio.com/items?itemName=swellaby.vscode-rust-test-adapter)
 
+### Swift
+
+* [Swift Test Explorer](https://marketplace.visualstudio.com/items?itemName=MakeItBetter.vscode-swift-test-adapter)
+
 ### .NET Framework
 
 * [NXunit Test Explorer](https://marketplace.visualstudio.com/items?itemName=wghats.vscode-nxunit-test-adapter)
