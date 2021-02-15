@@ -26,7 +26,7 @@ Currently the following Test Adapters are available:
 ### ABAP
 
 * [ABAP remote filesystem](https://marketplace.visualstudio.com/items?itemName=murbani.vscode-abap-remote-fs)
-  
+
 ### C
 
 * [Ceedling Test Explorer](https://marketplace.visualstudio.com/items?itemName=numaru.vscode-ceedling-test-adapter)
@@ -127,6 +127,7 @@ Property                              | Description
 --------------------------------------|---------------------------------------------------------------
 `testExplorer.onStart`                | Retire or reset all test states whenever a test run is started
 `testExplorer.onReload`               | Retire or reset all test states whenever the test tree is reloaded
+`testExplorer.autoSave` | Automatically saves all modified files whenever a test run is started
 `testExplorer.codeLens`               | Show a CodeLens above each test or suite for running or debugging the tests
 `testExplorer.gutterDecoration`       | Show the state of each test in the editor using Gutter Decorations
 `testExplorer.errorDecoration`        | Show error messages from test failures as decorations in the editor
