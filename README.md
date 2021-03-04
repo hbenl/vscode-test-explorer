@@ -32,6 +32,7 @@ Currently the following Test Adapters are available:
 * [Ceedling Test Explorer](https://marketplace.visualstudio.com/items?itemName=numaru.vscode-ceedling-test-adapter)
 * [CppUTest Test Explorer](https://marketplace.visualstudio.com/items?itemName=bneumann.cpputest-test-adapter)
 * [Unity Framework for C Test Explorer](https://marketplace.visualstudio.com/items?itemName=fpopescu.vscode-unity-test-adapter)
+* [Acutest Test Explorer](https://marketplace.visualstudio.com/items?itemName=Moosecasa.vscode-acutest-test-adapter)
 
 ### C++
 
@@ -42,6 +43,7 @@ Currently the following Test Adapters are available:
 * [catkin-tools](https://marketplace.visualstudio.com/items?itemName=betwo.b2-catkin-tools)
 * [CppUTest Test Explorer](https://marketplace.visualstudio.com/items?itemName=bneumann.cpputest-test-adapter)
 * [Boost.Test Explorer](https://marketplace.visualstudio.com/items?itemName=zcoinofficial.boost-test-adapter)
+* [Acutest Test Explorer](https://marketplace.visualstudio.com/items?itemName=Moosecasa.vscode-acutest-test-adapter)
 
 ### Elm
 
