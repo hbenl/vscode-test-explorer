@@ -43,6 +43,10 @@ Currently the following Test Adapters are available:
 * [CppUTest Test Explorer](https://marketplace.visualstudio.com/items?itemName=bneumann.cpputest-test-adapter)
 * [Boost.Test Explorer](https://marketplace.visualstudio.com/items?itemName=zcoinofficial.boost-test-adapter)
 
+### Elixir
+
+* [Elixir Test Explorer](https://marketplace.visualstudio.com/items?itemName=adamzapasnik.elixir-test-explorer)
+
 ### Elm
 
 * [Run Elm tests](https://marketplace.visualstudio.com/items?itemName=FraWa.vscode-elm-test-runner)
