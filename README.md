@@ -45,6 +45,10 @@ Currently the following Test Adapters are available:
 * [Boost.Test Explorer](https://marketplace.visualstudio.com/items?itemName=zcoinofficial.boost-test-adapter)
 * [Acutest Test Explorer](https://marketplace.visualstudio.com/items?itemName=Moosecasa.vscode-acutest-test-adapter)
 
+### Elixir
+
+* [Elixir Test Explorer](https://marketplace.visualstudio.com/items?itemName=adamzapasnik.elixir-test-explorer)
+
 ### Elm
 
 * [Run Elm tests](https://marketplace.visualstudio.com/items?itemName=FraWa.vscode-elm-test-runner)
