@@ -44,6 +44,7 @@ Currently the following Test Adapters are available:
 * [CppUTest Test Explorer](https://marketplace.visualstudio.com/items?itemName=bneumann.cpputest-test-adapter)
 * [Boost.Test Explorer](https://marketplace.visualstudio.com/items?itemName=zcoinofficial.boost-test-adapter)
 * [Acutest Test Explorer](https://marketplace.visualstudio.com/items?itemName=Moosecasa.vscode-acutest-test-adapter)
+* [CppUnit Test Explorer](https://marketplace.visualstudio.com/items?itemName=dprog.vscode-cppunit-test-adapter)
 
 ### Elixir
 
@@ -73,6 +74,10 @@ Currently the following Test Adapters are available:
 
 * [PHPUnit Test Explorer](https://marketplace.visualstudio.com/items?itemName=recca0120.vscode-phpunit)
 * [PHP Tools for VSCode](https://marketplace.visualstudio.com/items?itemName=DEVSENSE.phptools-vscode)
+
+### R
+
+* [R Test Explorer](https://marketplace.visualstudio.com/items?itemName=meakbiyik.vscode-r-test-adapter)
 
 ### REST/GraphQL
 
