@@ -65,6 +65,9 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		if (collection) {
 			collection.dispose();
 			this.collections.delete(adapter);
+			this.decorator.updateAllDecorations();
+			this.treeEvents.sendTreeChangedEvent();
+			this.codeLensesChanged.fire();
 			this.updateVisibility();
 		}
 	}

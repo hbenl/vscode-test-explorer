@@ -8,7 +8,6 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	const hub = new TestHub();
 	const testExplorer = new TestExplorer(context);
-	hub.registerTestController(testExplorer);
 
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	const workspaceUri = (workspaceFolders !== undefined && workspaceFolders.length > 0) ? workspaceFolders[0].uri : undefined;
@@ -17,6 +16,12 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	const showCollapseAll = configuration.get<boolean>('showCollapseButton');
 	const addToEditorContextMenu = configuration.get<boolean>('addToEditorContextMenu');
 	const hideWhen = configuration.get<HideWhenSetting>('hideWhen');
+
+	if (configuration.get('useNativeTesting')) {
+		vscode.commands.executeCommand('testExplorerConverter.activate');
+	} else {
+		hub.registerTestController(testExplorer);
+	}
 
 	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(configChange => {
 		if (configChange.affectsConfiguration('testExplorer.showExpandButton') ||
@@ -33,6 +38,16 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 			const hideWhen = configuration.get<HideWhenSetting>('hideWhen');
 			testExplorer.hideWhen = (hideWhen !== undefined) ? hideWhen : 'never';
 			testExplorer.updateVisibility();
+		}
+		if (configChange.affectsConfiguration('testExplorer.useNativeTesting')) {
+			const configuration = vscode.workspace.getConfiguration('testExplorer', workspaceUri);
+			const useNativeTesting = configuration.get('useNativeTesting');
+			if (useNativeTesting) {
+				hub.unregisterTestController(testExplorer);
+				vscode.commands.executeCommand('testExplorerConverter.activate');
+			} else {
+				hub.registerTestController(testExplorer);
+			}
 		}
 	}));
 
