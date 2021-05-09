@@ -15,6 +15,7 @@ export type HideWhenSetting = 'never' | 'noAdapters' | 'noTests';
 
 export class TestExplorer implements TestController, vscode.TreeDataProvider<TreeNode | ErrorNode>, vscode.CodeLensProvider, vscode.HoverProvider {
 
+	public disabled = false;
 	public hideWhen: HideWhenSetting;
 
 	public readonly iconPaths: IconPaths;
@@ -385,12 +386,14 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	}
 
 	updateVisibility(): void {
-		let visible = true;
-		if (this.hideWhen === 'noAdapters') {
-			visible = (this.collections.size > 0);
-		} else if (this.hideWhen === 'noTests') {
-			visible = [ ...this.collections.values() ].some(
-				collection => ((collection.suite !== undefined) || (collection.error !== undefined)));
+		let visible = !this.disabled;
+		if (!this.disabled) {
+			if (this.hideWhen === 'noAdapters') {
+				visible = (this.collections.size > 0);
+			} else if (this.hideWhen === 'noTests') {
+				visible = [ ...this.collections.values() ].some(
+					collection => ((collection.suite !== undefined) || (collection.error !== undefined)));
+			}
 		}
 		vscode.commands.executeCommand('setContext', 'testExplorerVisible', visible);
 	}

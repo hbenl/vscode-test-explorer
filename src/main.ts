@@ -18,6 +18,8 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	const hideWhen = configuration.get<HideWhenSetting>('hideWhen');
 
 	if (configuration.get('useNativeTesting')) {
+		testExplorer.disabled = true;
+		testExplorer.updateVisibility();
 		vscode.commands.executeCommand('testExplorerConverter.activate');
 	} else {
 		hub.registerTestController(testExplorer);
@@ -44,8 +46,12 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 			const useNativeTesting = configuration.get('useNativeTesting');
 			if (useNativeTesting) {
 				hub.unregisterTestController(testExplorer);
+				testExplorer.disabled = true;
+				testExplorer.updateVisibility();
 				vscode.commands.executeCommand('testExplorerConverter.activate');
 			} else {
+				testExplorer.disabled = false;
+				testExplorer.updateVisibility();
 				hub.registerTestController(testExplorer);
 			}
 		}
