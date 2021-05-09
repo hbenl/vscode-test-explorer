@@ -1,3 +1,7 @@
+### Version 2.20.0
+* add `testExplorer.useNativeTesting` configuration option
+* update list of test adapters in README.md
+
 ### Version 2.19.6
 * update list of test adapters in README.md
 

@@ -151,6 +151,7 @@ Property                              | Description
 `testExplorer.mergeSuites`            | Merge suites with the same label and parent
 `testExplorer.hideEmptyLog`           | Hide the output channel used to show a test's log when the user clicks on a test whose log is empty
 `testExplorer.hideWhen`               | Hide the Test Explorer when no test adapters have been registered or when no tests have been found by the registered adapters. The default is to never hide the Test Explorer (some test adapters only work with this default setting).
+`testExplorer.useNativeTesting`       | Disable the Test Explorer UI and use VSCode's native Testing UI instead
 
 Further configuration options are provided by the Test Adapters.
 
