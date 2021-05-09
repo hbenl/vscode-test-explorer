@@ -20,7 +20,7 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 	if (configuration.get('useNativeTesting')) {
 		testExplorer.disabled = true;
 		testExplorer.updateVisibility();
-		vscode.commands.executeCommand('testExplorerConverter.activate');
+		setTimeout(() => vscode.commands.executeCommand('testExplorerConverter.activate'), 0);
 	} else {
 		hub.registerTestController(testExplorer);
 	}
