@@ -22,6 +22,7 @@ Currently the following Test Adapters are available:
 * [Jest Test Explorer](https://marketplace.visualstudio.com/items?itemName=kavod-io.vscode-jest-test-adapter)
 * [AVA Test Explorer](https://marketplace.visualstudio.com/items?itemName=gwenio.vscode-ava-test-adapter)
 * [TestyTs Test Explorer](https://marketplace.visualstudio.com/items?itemName=Testy.vscode-testyts-test-adapter)
+* [React-scripts Test Adapter](https://marketplace.visualstudio.com/items?itemName=smarschollek.vscode-react-scripts-test-adapter)
 
 ### ABAP
 
