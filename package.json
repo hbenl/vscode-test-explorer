@@ -539,6 +539,10 @@
       ],
       "commandPalette": [
         {
+          "command": "test-explorer.reload",
+          "when": "testExplorerVisible"
+        },
+        {
           "command": "test-explorer.reload-collection",
           "when": "false"
         },
@@ -547,12 +551,28 @@
           "when": "false"
         },
         {
+          "command": "test-explorer.run-all",
+          "when": "testExplorerVisible"
+        },
+        {
           "command": "test-explorer.run",
           "when": "false"
         },
         {
           "command": "test-explorer.pick-and-run",
           "when": "false"
+        },
+        {
+          "command": "test-explorer.rerun",
+          "when": "testExplorerVisible"
+        },
+        {
+          "command": "test-explorer.run-file",
+          "when": "testExplorerVisible"
+        },
+        {
+          "command": "test-explorer.run-test-at-cursor",
+          "when": "testExplorerVisible"
         },
         {
           "command": "test-explorer.run-this-file",
@@ -571,8 +591,20 @@
           "when": "false"
         },
         {
+          "command": "test-explorer.redebug",
+          "when": "testExplorerVisible"
+        },
+        {
+          "command": "test-explorer.debug-test-at-cursor",
+          "when": "testExplorerVisible"
+        },
+        {
           "command": "test-explorer.debug-this-test",
           "when": "false"
+        },
+        {
+          "command": "test-explorer.cancel",
+          "when": "testExplorerVisible"
         },
         {
           "command": "test-explorer.show-log",
