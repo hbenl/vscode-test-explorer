@@ -22,6 +22,11 @@
     "test",
     "testing"
   ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    }
+  },
   "main": "out/main.js",
   "scripts": {
     "reinstall": "rimraf node_modules package-lock.json && npm install",
