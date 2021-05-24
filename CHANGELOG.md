@@ -1,3 +1,6 @@
+### Version 2.20.1
+* Support "workspace trust" feature: this extension will be enabled in untrusted workspaces
+
 ### Version 2.20.0
 * add `testExplorer.useNativeTesting` configuration option
 * update list of test adapters in README.md
