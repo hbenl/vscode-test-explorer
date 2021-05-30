@@ -1,3 +1,6 @@
+### Version 2.20.2
+* add dependency to the converter extension which is necessary for the `testExplorer.useNativeTesting` configuration option to work as expected
+
 ### Version 2.20.1
 * Support "workspace trust" feature: this extension will be enabled in untrusted workspaces
 

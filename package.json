@@ -5,7 +5,7 @@
   "icon": "icon.png",
   "author": "Holger Benl <hbenl@evandor.de>",
   "publisher": "hbenl",
-  "version": "2.20.1",
+  "version": "2.20.2",
   "license": "MIT",
   "homepage": "https://github.com/hbenl/vscode-test-explorer",
   "repository": {
