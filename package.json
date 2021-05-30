@@ -37,6 +37,9 @@
     "package": "vsce package",
     "publish": "vsce publish"
   },
+  "extensionDependencies": [
+    "ms-vscode.test-adapter-converter"
+  ],
   "dependencies": {
     "escape-string-regexp": "^4.0.0",
     "tslib": "^2.2.0",
