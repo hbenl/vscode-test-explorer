@@ -1,3 +1,6 @@
+### Version 2.20.4
+* re-add the dependency to the converter extension and update the minimum VSCode version
+
 ### Version 2.20.3
 * remove the dependency to the converter extension temporarily
 
