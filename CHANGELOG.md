@@ -1,3 +1,6 @@
+### Version 2.20.3
+* remove the dependency to the converter extension temporarily
+
 ### Version 2.20.2
 * add dependency to the converter extension which is necessary for the `testExplorer.useNativeTesting` configuration option to work as expected
 
