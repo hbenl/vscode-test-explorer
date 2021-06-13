@@ -41,7 +41,7 @@ export class TreeEventDebouncer {
 			this.timeout = undefined;
 		}
 
-		this.treeDataChanged.fire();
+		this.treeDataChanged.fire(undefined as any);
 	}
 
 	private sendNodeChangedEventsNow(): void {
@@ -56,7 +56,7 @@ export class TreeEventDebouncer {
 
 		for (const node of changedNodes) {
 			if (node.parent === undefined) { // root node
-				this.treeDataChanged.fire();
+				this.treeDataChanged.fire(undefined as any);
 			} else {
 				this.treeDataChanged.fire(node);
 			}
