@@ -1,3 +1,6 @@
+### Version 2.21.0
+* add debug-all and debug-file commands
+
 ### Version 2.20.4
 * re-add the dependency to the converter extension and update the minimum VSCode version
 
