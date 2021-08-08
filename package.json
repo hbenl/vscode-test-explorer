@@ -285,6 +285,14 @@
         "title": "Run this test"
       },
       {
+        "command": "test-explorer.debug-all",
+        "title": "Test Explorer: Debug all tests",
+        "icon": {
+          "dark": "./icons/debug-dark.svg",
+          "light": "./icons/debug-light.svg"
+        }
+      },
+      {
         "command": "test-explorer.debug",
         "title": "Debug this test",
         "icon": {
@@ -299,6 +307,10 @@
       {
         "command": "test-explorer.redebug",
         "title": "Test Explorer: Repeat the last test run in the debugger"
+      },
+      {
+        "command": "test-explorer.debug-file",
+        "title": "Test Explorer: Debug tests in current file"
       },
       {
         "command": "test-explorer.debug-test-at-cursor",
@@ -591,6 +603,10 @@
           "when": "false"
         },
         {
+          "command": "test-explorer.debug-all",
+          "when": "testExplorerVisible"
+        },
+        {
           "command": "test-explorer.debug",
           "when": "false"
         },
@@ -600,6 +616,10 @@
         },
         {
           "command": "test-explorer.redebug",
+          "when": "testExplorerVisible"
+        },
+        {
+          "command": "test-explorer.debug-file",
           "when": "testExplorerVisible"
         },
         {

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { TestHub as ITestHub} from 'vscode-test-adapter-api';
 import { TestHub } from './hub/testHub';
 import { TestExplorer, HideWhenSetting } from './testExplorer';
-import { runTestsInFile, runTestAtCursor, debugTestAtCursor, expand } from './util';
+import { runTestsInFile, runTestAtCursor, debugTestAtCursor, expand, debugTestsInFile } from './util';
 
 export function activate(context: vscode.ExtensionContext): ITestHub {
 
@@ -97,11 +97,15 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	registerCommand('test-explorer.cancel', () => testExplorer.cancel());
 
-	registerCommand('test-explorer.debug', (node) => testExplorer.debug([ node ]));
+	registerCommand('test-explorer.debug-all', () => testExplorer.debug());
 
-	registerCommand('test-explorer.pick-and-debug', (nodes) => testExplorer.debug(nodes));
+	registerCommand('test-explorer.debug', (clickedNode, allNodes) => testExplorer.debug(allNodes || [ clickedNode ], false));
+
+	registerCommand('test-explorer.pick-and-debug', (nodes) => testExplorer.debug(nodes, true));
 
 	registerCommand('test-explorer.redebug', () => testExplorer.redebug());
+
+	registerCommand('test-explorer.debug-file', (file?: string) => debugTestsInFile(file, testExplorer));
 
 	registerCommand('test-explorer.debug-test-at-cursor', () => debugTestAtCursor(testExplorer));
 

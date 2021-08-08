@@ -163,20 +163,36 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		return Promise.resolve();
 	}
 
-	async debug(nodes: TreeNode[]): Promise<void> {
+	async debug(nodes?: TreeNode[], pick = true): Promise<void> {
 
 		this.lastTestRun = undefined;
 
-		const nodesToRun = await pickNodes(nodes);
-		if ((nodesToRun.length > 0) && nodesToRun[0].collection.adapter.debug) {
-			try {
+		if (nodes) {
 
-				this.lastTestRun = [ nodesToRun[0].collection, getAdapterIds(nodesToRun) ];
-				await nodesToRun[0].collection.adapter.debug(getAdapterIds(nodesToRun));
+			const nodesToRun = pick ? await pickNodes(nodes) : nodes;
+			if ((nodesToRun.length > 0) && nodesToRun[0].collection.adapter.debug) {
+				try {
+	
+					this.lastTestRun = [ nodesToRun[0].collection, getAdapterIds(nodesToRun) ];
+					await nodesToRun[0].collection.adapter.debug(getAdapterIds(nodesToRun));
+	
+				} catch(e) {
+					vscode.window.showErrorMessage(`Error while debugging test: ${e}`);
+					return;
+				}
+			}
 
-			} catch(e) {
-				vscode.window.showErrorMessage(`Error while debugging test: ${e}`);
-				return;
+		} else {
+
+			for (const collection of this.collections.values()) {
+				if (collection.suite && collection.adapter.debug) {
+					try {
+						await collection.adapter.debug(collection.suite.adapterIds);
+					} catch (e) {
+						vscode.window.showErrorMessage(`Error while debugging test: ${e}`);
+						return;
+					}
+				}
 			}
 		}
 	}
