@@ -38,7 +38,7 @@
     "publish": "vsce publish"
   },
   "extensionDependencies": [
-    "ms-vscode.test-adapter-converter"
+    "hbenl.test-adapter-converter"
   ],
   "dependencies": {
     "escape-string-regexp": "^4.0.0",
