@@ -10,6 +10,25 @@ The Test Explorer can also be used in [VS Live Share](https://aka.ms/vsls) sessi
 This extension will be automatically installed when you install one of the Test Adapters,
 so there is usually no need to install this extension manually.
 
+## Migrating to native testing
+
+In version 1.59, VS Code added an official API and UI for running tests, which provides all the functionality of this extension and more.
+Therefore this extension is now deprecated. I will keep maintaining it so it will remain usable but I don't plan to add any major new features to it.
+
+### Changes for users
+
+You can keep using this extension as before, but you now also have the option to use VS Code's native testing UI
+instead by setting `testExplorer.useNativeTesting` to `true` in your VS Code settings.
+
+### Changes for extension authors
+
+If you plan to write a new testing extension for VS Code, I recommend you use the native testing API as it's more flexible and has more features
+than this extension's Test Adapter API. [Here](https://code.visualstudio.com/api/extension-guides/testing)'s the official guide for the native testing API.
+
+If you're maintaining an extension that uses the Test Adapter API, [here](https://github.com/microsoft/vscode-docs/blob/vnext/api/extension-guides/testing.md#migrating-from-the-test-explorer-ui) is a short guide how to migrate your Test Adapter to the native API.
+The migration isn't strictly necessary because this extension will remain usable and your users can switch to the native testing UI using the
+`testExplorer.useNativeTesting` setting anyway, but you might find the additional flexibility of the native testing API useful in the future.
+
 ## Test Adapters
 
 Currently the following Test Adapters are available:
