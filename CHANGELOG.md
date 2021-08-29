@@ -1,3 +1,7 @@
+### Version 2.21.1
+* add section about the native testing API to README.md
+* update list of test adapters in README.md
+
 ### Version 2.21.0
 * add debug-all and debug-file commands
 
