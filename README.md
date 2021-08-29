@@ -63,6 +63,10 @@ Currently the following Test Adapters are available:
 
 * [Haxe Test Explorer](https://marketplace.visualstudio.com/items?itemName=vshaxe.haxe-test-adapter)
 
+### Java
+
+* [Apache NetBeans Language Server](https://marketplace.visualstudio.com/items?itemName=ASF.apache-netbeans-java)
+
 ### Lua
 
 * [LuaUnit Test Explorer](https://marketplace.visualstudio.com/items?itemName=lej.vscode-lua-test-adapter)
