@@ -50,6 +50,25 @@ export function runTestsInFile(fileUri: string | undefined, testExplorer: TestEx
 	}
 }
 
+export function debugTestsInFile(fileUri: string | undefined, testExplorer: TestExplorer): void {
+
+	if (!fileUri && vscode.window.activeTextEditor) {
+		fileUri = vscode.window.activeTextEditor.document.uri.toString();
+	}
+
+	if (fileUri) {
+		for (const collection of testExplorer.collections.values()) {
+			if (collection.suite && collection.adapter.debug) {
+				const found = findFileNodes(fileUri, collection.suite);
+				if (found.length > 0) {
+					testExplorer.debug(found, false);
+					return;
+				}
+			}
+		}
+	}
+}
+
 function findFileNodes(fileUri: string, searchNode: TreeNode): TreeNode[] {
 
 	if (searchNode.fileUri) {

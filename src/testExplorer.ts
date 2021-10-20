@@ -15,6 +15,7 @@ export type HideWhenSetting = 'never' | 'noAdapters' | 'noTests';
 
 export class TestExplorer implements TestController, vscode.TreeDataProvider<TreeNode | ErrorNode>, vscode.CodeLensProvider, vscode.HoverProvider {
 
+	public disabled = false;
 	public hideWhen: HideWhenSetting;
 
 	public readonly iconPaths: IconPaths;
@@ -65,6 +66,9 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		if (collection) {
 			collection.dispose();
 			this.collections.delete(adapter);
+			this.decorator.updateAllDecorations();
+			this.treeEvents.sendTreeChangedEvent();
+			this.codeLensesChanged.fire();
 			this.updateVisibility();
 		}
 	}
@@ -159,20 +163,36 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		return Promise.resolve();
 	}
 
-	async debug(nodes: TreeNode[]): Promise<void> {
+	async debug(nodes?: TreeNode[], pick = true): Promise<void> {
 
 		this.lastTestRun = undefined;
 
-		const nodesToRun = await pickNodes(nodes);
-		if ((nodesToRun.length > 0) && nodesToRun[0].collection.adapter.debug) {
-			try {
+		if (nodes) {
 
-				this.lastTestRun = [ nodesToRun[0].collection, getAdapterIds(nodesToRun) ];
-				await nodesToRun[0].collection.adapter.debug(getAdapterIds(nodesToRun));
+			const nodesToRun = pick ? await pickNodes(nodes) : nodes;
+			if ((nodesToRun.length > 0) && nodesToRun[0].collection.adapter.debug) {
+				try {
+	
+					this.lastTestRun = [ nodesToRun[0].collection, getAdapterIds(nodesToRun) ];
+					await nodesToRun[0].collection.adapter.debug(getAdapterIds(nodesToRun));
+	
+				} catch(e) {
+					vscode.window.showErrorMessage(`Error while debugging test: ${e}`);
+					return;
+				}
+			}
 
-			} catch(e) {
-				vscode.window.showErrorMessage(`Error while debugging test: ${e}`);
-				return;
+		} else {
+
+			for (const collection of this.collections.values()) {
+				if (collection.suite && collection.adapter.debug) {
+					try {
+						await collection.adapter.debug(collection.suite.adapterIds);
+					} catch (e) {
+						vscode.window.showErrorMessage(`Error while debugging test: ${e}`);
+						return;
+					}
+				}
 			}
 		}
 	}
@@ -196,21 +216,31 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 		};
 	}
 
-	showLog(nodes: TestNode[]): void {
+	showLog = (function () {
+		let lastCalled = new Date(); // function-local static
+		function showLog(this: TestExplorer, nodes: TestNode[]) {
+			// first check if the user double-clicked
+			const dateDiff = <any>new Date() - <any>lastCalled;
+			lastCalled = new Date();
+			if (dateDiff < 250) {
+				// show the source instead
+				this.showSource(nodes[0]);
+				return;
+			}
+			if (nodes.length > 0) {
+				this.nodesShownInOutputChannel = {
+					collection: nodes[0].collection,
+					ids: nodes.map(node => node.info.id)
+				}
 
-		if (nodes.length > 0) {
-
-			this.nodesShownInOutputChannel = {
-				collection: nodes[0].collection,
-				ids: nodes.map(node => node.info.id)
+			} else {
+				this.nodesShownInOutputChannel = undefined;
 			}
 
-		} else {
-			this.nodesShownInOutputChannel = undefined;
+			this.updateLog();
 		}
-
-		this.updateLog();
-	}
+		return showLog;
+	})();
 
 	showError(message: string | undefined): void {
 
@@ -241,8 +271,11 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 				line = findLineContaining(node.info.label, document.getText());
 			}
 
-			const options = (line !== undefined) ? { selection: new vscode.Range(line, 0, line, 0) } : undefined;
-			await vscode.window.showTextDocument(document, options);
+			const range = (line !== undefined) ? new vscode.Range(line, 0, line, 0) : undefined;
+			const editor = await vscode.window.showTextDocument(document, { selection: range });
+			if (range !== undefined) {
+				editor.revealRange(range.with(new vscode.Position(Math.max(line! - 1, 0), 0)), vscode.TextEditorRevealType.AtTop);
+			}
 		}
 	}
 
@@ -369,12 +402,14 @@ export class TestExplorer implements TestController, vscode.TreeDataProvider<Tre
 	}
 
 	updateVisibility(): void {
-		let visible = true;
-		if (this.hideWhen === 'noAdapters') {
-			visible = (this.collections.size > 0);
-		} else if (this.hideWhen === 'noTests') {
-			visible = [ ...this.collections.values() ].some(
-				collection => ((collection.suite !== undefined) || (collection.error !== undefined)));
+		let visible = !this.disabled;
+		if (!this.disabled) {
+			if (this.hideWhen === 'noAdapters') {
+				visible = (this.collections.size > 0);
+			} else if (this.hideWhen === 'noTests') {
+				visible = [ ...this.collections.values() ].some(
+					collection => ((collection.suite !== undefined) || (collection.error !== undefined)));
+			}
 		}
 		vscode.commands.executeCommand('setContext', 'testExplorerVisible', visible);
 	}

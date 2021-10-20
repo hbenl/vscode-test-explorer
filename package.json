@@ -5,7 +5,7 @@
   "icon": "icon.png",
   "author": "Holger Benl <hbenl@evandor.de>",
   "publisher": "hbenl",
-  "version": "2.19.2",
+  "version": "2.21.1",
   "license": "MIT",
   "homepage": "https://github.com/hbenl/vscode-test-explorer",
   "repository": {
@@ -22,6 +22,11 @@
     "test",
     "testing"
   ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    }
+  },
   "main": "out/main.js",
   "scripts": {
     "reinstall": "rimraf node_modules package-lock.json && npm install",
@@ -32,19 +37,23 @@
     "package": "vsce package",
     "publish": "vsce publish"
   },
+  "extensionDependencies": [
+    "ms-vscode.test-adapter-converter"
+  ],
   "dependencies": {
     "escape-string-regexp": "^4.0.0",
-    "tslib": "^2.0.0",
+    "tslib": "^2.3.0",
     "vscode-test-adapter-api": "^1.9.0"
   },
   "devDependencies": {
-    "@types/vscode": "~1.38.0",
+    "@types/node": "^14.17.9",
+    "@types/vscode": "~1.59.0",
     "rimraf": "^3.0.2",
-    "typescript": "^3.9.3",
-    "vsce": "^1.75.0"
+    "typescript": "^4.3.5",
+    "vsce": "^1.96.1"
   },
   "engines": {
-    "vscode": "^1.38.0"
+    "vscode": "^1.59.0"
   },
   "activationEvents": [
     "*"
@@ -196,6 +205,12 @@
           ],
           "default": "never",
           "scope": "resource"
+        },
+        "testExplorer.useNativeTesting": {
+          "description": "Disable the Test Explorer UI and use VSCode's native Testing UI instead",
+          "type": "boolean",
+          "default": false,
+          "scope": "resource"
         }
       }
     },
@@ -270,6 +285,14 @@
         "title": "Run this test"
       },
       {
+        "command": "test-explorer.debug-all",
+        "title": "Test Explorer: Debug all tests",
+        "icon": {
+          "dark": "./icons/debug-dark.svg",
+          "light": "./icons/debug-light.svg"
+        }
+      },
+      {
         "command": "test-explorer.debug",
         "title": "Debug",
         "icon": {
@@ -284,6 +307,10 @@
       {
         "command": "test-explorer.redebug",
         "title": "Test Explorer: Repeat the last test run in the debugger"
+      },
+      {
+        "command": "test-explorer.debug-file",
+        "title": "Test Explorer: Debug tests in current file"
       },
       {
         "command": "test-explorer.debug-test-at-cursor",
@@ -561,12 +588,20 @@
       ],
       "commandPalette": [
         {
+          "command": "test-explorer.reload",
+          "when": "testExplorerVisible"
+        },
+        {
           "command": "test-explorer.reload-collection",
           "when": "false"
         },
         {
           "command": "test-explorer.reloading",
           "when": "false"
+        },
+        {
+          "command": "test-explorer.run-all",
+          "when": "testExplorerVisible"
         },
         {
           "command": "test-explorer.run",
@@ -577,12 +612,28 @@
           "when": "false"
         },
         {
+          "command": "test-explorer.rerun",
+          "when": "testExplorerVisible"
+        },
+        {
+          "command": "test-explorer.run-file",
+          "when": "testExplorerVisible"
+        },
+        {
+          "command": "test-explorer.run-test-at-cursor",
+          "when": "testExplorerVisible"
+        },
+        {
           "command": "test-explorer.run-this-file",
           "when": "false"
         },
         {
           "command": "test-explorer.run-this-test",
           "when": "false"
+        },
+        {
+          "command": "test-explorer.debug-all",
+          "when": "testExplorerVisible"
         },
         {
           "command": "test-explorer.debug",
@@ -593,8 +644,24 @@
           "when": "false"
         },
         {
+          "command": "test-explorer.redebug",
+          "when": "testExplorerVisible"
+        },
+        {
+          "command": "test-explorer.debug-file",
+          "when": "testExplorerVisible"
+        },
+        {
+          "command": "test-explorer.debug-test-at-cursor",
+          "when": "testExplorerVisible"
+        },
+        {
           "command": "test-explorer.debug-this-test",
           "when": "false"
+        },
+        {
+          "command": "test-explorer.cancel",
+          "when": "testExplorerVisible"
         },
         {
           "command": "test-explorer.show-log",

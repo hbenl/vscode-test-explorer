@@ -2,20 +2,28 @@ import * as vscode from 'vscode';
 import { TestHub as ITestHub} from 'vscode-test-adapter-api';
 import { TestHub } from './hub/testHub';
 import { TestExplorer, HideWhenSetting } from './testExplorer';
-import { runTestsInFile, runTestAtCursor, debugTestAtCursor, expand } from './util';
+import { runTestsInFile, runTestAtCursor, debugTestAtCursor, expand, debugTestsInFile } from './util';
 
 export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	const hub = new TestHub();
 	const testExplorer = new TestExplorer(context);
-	hub.registerTestController(testExplorer);
 
-	const workspaceUri = (vscode.workspace.workspaceFolders !== undefined) ? vscode.workspace.workspaceFolders[0].uri : undefined;
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	const workspaceUri = (workspaceFolders !== undefined && workspaceFolders.length > 0) ? workspaceFolders[0].uri : undefined;
 	const configuration = vscode.workspace.getConfiguration('testExplorer', workspaceUri);
 	const expandLevels = configuration.get<number>('showExpandButton') || 0;
 	const showCollapseAll = configuration.get<boolean>('showCollapseButton');
 	const addToEditorContextMenu = configuration.get<boolean>('addToEditorContextMenu');
 	const hideWhen = configuration.get<HideWhenSetting>('hideWhen');
+
+	if (configuration.get('useNativeTesting')) {
+		testExplorer.disabled = true;
+		testExplorer.updateVisibility();
+		setTimeout(() => vscode.commands.executeCommand('testExplorerConverter.activate'), 0);
+	} else {
+		hub.registerTestController(testExplorer);
+	}
 
 	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(configChange => {
 		if (configChange.affectsConfiguration('testExplorer.showExpandButton') ||
@@ -32,6 +40,20 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 			const hideWhen = configuration.get<HideWhenSetting>('hideWhen');
 			testExplorer.hideWhen = (hideWhen !== undefined) ? hideWhen : 'never';
 			testExplorer.updateVisibility();
+		}
+		if (configChange.affectsConfiguration('testExplorer.useNativeTesting')) {
+			const configuration = vscode.workspace.getConfiguration('testExplorer', workspaceUri);
+			const useNativeTesting = configuration.get('useNativeTesting');
+			if (useNativeTesting) {
+				hub.unregisterTestController(testExplorer);
+				testExplorer.disabled = true;
+				testExplorer.updateVisibility();
+				vscode.commands.executeCommand('testExplorerConverter.activate');
+			} else {
+				testExplorer.disabled = false;
+				testExplorer.updateVisibility();
+				hub.registerTestController(testExplorer);
+			}
 		}
 	}));
 
@@ -75,11 +97,15 @@ export function activate(context: vscode.ExtensionContext): ITestHub {
 
 	registerCommand('test-explorer.cancel', () => testExplorer.cancel());
 
-	registerCommand('test-explorer.debug', (node) => testExplorer.debug([ node ]));
+	registerCommand('test-explorer.debug-all', () => testExplorer.debug());
 
-	registerCommand('test-explorer.pick-and-debug', (nodes) => testExplorer.debug(nodes));
+	registerCommand('test-explorer.debug', (clickedNode, allNodes) => testExplorer.debug(allNodes || [ clickedNode ], false));
+
+	registerCommand('test-explorer.pick-and-debug', (nodes) => testExplorer.debug(nodes, true));
 
 	registerCommand('test-explorer.redebug', () => testExplorer.redebug());
+
+	registerCommand('test-explorer.debug-file', (file?: string) => debugTestsInFile(file, testExplorer));
 
 	registerCommand('test-explorer.debug-test-at-cursor', () => debugTestAtCursor(testExplorer));
 

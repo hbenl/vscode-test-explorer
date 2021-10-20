@@ -1,3 +1,41 @@
+### Version 2.21.1
+* add section about the native testing API to README.md
+* update list of test adapters in README.md
+
+### Version 2.21.0
+* add debug-all and debug-file commands
+
+### Version 2.20.4
+* re-add the dependency to the converter extension and update the minimum VSCode version
+
+### Version 2.20.3
+* remove the dependency to the converter extension temporarily
+
+### Version 2.20.2
+* add dependency to the converter extension which is necessary for the `testExplorer.useNativeTesting` configuration option to work as expected
+
+### Version 2.20.1
+* Support "workspace trust" feature: this extension will be enabled in untrusted workspaces
+
+### Version 2.20.0
+* add `testExplorer.useNativeTesting` configuration option
+* update list of test adapters in README.md
+
+### Version 2.19.6
+* update list of test adapters in README.md
+
+### Version 2.19.5
+* update list of test adapters in README.md
+
+### Version 2.19.4
+* bugfix: tests were sometimes duplicated when describes were found while running tests (e.g. describe.each)
+* update list of test adapters in README.md
+
+### Version 2.19.3
+* show source on tree item double-click
+* show workspace folder and Test Adapter label when the tests fail to load
+* update list of test adapters in README.md
+
 ### Version 2.19.2
 * This release is identical to the previous one, it was only created to republish this extension at open-vsx.org
 
