@@ -254,7 +254,7 @@
       },
       {
         "command": "test-explorer.run",
-        "title": "Run",
+        "title": "Run tests",
         "icon": {
           "dark": "./icons/start-dark.svg",
           "light": "./icons/start-light.svg"
@@ -294,7 +294,7 @@
       },
       {
         "command": "test-explorer.debug",
-        "title": "Debug",
+        "title": "Debugthis test",
         "icon": {
           "dark": "./icons/debug-dark.svg",
           "light": "./icons/debug-light.svg"
