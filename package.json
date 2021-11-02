@@ -294,7 +294,7 @@
       },
       {
         "command": "test-explorer.debug",
-        "title": "Debugthis test",
+        "title": "Debug this test",
         "icon": {
           "dark": "./icons/debug-dark.svg",
           "light": "./icons/debug-light.svg"
