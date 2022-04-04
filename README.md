@@ -12,7 +12,10 @@ so there is usually no need to install this extension manually.
 
 ## Migrating to native testing
 
-In version 1.59, VS Code added an official API and UI for running tests, which provides all the functionality of this extension and more.
+In version 1.59, VS Code added an official API and UI for running tests, which provides most of the functionality of this extension and more. Notable missing features in the VS Code native UI are:
+- Auto run
+- Scrollbar decorations for errors
+
 Therefore this extension is now deprecated. I will keep maintaining it so it will remain usable but I don't plan to add any major new features to it.
 
 ### Changes for users
