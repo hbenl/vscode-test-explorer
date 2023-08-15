@@ -26,7 +26,7 @@ export function getCompareFn(sortSetting: SortSetting | null | undefined): ((a: 
 }
 
 function compareLabel(a: TreeNode, b: TreeNode): number {
-	return a.info.label.localeCompare(b.info.label);
+	return a.info.label.localeCompare(b.info.label, undefined, { numeric: true });
 }
 
 function compareLocation(a: TreeNode, b: TreeNode): number {
