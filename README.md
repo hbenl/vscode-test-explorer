@@ -17,8 +17,7 @@ Therefore this extension is now deprecated. I will keep maintaining it so it wil
 
 ### Changes for users
 
-You can keep using this extension as before, but you now also have the option to use VS Code's native testing UI
-instead by setting `testExplorer.useNativeTesting` to `true` in your VS Code settings.
+Since version 2.22.0, this extension defaults to using VS Code's official testing UI. You can get the old Test Explorer UI back by setting `testExplorer.useNativeTesting` to `false` in your VS Code settings.
 
 ### Changes for extension authors
 
