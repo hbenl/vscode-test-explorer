@@ -56,11 +56,9 @@ Currently the following Test Adapters are available:
 
 ### C++
 
-* [C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)
 * [CMake Test Explorer](https://marketplace.visualstudio.com/items?itemName=fredericbonnet.cmake-test-adapter)
 * [CppUnitTestFramework Explorer](https://marketplace.visualstudio.com/items?itemName=drleq.vscode-cpputf-test-adapter)
 * [Bandit Test Explorer](https://marketplace.visualstudio.com/items?itemName=dampsoft.vscode-banditcpp-test-adapter)
-* [catkin-tools](https://marketplace.visualstudio.com/items?itemName=betwo.b2-catkin-tools)
 * [CppUTest Test Explorer](https://marketplace.visualstudio.com/items?itemName=bneumann.cpputest-test-adapter)
 * [Boost.Test Explorer](https://marketplace.visualstudio.com/items?itemName=zcoinofficial.boost-test-adapter)
 * [Acutest Test Explorer](https://marketplace.visualstudio.com/items?itemName=Moosecasa.vscode-acutest-test-adapter)
@@ -82,10 +80,6 @@ Currently the following Test Adapters are available:
 
 * [Haxe Test Explorer](https://marketplace.visualstudio.com/items?itemName=vshaxe.haxe-test-adapter)
 
-### Java
-
-* [Apache NetBeans Language Server](https://marketplace.visualstudio.com/items?itemName=ASF.apache-netbeans-java)
-
 ### Lua
 
 * [LuaUnit Test Explorer](https://marketplace.visualstudio.com/items?itemName=lej.vscode-lua-test-adapter)
@@ -93,15 +87,6 @@ Currently the following Test Adapters are available:
 ### Python
 
 * [Python Test Explorer](https://marketplace.visualstudio.com/items?itemName=LittleFoxTeam.vscode-python-test-adapter)
-
-### PHP
-
-* [PHPUnit Test Explorer](https://marketplace.visualstudio.com/items?itemName=recca0120.vscode-phpunit)
-* [PHP Tools for VSCode](https://marketplace.visualstudio.com/items?itemName=DEVSENSE.phptools-vscode)
-
-### R
-
-* [R Test Explorer](https://marketplace.visualstudio.com/items?itemName=meakbiyik.vscode-r-test-adapter)
 
 ### REST/GraphQL
 
@@ -121,19 +106,11 @@ Currently the following Test Adapters are available:
 
 ### .NET Framework
 
-* [NXunit Test Explorer](https://marketplace.visualstudio.com/items?itemName=wghats.vscode-nxunit-test-adapter)
 * [.Net Core Test Explorer](https://marketplace.visualstudio.com/items?itemName=derivitec-ltd.vscode-dotnet-adapter)
-
-### Powershell
-* [Pester Test Explorer](https://marketplace.visualstudio.com/items?itemName=TylerLeonhardt.vscode-pester-test-adapter)
 
 ### VHDL/SystemVerilog
 
 * [VUnit Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbohlin.vunit-test-explorer)
-
-### Z80 Assembler
-
-* [Z80 Unit Tests](https://marketplace.visualstudio.com/items?itemName=maziac.z80-unit-tests)
 
 ### Live Share
 
