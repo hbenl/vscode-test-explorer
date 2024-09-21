@@ -209,7 +209,7 @@
         "testExplorer.useNativeTesting": {
           "description": "Disable the Test Explorer UI and use VSCode's native Testing UI instead",
           "type": "boolean",
-          "default": false,
+          "default": true,
           "scope": "resource"
         }
       }
