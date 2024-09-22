@@ -1,3 +1,6 @@
+### Version 2.22.1
+* update list of test adapters in README.md
+
 ### Version 2.22.0
 * use VS Code's native testing API by default
 * update list of test adapters in README.md
