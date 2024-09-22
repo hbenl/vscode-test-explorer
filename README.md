@@ -69,7 +69,7 @@ Currently the following Test Adapters are available:
 
 ### Elm
 
-* [Run Elm tests](https://marketplace.visualstudio.com/items?itemName=FraWa.vscode-elm-test-runner)
+* [Elm](https://marketplace.visualstudio.com/items?itemName=Elmtooling.elm-ls-vscode)
 
 ### Go
 
