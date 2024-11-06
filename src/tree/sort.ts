@@ -1,6 +1,6 @@
 import { TreeNode } from './treeNode';
 
-export type SortSetting = 'byLabel' | 'byLocation' | 'byLabelWithSuitesFirst' | 'byLocationWithSuitesFirst';
+export type SortSetting = 'byLabel' | 'byLocation' | 'byLabelWithSuitesFirst' | 'byLocationWithSuitesFirst' | 'byFailingSuitesFirst';
 
 export function getCompareFn(sortSetting: SortSetting | null | undefined): ((a: TreeNode, b: TreeNode) => number) | undefined {
 	switch (sortSetting) {
@@ -17,6 +17,9 @@ export function getCompareFn(sortSetting: SortSetting | null | undefined): ((a: 
 		case 'byLocationWithSuitesFirst':
 			return compareWithSuitesFirst(compareLocation);
 
+		case 'byFailingSuitesFirst':
+			return compareWithFailingSuitesFirst;
+
 		case null:
 			return compareOriginalPosition;
 
@@ -27,6 +30,15 @@ export function getCompareFn(sortSetting: SortSetting | null | undefined): ((a: 
 
 function compareLabel(a: TreeNode, b: TreeNode): number {
 	return a.info.label.localeCompare(b.info.label);
+}
+
+function compareWithFailingSuitesFirst(a: TreeNode, b: TreeNode): number {
+	if (a.state.current === 'failed' && b.state.current !== 'failed') {
+		return -1;
+	} else if (b.state.current === 'failed' && a.state.current !== 'failed') {
+		return 1;
+	}
+	return compareLabel(a, b);
 }
 
 function compareLocation(a: TreeNode, b: TreeNode): number {
