@@ -199,6 +199,10 @@ export class TestCollection {
 
 		if (testRunEvent.type === 'started') {
 
+			if (this.shouldSaveAllOnStart()) {
+				vscode.commands.executeCommand('workbench.action.files.saveFiles');
+			}
+
 			if (this.shouldRetireStateOnStart()) {
 				this.retireState();
 			} else if (this.shouldResetStateOnStart()) {
@@ -448,6 +452,10 @@ export class TestCollection {
 		this.explorer.treeEvents.sendNodeChangedEvents(false);
 	}
 
+	shouldSaveAllOnStart(): boolean {
+		return (this.getConfiguration().get('autoSave') !== false);
+	}
+
 	shouldRetireStateOnStart(): boolean {
 		return (this.getConfiguration().get('onStart') === 'retire');
 	}
@@ -569,7 +577,7 @@ export class TestCollection {
 					}
 
 					codeLens.range = new vscode.Range(newCodeLensLine, 0, newCodeLensLine, 0);
-				} 
+				}
 			}
 		}
 	}
